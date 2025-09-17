@@ -1,17 +1,17 @@
+import type { Types } from "@my-monorepo/shared";
 import { create } from "zustand";
-import type { RecipeType } from "@/types/recipe.type";
 
 interface RecipeState {
-  recipesList: RecipeType[];
-  selectedRecipe: RecipeType | null;
+  recipesList: Types.Recipe.RecipeType[];
+  selectedRecipe: Types.Recipe.RecipeType | null;
 
-  setRecipesList: (recipes: RecipeType[]) => void;
+  setRecipesList: (recipes: Types.Recipe.RecipeType[]) => void;
   clearRecipesList: () => void;
 
-  setSelectedRecipe: (recipe: RecipeType | null) => void;
+  setSelectedRecipe: (recipe: Types.Recipe.RecipeType | null) => void;
   clearSelectedRecipe: () => void;
 
-  updateRecipeInList: (updatedRecipe: RecipeType) => void;
+  updateRecipeInList: (updatedRecipe: Types.Recipe.RecipeType) => void;
 }
 
 const useRecipeStore = create<RecipeState>((set) => ({

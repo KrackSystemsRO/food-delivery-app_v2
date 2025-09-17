@@ -1,3 +1,4 @@
+export * as Allergen from "./allergen";
 export * as Cart from "./cart";
 export * as Category from "./category";
 export * as Company from "./company";
@@ -6,5 +7,6 @@ export * as Ingredient from "./ingredient";
 export * as Navigation from "./navigation";
 export * as Order from "./order";
 export * as Product from "./product";
+export * as Recipe from "./recipe";
 export * as Store from "./store";
 export * as User from "./user";

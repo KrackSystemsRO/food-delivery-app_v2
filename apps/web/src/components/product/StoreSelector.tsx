@@ -1,11 +1,10 @@
 import { useState, useMemo, useCallback, memo } from "react";
 import { Label, Input } from "@/components/ui";
-import type { StoreType } from "@/types/store.type";
-
+import { Types } from "@my-monorepo/shared";
 interface StoreSelectorProps {
-  stores: StoreType[];
-  value: StoreType | null;
-  onChange: (store: StoreType) => void;
+  stores: Types.Store.StoreType[];
+  value: Types.Store.StoreType | null;
+  onChange: (store: Types.Store.StoreType) => void;
 }
 
 const StoreItem = memo(
@@ -13,8 +12,8 @@ const StoreItem = memo(
     store,
     onSelect,
   }: {
-    store: StoreType;
-    onSelect: (store: StoreType) => void;
+    store: Types.Store.StoreType;
+    onSelect: (store: Types.Store.StoreType) => void;
   }) => (
     <li
       key={store._id}
@@ -51,7 +50,7 @@ export default function StoreSelector({
   );
 
   const handleSelectStore = useCallback(
-    (store: StoreType) => {
+    (store: Types.Store.StoreType) => {
       onChange(store);
       setQuery("");
       setIsOpen(false);

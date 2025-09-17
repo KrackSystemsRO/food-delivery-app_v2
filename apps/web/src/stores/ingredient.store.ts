@@ -1,17 +1,21 @@
+import type { Types } from "@my-monorepo/shared";
 import { create } from "zustand";
-import type { IngredientType } from "@/types/ingredient.type";
 
 interface IngredientState {
-  ingredientsList: IngredientType[];
-  selectedIngredient: IngredientType | null;
+  ingredientsList: Types.Ingredient.IngredientType[];
+  selectedIngredient: Types.Ingredient.IngredientType | null;
 
-  setIngredientsList: (ingredients: IngredientType[]) => void;
+  setIngredientsList: (ingredients: Types.Ingredient.IngredientType[]) => void;
   clearIngredientsList: () => void;
 
-  setSelectedIngredient: (ingredient: IngredientType | null) => void;
+  setSelectedIngredient: (
+    ingredient: Types.Ingredient.IngredientType | null
+  ) => void;
   clearSelectedIngredient: () => void;
 
-  updateIngredientInList: (updatedIngredient: IngredientType) => void;
+  updateIngredientInList: (
+    updatedIngredient: Types.Ingredient.IngredientType
+  ) => void;
 }
 
 const useIngredientStore = create<IngredientState>((set) => ({

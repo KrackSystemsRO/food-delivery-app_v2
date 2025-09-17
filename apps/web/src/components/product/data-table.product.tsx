@@ -10,16 +10,16 @@ import {
 } from "@/components/ui";
 import { Pencil, Trash2, Check, X, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { ProductType } from "@/types/product.type";
+import { Types } from "@my-monorepo/shared";
 
 interface ProductTableProps {
-  products: ProductType[];
-  sortKey: keyof ProductType;
+  products: Types.Product.ProductType[];
+  sortKey: keyof Types.Product.ProductType;
   sortDirection: "asc" | "desc";
   loading: boolean;
-  onSort: (key: keyof ProductType) => void;
-  onEdit: (product: ProductType) => void;
-  onDelete: (product: ProductType) => void;
+  onSort: (key: keyof Types.Product.ProductType) => void;
+  onEdit: (product: Types.Product.ProductType) => void;
+  onDelete: (product: Types.Product.ProductType) => void;
 }
 
 function ProductTableComponent({
@@ -33,7 +33,7 @@ function ProductTableComponent({
 }: ProductTableProps) {
   const { t } = useTranslation();
 
-  const columns: { key: keyof ProductType; label: string }[] = [
+  const columns: { key: keyof Types.Product.ProductType; label: string }[] = [
     { key: "name", label: t("common.table.name") || "Name" },
     { key: "category", label: t("common.table.category") || "Category" },
     { key: "price", label: t("common.table.price") || "Price" },

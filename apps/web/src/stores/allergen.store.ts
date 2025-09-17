@@ -1,17 +1,17 @@
+import type { Types } from "@my-monorepo/shared";
 import { create } from "zustand";
-import type { AllergenType } from "@/types/allergen.type";
 
 interface AllergenState {
-  allergensList: AllergenType[];
-  selectedAllergen: AllergenType | null;
+  allergensList: Types.Allergen.AllergenType[];
+  selectedAllergen: Types.Allergen.AllergenType | null;
 
-  setAllergensList: (allergens: AllergenType[]) => void;
+  setAllergensList: (allergens: Types.Allergen.AllergenType[]) => void;
   clearAllergensList: () => void;
 
-  setSelectedAllergen: (allergen: AllergenType | null) => void;
+  setSelectedAllergen: (allergen: Types.Allergen.AllergenType | null) => void;
   clearSelectedAllergen: () => void;
 
-  updateAllergenInList: (updatedAllergen: AllergenType) => void;
+  updateAllergenInList: (updatedAllergen: Types.Allergen.AllergenType) => void;
 }
 
 const useAllergenStore = create<AllergenState>((set) => ({

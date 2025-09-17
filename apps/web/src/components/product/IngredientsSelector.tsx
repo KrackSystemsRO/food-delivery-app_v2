@@ -3,14 +3,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import type { IngredientWithQuantity } from "@/types/product.type";
-import type { IngredientType } from "@/types/ingredient.type";
+import { Types } from "@my-monorepo/shared";
 import { addIngredient, checkIngredient } from "@/services/ingredient.service";
 
 interface IngredientsSelectorProps {
-  options: IngredientType[];
+  options: Types.Ingredient.IngredientType[];
   value: IngredientWithQuantity[];
   onChange: (val: IngredientWithQuantity[]) => void;
-  onInputChange?: (query: string) => Promise<IngredientType[]>;
+  onInputChange?: (query: string) => Promise<Types.Ingredient.IngredientType[]>;
 }
 
 const IngredientItem = memo(
@@ -48,7 +48,9 @@ function IngredientsSelectorComponent({
   const [query, setQuery] = useState("");
   const [quantity, setQuantity] = useState("");
   const [unit, setUnit] = useState("gram");
-  const [filtered, setFiltered] = useState<IngredientType[]>([]);
+  const [filtered, setFiltered] = useState<Types.Ingredient.IngredientType[]>(
+    []
+  );
 
   const isExistingIngredient = useMemo(
     () => options.some((o) => o.name.toLowerCase() === query.toLowerCase()),
@@ -75,7 +77,7 @@ function IngredientsSelectorComponent({
   }, [query, options, onInputChange]);
 
   const handleAdd = useCallback(
-    (ing: IngredientType) => {
+    (ing: Types.Ingredient.IngredientType) => {
       if (!quantity.trim()) return;
       onChange([...value, { ingredient: ing, quantity, unit }]);
       setQuery("");
@@ -89,7 +91,7 @@ function IngredientsSelectorComponent({
     if (!query.trim()) return;
     try {
       const response = await addIngredient({ name: query.trim(), unit });
-      const newIng: IngredientType = response.result;
+      const newIng: Types.Ingredient.IngredientType = response.result;
       onChange([...value, { ingredient: newIng, quantity: "", unit }]);
       setQuery("");
       setQuantity("");
@@ -119,7 +121,7 @@ function IngredientsSelectorComponent({
   );
 
   const handleSelectFiltered = useCallback(
-    (opt: IngredientType) => {
+    (opt: Types.Ingredient.IngredientType) => {
       if (!quantity.trim()) {
         setQuery(opt.name);
         document.getElementById("ingredient-qty")?.focus();

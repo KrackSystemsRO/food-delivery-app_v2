@@ -1,17 +1,17 @@
+import type { Types } from "@my-monorepo/shared";
 import { create } from "zustand";
-import type { CompanyType } from "@/types/company.type";
 
 interface CompanyState {
-  companiesList: CompanyType[];
-  selectedCompany: CompanyType | null;
+  companiesList: Types.Company.CompanyType[];
+  selectedCompany: Types.Company.CompanyType | null;
 
-  setCompaniesList: (companies: CompanyType[]) => void;
+  setCompaniesList: (companies: Types.Company.CompanyType[]) => void;
   clearCompaniesList: () => void;
 
-  setSelectedCompany: (company: CompanyType | null) => void;
+  setSelectedCompany: (company: Types.Company.CompanyType | null) => void;
   clearSelectedCompany: () => void;
 
-  updateCompanyInList: (updatedCompany: CompanyType) => void;
+  updateCompanyInList: (updatedCompany: Types.Company.CompanyType) => void;
 }
 
 const useCompanyStore = create<CompanyState>((set) => ({

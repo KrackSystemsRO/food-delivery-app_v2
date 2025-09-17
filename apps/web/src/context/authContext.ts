@@ -7,20 +7,19 @@ import React, {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import authorizedAxios from "@/utils/request/authorizedRequest";
-import type { UserType } from "@/types/user.type";
 import { getUserDetails } from "@/services/user.service";
 import { showToast } from "@/utils/toast";
 import Cookies from "js-cookie";
-
+import { Types } from "@my-monorepo/shared";
 interface AuthContextType {
   accessToken: string | null;
   refreshToken: string | null;
-  user: UserType | null;
+  user: Types.User.UserType | null;
   login: (accessToken: string, refreshToken: string) => Promise<void>;
   logout: () => Promise<void>;
   loading: boolean;
   refreshAuth: () => Promise<void>;
-  setUser: React.Dispatch<React.SetStateAction<UserType | null>>;
+  setUser: React.Dispatch<React.SetStateAction<Types.User.UserType | null>>;
   setAccessToken: React.Dispatch<React.SetStateAction<string | null>>;
   setRefreshToken: React.Dispatch<React.SetStateAction<string | null>>;
 }
@@ -40,7 +39,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
-  const [user, setUser] = useState<UserType | null>(null);
+  const [user, setUser] = useState<Types.User.UserType | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 

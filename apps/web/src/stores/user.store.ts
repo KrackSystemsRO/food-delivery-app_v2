@@ -1,17 +1,17 @@
+import type { Types } from "@my-monorepo/shared";
 import { create } from "zustand";
-import type { UserType } from "@/types/user.type";
 
 interface UserState {
-  usersList: UserType[];
-  selectedUser: UserType | null;
+  usersList: Types.User.UserType[];
+  selectedUser: Types.User.UserType | null;
 
-  setUsersList: (users: UserType[]) => void;
+  setUsersList: (users: Types.User.UserType[]) => void;
   clearUsersList: () => void;
 
-  setSelectedUser: (user: UserType | null) => void;
+  setSelectedUser: (user: Types.User.UserType | null) => void;
   clearSelectedUser: () => void;
 
-  updateUserInList: (updatedUser: UserType) => void;
+  updateUserInList: (updatedUser: Types.User.UserType) => void;
 }
 
 const useUserStore = create<UserState>((set) => ({

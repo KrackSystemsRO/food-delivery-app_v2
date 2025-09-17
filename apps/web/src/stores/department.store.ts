@@ -1,17 +1,21 @@
+import type { Types } from "@my-monorepo/shared";
 import { create } from "zustand";
-import type { DepartmentType } from "@/types/department.type";
 
 interface DepartmentState {
-  departmentsList: DepartmentType[];
-  selectedDepartment: DepartmentType | null;
+  departmentsList: Types.Department.DepartmentType[];
+  selectedDepartment: Types.Department.DepartmentType | null;
 
-  setDepartmentsList: (departments: DepartmentType[]) => void;
+  setDepartmentsList: (departments: Types.Department.DepartmentType[]) => void;
   clearDepartmentsList: () => void;
 
-  setSelectedDepartment: (department: DepartmentType | null) => void;
+  setSelectedDepartment: (
+    department: Types.Department.DepartmentType | null
+  ) => void;
   clearSelectedDepartment: () => void;
 
-  updateDepartmentInList: (updatedDepartment: DepartmentType) => void;
+  updateDepartmentInList: (
+    updatedDepartment: Types.Department.DepartmentType
+  ) => void;
 }
 
 const useDepartmentStore = create<DepartmentState>((set) => ({

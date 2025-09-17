@@ -16,6 +16,7 @@ export interface UserType {
   userId: number;
   cityId: string;
   zoneId: string;
+  is_active: boolean;
   __v: number;
 }
 

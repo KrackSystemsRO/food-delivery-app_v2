@@ -1,17 +1,17 @@
+import type { Types } from "@my-monorepo/shared";
 import { create } from "zustand";
-import type { CategoryType } from "@/types/category.type";
 
 interface CategoryState {
-  categoriesList: CategoryType[];
-  selectedCategory: CategoryType | null;
+  categoriesList: Types.Category.CategoryType[];
+  selectedCategory: Types.Category.CategoryType | null;
 
-  setCategoriesList: (categories: CategoryType[]) => void;
+  setCategoriesList: (categories: Types.Category.CategoryType[]) => void;
   clearCategoriesList: () => void;
 
-  setSelectedCategory: (category: CategoryType | null) => void;
+  setSelectedCategory: (category: Types.Category.CategoryType | null) => void;
   clearSelectedCategory: () => void;
 
-  updateCategoryInList: (updatedCategory: CategoryType) => void;
+  updateCategoryInList: (updatedCategory: Types.Category.CategoryType) => void;
 }
 
 const useCategoryStore = create<CategoryState>((set) => ({

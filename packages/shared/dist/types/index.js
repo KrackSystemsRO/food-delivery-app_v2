@@ -33,7 +33,8 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = exports.Store = exports.Product = exports.Order = exports.Navigation = exports.Ingredient = exports.Department = exports.Company = exports.Category = exports.Cart = void 0;
+exports.User = exports.Store = exports.Recipe = exports.Product = exports.Order = exports.Navigation = exports.Ingredient = exports.Department = exports.Company = exports.Category = exports.Cart = exports.Allergen = void 0;
+exports.Allergen = __importStar(require("./allergen"));
 exports.Cart = __importStar(require("./cart"));
 exports.Category = __importStar(require("./category"));
 exports.Company = __importStar(require("./company"));
@@ -42,5 +43,6 @@ exports.Ingredient = __importStar(require("./ingredient"));
 exports.Navigation = __importStar(require("./navigation"));
 exports.Order = __importStar(require("./order"));
 exports.Product = __importStar(require("./product"));
+exports.Recipe = __importStar(require("./recipe"));
 exports.Store = __importStar(require("./store"));
 exports.User = __importStar(require("./user"));

@@ -16,10 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui";
 import { useTranslation } from "react-i18next";
-
-import type { CompanyType } from "@/types/company.type";
-import type { UserType } from "@/types/user.type";
 import type { StoreForm } from "@/types/store.type";
+import { Types } from "@my-monorepo/shared";
 
 interface StoreModalProps {
   isOpen: boolean;
@@ -28,8 +26,8 @@ interface StoreModalProps {
   form: StoreForm;
   setForm: (form: StoreForm) => void;
   isEditing: boolean;
-  companies: CompanyType[];
-  users: UserType[];
+  companies: Types.Company.CompanyType[];
+  users: Types.User.UserType[];
 }
 
 const SelectItemMemo = memo(({ children, ...props }: any) => (

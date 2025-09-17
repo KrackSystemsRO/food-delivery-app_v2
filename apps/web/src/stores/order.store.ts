@@ -1,17 +1,17 @@
+import type { Types } from "@my-monorepo/shared";
 import { create } from "zustand";
-import type { OrderType } from "@/types/order.type";
 
 interface OrderState {
-  ordersList: OrderType[];
-  selectedOrder: OrderType | null;
+  ordersList: Types.Order.OrderType[];
+  selectedOrder: Types.Order.OrderType | null;
 
-  setOrdersList: (orders: OrderType[]) => void;
+  setOrdersList: (orders: Types.Order.OrderType[]) => void;
   clearOrdersList: () => void;
 
-  setSelectedOrder: (order: OrderType | null) => void;
+  setSelectedOrder: (order: Types.Order.OrderType | null) => void;
   clearSelectedOrder: () => void;
 
-  updateOrderInList: (updatedOrder: OrderType) => void;
+  updateOrderInList: (updatedOrder: Types.Order.OrderType) => void;
 }
 
 const useOrderStore = create<OrderState>((set) => ({

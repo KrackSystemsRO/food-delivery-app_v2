@@ -11,7 +11,7 @@ import {
 } from "@/components/ui";
 import { useTranslation } from "react-i18next";
 import type { ProductForm } from "@/types/product.type";
-import type { CategoryType } from "@/types/category.type";
+import { Types } from "@my-monorepo/shared";
 import MultiSelectWithChips from "./MultiSelectWithChips";
 import { IngredientsSelector } from "./IngredientsSelector";
 import StoreSelector from "./StoreSelector";
@@ -150,10 +150,12 @@ export function ProductModalComponent({
               allowCreate={true}
               onInputChange={handleCategorySearch}
               onChange={(newCats) => {
-                const mapped: CategoryType[] = newCats.map((c) => ({
-                  _id: c._id,
-                  name: c.name,
-                }));
+                const mapped: Types.Category.CategoryType[] = newCats.map(
+                  (c) => ({
+                    _id: c._id,
+                    name: c.name,
+                  })
+                );
                 setForm({ ...form, category: mapped });
               }}
             />

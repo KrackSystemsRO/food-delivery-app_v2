@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { isEqual } from "@/utils/utils";
 import { getUsers } from "@/services/user.service";
 import useUserStore from "@/stores/user.store";
-import type { UserType } from "@/types/user.type";
+import type { Types } from "@my-monorepo/shared";
 
 export function useUsers(alwaysFetch = false) {
   const [loading, setLoading] = useState(false);
@@ -16,8 +16,8 @@ export function useUsers(alwaysFetch = false) {
       try {
         setLoading(true);
         if (!usersList.length || alwaysFetch) {
-          const response = await getUsers();
-          const fetchedUsers: UserType[] = response?.result ?? [];
+          const response = await getUsers({});
+          const fetchedUsers: Types.User.UserType[] = response?.result ?? [];
           if (isMounted && !isEqual(usersList, fetchedUsers)) {
             setUsersList(fetchedUsers);
           }
@@ -31,8 +31,8 @@ export function useUsers(alwaysFetch = false) {
 
     const pollUsers = async () => {
       try {
-        const response = await getUsers();
-        const fetchedUsers: UserType[] = response?.result ?? [];
+        const response = await getUsers({});
+        const fetchedUsers: Types.User.UserType[] = response?.result ?? [];
         if (isMounted && !isEqual(usersList, fetchedUsers)) {
           setUsersList(fetchedUsers);
         }
@@ -42,7 +42,7 @@ export function useUsers(alwaysFetch = false) {
     };
 
     fetchUsers();
-    const interval = setInterval(pollUsers, 30000); // refresh every 30s
+    const interval = setInterval(pollUsers, 30000);
 
     return () => {
       isMounted = false;

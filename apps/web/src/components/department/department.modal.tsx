@@ -20,9 +20,8 @@ import { ChevronDownIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Textarea } from "../ui/textarea";
 import type { DepartmentForm } from "@/types/department.type";
-import type { UserType } from "@/types/user.type";
-import type { CompanyType } from "@/types/company.type";
 import { useMemo, useCallback } from "react";
+import { Types } from "@my-monorepo/shared";
 
 interface DepartmentModalProps {
   isOpen: boolean;
@@ -31,8 +30,8 @@ interface DepartmentModalProps {
   form: DepartmentForm;
   setForm: (form: DepartmentForm) => void;
   isEditing: boolean;
-  users: UserType[];
-  companies: CompanyType[];
+  users: Types.User.UserType[];
+  companies: Types.Company.CompanyType[];
 }
 
 interface CustomSelectProps<T> {

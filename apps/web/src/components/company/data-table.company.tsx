@@ -9,16 +9,15 @@ import {
 } from "@/components/ui";
 import { Pencil, Trash2, Check, X, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { CompanyType } from "@/types/company.type";
-
+import { Types } from "@my-monorepo/shared";
 interface CompanyTableProps {
-  companies: CompanyType[];
-  sortKey: keyof CompanyType;
+  companies: Types.Company.CompanyType[];
+  sortKey: keyof Types.Company.CompanyType;
   sortDirection: "asc" | "desc";
   loading: boolean;
-  onSort: (key: keyof CompanyType) => void;
-  onEdit: (company: CompanyType) => void;
-  onDelete: (company: CompanyType) => void;
+  onSort: (key: keyof Types.Company.CompanyType) => void;
+  onEdit: (company: Types.Company.CompanyType) => void;
+  onDelete: (company: Types.Company.CompanyType) => void;
 }
 
 export function CompanyTable({
@@ -39,7 +38,7 @@ export function CompanyTable({
     { key: "is_active" as const, label: t("common.table.is_active", "Status") },
   ];
 
-  const renderAdmins = (admins: CompanyType["admin"]) =>
+  const renderAdmins = (admins: Types.Company.CompanyType["admin"]) =>
     admins?.length
       ? admins.map((a) => `${a.first_name} ${a.last_name}`).join(", ")
       : "-";
