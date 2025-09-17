@@ -1,5 +1,5 @@
 export * as Cart from "./cart";
-export * as Categotry from "./category";
+export * as Category from "./category";
 export * as Company from "./company";
 export * as Department from "./department";
 export * as Ingredient from "./ingredient";

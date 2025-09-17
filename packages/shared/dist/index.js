@@ -33,5 +33,5 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Type = void 0;
-exports.Type = __importStar(require("./types"));
+exports.Types = void 0;
+exports.Types = __importStar(require("./types"));
