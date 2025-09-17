@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@my-monorepo/shared": ["./packages/shared/src"]
+    },
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "resolveJsonModule": true
+  },
+  "include": [],
+  "references": [
+    { "path": "packages/shared" },
+    { "path": "apps/backend" },
+    { "path": "apps/web" },
+    { "path": "apps/mobile" }
+  ]
+}

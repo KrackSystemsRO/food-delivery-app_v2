@@ -1,4 +1,3 @@
-// services/allergenService.ts
 import allergenModel from "@/models/allergen.model";
 import { getQueryById } from "@/utils/getQueryById";
 import { checkPermissionOrThrow } from "@/utils/permissions.helpers";
