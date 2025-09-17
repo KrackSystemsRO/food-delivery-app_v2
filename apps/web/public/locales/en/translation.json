@@ -1,0 +1,388 @@
+{
+  "login": {
+    "title": "Login to your account",
+    "description": "Enter your email below to login to your account",
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "description": "Enter your email to receive reset instructions.",
+      "question": "Forgot your password?",
+      "message": {
+        "success": "Reset email sent",
+        "failed": "Failed to send email"
+      },
+      "button": { "send": "Send reset link", "backToLogin": "< Back to login" }
+    },
+    "dontHaveAnAccount": "Don't have an account?",
+    "input": { "placeHolder": { "email": "email@example.com" } },
+    "message": {
+      "successMessage": "Login successful!",
+      "failedMessage": "Login failed"
+    }
+  },
+  "register": {
+    "title": "Create Account",
+    "description": "Fill in the form to register.",
+    "question": { "haveAccount": "Already have an account?" },
+    "message": {
+      "success": "Registration successful",
+      "failed": "Registration failed"
+    }
+  },
+  "common": {
+    "form": {
+      "label": {
+        "price": "Price",
+        "categories": "Categories",
+        "name": "Name",
+        "owner": "Owner",
+        "admin": "Admin",
+        "type": "Type",
+        "status": "Status",
+        "email": "Email",
+        "password": "Password",
+        "confirmPassword": "Confirm password",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "role": "Role",
+        "address": "Address",
+        "phone": "Phone",
+        "description": "Description",
+        "company": "Company",
+        "openStatus": "Open status",
+        "recipe": "Recipe",
+        "addCategory": "Add Category",
+        "store": "Store",
+        "user": "User",
+        "total": "Total",
+        "items": "Items",
+        "available": "Available",
+        "unavailable": "Unavailable",
+        "observations": "Observations",
+        "deliveryLocation": "Delivery Location"
+      },
+      "button": {
+        "login": "Login",
+        "signUp": "Sign up",
+        "loading": "Sending...",
+        "add": "Add"
+      },
+      "select": {
+        "role": "Select role",
+        "type": "Select Type",
+        "owner": "Owner",
+        "admins": "Admin",
+        "companies": "Companies",
+        "company": "Company",
+        "allCompanies": "All Company",
+        "allTypes": "All Types",
+        "allAdmins": "All Admins",
+        "none": "None",
+        "open": "Open",
+        "closed": "Closed",
+        "selectRecipe": "Select Recipe",
+        "selectCategory": "Select Category"
+      }
+    },
+    "table": {
+      "price": "Price",
+      "category": "Category",
+      "name": "Nume",
+      "first_name": "First name",
+      "last_name": "Last name",
+      "email": "Email",
+      "role": "Role",
+      "actions": "Actions",
+      "is_active": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "allStatus": "All",
+      "noData": "No data to present yet.",
+      "type": "Type",
+      "admin": "Admin",
+      "company": "Company",
+      "address": "Address",
+      "owner": "Owner",
+      "is_open": "Is Open",
+      "description": "Description",
+      "createdAt": "Create",
+      "customer": "Customer",
+      "total": "Total"
+    },
+    "button": {
+      "create": "Create",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "update": "Update",
+      "resetFilters": "Reset filters"
+    },
+    "pagination": {
+      "page": "Page",
+      "pageOf": "of",
+      "prev": "Prev",
+      "next": "Next",
+      "itemsPerPage": "Items per page"
+    }
+  },
+  "user": {
+    "title": "Manage Users",
+    "createUser": "Create User",
+    "editUser": "Edit User",
+    "searchPlaceholder": "Search by name or email",
+    "filter": { "role": "Role", "status": "Status" },
+    "dialogDescription": "Fill in the user details below.",
+    "message": {
+      "deleted": "User deleted",
+      "deleteFailed": "Failed to delete user",
+      "allFieldsRequired": "All fields are required",
+      "updated": "User updated",
+      "created": "User created",
+      "submitFailed": "Failed to submit user",
+      "confirmDeleteTitle": "Confirm Delete",
+      "confirmDeleteDesc": "Are you sure you want to delete this user? This action cannot be undone."
+    }
+  },
+  "company": {
+    "dialogDescription": "Fill in the company details below.",
+    "adminsHelp": "Admin help",
+    "title": "Manage Companies",
+    "createCompany": "Create Company",
+    "editCompany": "Edit Company",
+    "searchPlaceholder": "Search by name",
+    "message": {
+      "allFieldsRequired": "All fields are required",
+      "created": "Company created",
+      "updated": "Company updated",
+      "submitFailed": "Failed to submit company",
+      "confirmDeleteTitle": "Confirm Delete",
+      "confirmDeleteDesc": "Are you sure you want to delete this company?",
+      "deleted": "Company deleted",
+      "deleteFailed": "Failed to delete company",
+      "loadFailed": "Failed to load companies"
+    },
+    "type": {
+      "allTypes": "All types",
+      "client": "Client",
+      "provider": "Provider"
+    },
+    "filter": {
+      "status": "Status",
+      "type": "Type",
+      "allCompanies": "All Company",
+      "company": "Company"
+    }
+  },
+  "department": {
+    "dialogDescription": "Fill in the department details below.",
+    "adminsHelp": "Admin help",
+    "title": "Manage Department",
+    "createDepartment": "Create Department",
+    "editDepartment": "Edit Department",
+    "searchPlaceholder": "Search by name",
+    "message": {
+      "allFieldsRequired": "All fields are required",
+      "created": "Department created",
+      "updated": "Department updated",
+      "submitFailed": "Failed to submit department",
+      "confirmDeleteTitle": "Confirm Delete",
+      "confirmDeleteDesc": "Are you sure you want to delete this department?",
+      "deleted": "Department deleted",
+      "deleteFailed": "Failed to delete department",
+      "loadFailed": "Failed to load departments"
+    },
+    "type": {
+      "allTypes": "All types",
+      "client": "Client",
+      "provider": "Provider"
+    },
+    "filter": { "status": "Status", "type": "Type" }
+  },
+  "role": {
+    "allRoles": "All Roles",
+    "admin": "Admin",
+    "managerRestaurant": "Restaurant manager",
+    "client": "Client",
+    "courier": "Courier"
+  },
+  "store": {
+    "searchPlaceholder": "Search by name ",
+    "dialogDescription": "Fill in the store details below.",
+    "store": "Store",
+    "title": "Manage Stores",
+    "createStore": "Create store",
+    "editStore": "Edit store",
+    "adminsHelp": "Select one or more admins responsible for this store.",
+    "message": {
+      "allFieldsRequired": "All fields are required",
+      "created": "Store created",
+      "updated": "Store updated",
+      "submitFailed": "Failed to submit store",
+      "confirmDeleteTitle": "Confirm Delete",
+      "confirmDeleteDesc": "Are you sure you want to delete this store?",
+      "deleted": "Store deleted",
+      "deleteFailed": "Failed to delete store",
+      "loadFailed": "Failed to load stores"
+    }
+  },
+  "category": {
+    "dialogDescription": "Fill in the category details below.",
+    "adminsHelp": "Admin help",
+    "title": "Manage Categoies",
+    "createCategory": "Create Category",
+    "editCategory": "Edit Category",
+    "searchPlaceholder": "Search by name",
+    "message": {
+      "allFieldsRequired": "All fields are required",
+      "created": "Category created",
+      "updated": "Category updated",
+      "submitFailed": "Failed to submit category",
+      "confirmDeleteTitle": "Confirm Delete",
+      "confirmDeleteDesc": "Are you sure you want to delete this category?",
+      "deleted": "Category deleted",
+      "deleteFailed": "Failed to delete category",
+      "loadFailed": "Failed to load companies"
+    },
+    "type": {
+      "allTypes": "All types",
+      "client": "Client",
+      "provider": "Provider"
+    },
+    "filter": {
+      "status": "Status",
+      "type": "Type",
+      "allCategories": "All Categories",
+      "company": "Company"
+    }
+  },
+  "ingredient": {
+    "dialogDescription": "Fill in the ingredient details below.",
+    "adminsHelp": "Admin help",
+    "title": "Manage Ingredients",
+    "createIngredient": "Create Ingredient",
+    "editIngredient": "Edit Ingredient",
+    "searchPlaceholder": "Search by name",
+    "message": {
+      "allFieldsRequired": "All fields are required",
+      "created": "Ingredient created",
+      "updated": "Ingredient updated",
+      "submitFailed": "Failed to submit ingredient",
+      "confirmDeleteTitle": "Confirm Delete",
+      "confirmDeleteDesc": "Are you sure you want to delete this ingredient?",
+      "deleted": "Ingredient deleted",
+      "deleteFailed": "Failed to delete ingredient",
+      "loadFailed": "Failed to load companies"
+    },
+    "type": {
+      "allTypes": "All types",
+      "client": "Client",
+      "provider": "Provider"
+    },
+    "filter": {
+      "status": "Status",
+      "type": "Type",
+      "allIngredients": "All Ingredients",
+      "company": "Company"
+    }
+  },
+  "allergen": {
+    "dialogDescription": "Fill in the allergen details below.",
+    "adminsHelp": "Admin help",
+    "title": "Manage Allergen",
+    "createAllergen": "Create Allergen",
+    "editAllergen": "Edit Allergen",
+    "searchPlaceholder": "Search by name",
+    "message": {
+      "allFieldsRequired": "All fields are required",
+      "created": "Allergen created",
+      "updated": "Allergen updated",
+      "submitFailed": "Failed to submit allergen",
+      "confirmDeleteTitle": "Confirm Delete",
+      "confirmDeleteDesc": "Are you sure you want to delete this allergen?",
+      "deleted": "Allergen deleted",
+      "deleteFailed": "Failed to delete allergen",
+      "loadFailed": "Failed to load companies"
+    },
+    "type": {
+      "allTypes": "All types",
+      "client": "Client",
+      "provider": "Provider"
+    },
+    "filter": {
+      "status": "Status",
+      "type": "Type",
+      "allAllergen": "All Allergen",
+      "company": "Company"
+    }
+  },
+  "product": {
+    "dialogDescription": "Fill in the product details below.",
+    "adminsHelp": "Admin help",
+    "title": "Manage Product",
+    "createProduct": "Create Product",
+    "editProduct": "Edit Product",
+    "searchPlaceholder": "Search by name",
+    "message": {
+      "allFieldsRequired": "All fields are required",
+      "created": "Product created",
+      "updated": "Product updated",
+      "submitFailed": "Failed to submit product",
+      "confirmDeleteTitle": "Confirm Delete",
+      "confirmDeleteDesc": "Are you sure you want to delete this product?",
+      "deleted": "Product deleted",
+      "deleteFailed": "Failed to delete product",
+      "loadFailed": "Failed to load product"
+    },
+    "type": {
+      "allTypes": "All types",
+      "client": "Client",
+      "provider": "Provider"
+    },
+    "filter": {
+      "status": "Status",
+      "type": "Type",
+      "allProduct": "All Product",
+      "company": "Company",
+      "priceMax": "Max price",
+      "priceMin": "Min price"
+    }
+  },
+  "order": {
+    "dialogDescription": "Fill in the order details below.",
+    "adminsHelp": "Admin help",
+    "viewOrder": "Order",
+    "client": "Client",
+    "title": "Manage Order",
+    "create": "Create Order",
+    "edit": "Edit Order",
+    "searchPlaceholder": "Search by name",
+    "status": {
+      "delivered": "Delivered",
+      "confirmed": "Confirmed",
+      "pending": "Pending",
+      "preparing": "Preparing",
+      "cancelled": "Cancelled",
+      "on_the_way": "On the way"
+    },
+    "message": {
+      "allFieldsRequired": "All fields are required",
+      "created": "Order created",
+      "updated": "Order updated",
+      "submitFailed": "Failed to submit order",
+      "confirmDeleteTitle": "Confirm Delete",
+      "confirmDeleteDesc": "Are you sure you want to delete this order?",
+      "deleted": "Order deleted",
+      "deleteFailed": "Failed to delete order",
+      "loadFailed": "Failed to load companies"
+    },
+    "type": {
+      "allTypes": "All types",
+      "client": "Client",
+      "provider": "Provider"
+    },
+    "filter": {
+      "status": "Status",
+      "type": "Type",
+      "allOrders": "All Arder",
+      "company": "Company"
+    }
+  }
+}

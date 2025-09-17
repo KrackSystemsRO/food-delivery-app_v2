@@ -1,0 +1,20 @@
+[
+  {
+    "restaurant": "Restaruant 1",
+    "name": "Tomato Omelette",
+    "description": "Crunchy peanut butter cookies",
+    "price": 8.99,
+    "available": true,
+    "category": "Main Course",
+    "recipe": "Tomato Omelette"
+  },
+  {
+    "restaurant": "Restaruant 1",
+    "name": "Peanut Butter Sandwich",
+    "description": "Delicious gluten-free milkshake",
+    "price": 5.99,
+    "available": true,
+    "category": "Main Course",
+    "recipe": "Peanut Butter Sandwich"
+  }
+]

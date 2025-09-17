@@ -1,0 +1,292 @@
+import { useEffect, useState, useCallback } from "react";
+import { Button } from "@/components/ui";
+import { Plus } from "lucide-react";
+import { showToast } from "@/utils/toast";
+import { useTranslation } from "react-i18next";
+
+import { ConfirmModal } from "@/components/user/confirm.modal";
+import { PaginationControls } from "@/components/common/pagination.common";
+import type { CompanyForm, CompanyType } from "@/types/company.type";
+import {
+  addCompany,
+  deleteCompany,
+  getCompanies,
+  updateCompany,
+} from "@/services/company.service";
+import useCompanyStore from "@/stores/company.store";
+import { CompanyTable } from "@/components/company/data-table.company";
+import { CompanyFilters } from "@/components/company/filters.company";
+import CompanyModal from "@/components/company/company.modal";
+import useUserStore from "@/stores/user.store";
+import { getUsers } from "@/services/user.service";
+
+const defaultFilters = {
+  search: "",
+  type: "",
+  is_active: undefined,
+  limit: 10,
+};
+
+export default function CompanyManagementPage() {
+  const { t } = useTranslation();
+
+  const [companyToDelete, setCompanyToDelete] = useState<CompanyType | null>(
+    null
+  );
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const { usersList, setUsersList } = useUserStore();
+  const [form, setForm] = useState<CompanyForm>({
+    name: "",
+    address: undefined,
+    type: undefined,
+    email: "",
+    phone_number: "",
+    is_active: true,
+    admin: [],
+  });
+  const [filters, setFilters] = useState(() => {
+    const saved = localStorage.getItem("companyFilters");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return {
+          search: parsed.search || "",
+          type: parsed.type || "",
+          is_active:
+            parsed.is_active === undefined ? undefined : parsed.is_active,
+          limit: parsed.limit ? Number(parsed.limit) : 10,
+        };
+      } catch {
+        return defaultFilters;
+      }
+    }
+    return defaultFilters;
+  });
+  const [sortConfig, setSortConfig] = useState<{
+    key: keyof CompanyType;
+    direction: "asc" | "desc";
+  }>({
+    key: "createdAt",
+    direction: "desc",
+  });
+
+  const {
+    companiesList: companies,
+    setCompaniesList,
+    clearCompaniesList,
+    selectedCompany,
+    setSelectedCompany,
+    clearSelectedCompany,
+    updateCompanyInList,
+  } = useCompanyStore();
+
+  const fetchCompanies = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await getCompanies({
+        search: filters.search,
+        type: filters.type,
+        is_active: filters.is_active,
+        page,
+        limit: filters.limit,
+        sort_by: sortConfig.key,
+        order: sortConfig.direction,
+      });
+      setCompaniesList(res.result);
+      setTotalPages(res.totalPages || 1);
+    } catch {
+      showToast("error", t("company.loadFailed") || "Failed to load companies");
+    } finally {
+      setLoading(false);
+    }
+  }, [filters, page, sortConfig, setCompaniesList, t]);
+
+  useEffect(() => {
+    (async () => {
+      const users = await getUsers({ is_active: true });
+      setUsersList(users.result);
+    })();
+  }, [setUsersList]);
+
+  useEffect(() => {
+    fetchCompanies();
+    return () => clearCompaniesList();
+  }, [fetchCompanies, clearCompaniesList]);
+
+  useEffect(() => {
+    localStorage.setItem("companyFilters", JSON.stringify(filters));
+  }, [filters]);
+
+  const handleSort = useCallback((key: keyof CompanyType) => {
+    setSortConfig((current) => ({
+      key,
+      direction:
+        current.key === key && current.direction === "asc" ? "desc" : "asc",
+    }));
+  }, []);
+
+  const openCreateModal = useCallback(() => {
+    clearSelectedCompany();
+    setForm({
+      name: "",
+      address: undefined,
+      type: undefined,
+      email: "",
+      phone_number: "",
+      is_active: true,
+      admin: [],
+    });
+    setModalOpen(true);
+  }, [clearSelectedCompany]);
+
+  const openEditModal = useCallback(
+    (company: CompanyType) => {
+      setSelectedCompany(company);
+      setForm({
+        name: company.name,
+        admin: company.admin || [],
+        email: company.email,
+        type: company.type,
+        is_active: company.is_active,
+        phone_number: company.phone_number,
+        address: company.address,
+      });
+      setModalOpen(true);
+    },
+    [setSelectedCompany]
+  );
+
+  const confirmDelete = useCallback((company: CompanyType) => {
+    setCompanyToDelete(company);
+    setDeleteModalOpen(true);
+  }, []);
+
+  const performDelete = useCallback(async () => {
+    if (!companyToDelete) return;
+    try {
+      await deleteCompany(companyToDelete._id);
+      fetchCompanies();
+      showToast("success", t("company.message.deleted") || "Company deleted");
+    } catch {
+      showToast(
+        "error",
+        t("company.message.deleteFailed") || "Failed to delete company"
+      );
+    } finally {
+      setDeleteModalOpen(false);
+      setCompanyToDelete(null);
+    }
+  }, [companyToDelete, fetchCompanies, t]);
+
+  const handleSubmit = useCallback(async () => {
+    if (!form.name || !form.type) {
+      showToast("error", t("company.message.allFieldsRequired"));
+      return;
+    }
+
+    try {
+      if (selectedCompany) {
+        const res = await updateCompany(selectedCompany._id, form);
+        if (res.status === 200) {
+          showToast("success", t("company.message.updated"));
+          updateCompanyInList(res.result);
+        } else throw new Error();
+      } else {
+        const res = await addCompany(form);
+        if (res.status === 201) {
+          showToast("success", t("company.message.created"));
+          fetchCompanies();
+        } else throw new Error();
+      }
+
+      setModalOpen(false);
+      clearSelectedCompany();
+    } catch {
+      showToast("error", t("company.message.submitFailed"));
+    }
+  }, [
+    form,
+    selectedCompany,
+    fetchCompanies,
+    updateCompanyInList,
+    clearSelectedCompany,
+    t,
+  ]);
+
+  const resetFilters = useCallback(() => {
+    setFilters(defaultFilters);
+    setPage(1);
+    setSortConfig({ key: "createdAt", direction: "desc" });
+    localStorage.removeItem("companyFilters");
+  }, []);
+
+  return (
+    <div className="p-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-base font-bold">
+          {t("company.title") || "Manage Company"}
+        </h2>
+        <Button onClick={openCreateModal}>
+          <Plus className="mr-2 h-4 w-4" />
+          {t("company.createCompany") || "Create Company"}
+        </Button>
+      </div>
+
+      <CompanyFilters
+        filters={filters}
+        setFilters={(updated: Partial<typeof filters>) => {
+          setFilters((prev) => ({ ...prev, ...updated }));
+          setPage(1);
+        }}
+        resetFilters={resetFilters}
+      />
+
+      <CompanyTable
+        companies={companies}
+        sortKey={sortConfig.key}
+        sortDirection={sortConfig.direction}
+        loading={loading}
+        onSort={handleSort}
+        onEdit={openEditModal}
+        onDelete={confirmDelete}
+      />
+
+      <PaginationControls
+        page={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+      />
+
+      <CompanyModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setModalOpen(false);
+          clearCompaniesList();
+          fetchCompanies();
+        }}
+        onSubmit={handleSubmit}
+        form={form}
+        setForm={setForm}
+        isEditing={!!selectedCompany}
+        users={usersList}
+      />
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={performDelete}
+        title={t("company.message.confirmDeleteTitle") || "Confirm Delete"}
+        description={
+          t("company.message.confirmDeleteDesc") ||
+          "Are you sure you want to delete this company? This action cannot be undone."
+        }
+        confirmText={t("common.button.delete") || "Delete"}
+        cancelText={t("common.button.cancel") || "Cancel"}
+      />
+    </div>
+  );
+}

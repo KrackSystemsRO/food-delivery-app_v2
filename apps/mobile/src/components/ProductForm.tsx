@@ -1,0 +1,265 @@
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { ScrollView, View, Alert } from "react-native";
+import {
+  TextInput,
+  Button,
+  Text,
+  Checkbox,
+  RadioButton,
+} from "react-native-paper";
+import { getListStore } from "@/services/store.service";
+import {
+  CategoryType,
+  createCategory,
+  getCategories,
+} from "@/services/category.service";
+import { getIngredients } from "@/services/ingredient.service";
+import IngredientsSelector from "@/components/IngredientsSelector";
+import MultiSelectWithChips from "@/components/select/MultiSelectWithChips";
+import { StoreType } from "@/types/store.type";
+import { IngredientType } from "@/types/ingredient.type";
+import { ProductType } from "@/types/product.type";
+import { normalizeFloatingPoint } from "@/utils/tools";
+
+type ProductFormProps = {
+  initialValues?: Partial<ProductType>;
+  onSubmit: (data: any) => Promise<void> | void;
+  mode?: "add" | "edit";
+};
+
+const ProductForm: React.FC<ProductFormProps> = ({
+  initialValues = {},
+  onSubmit,
+  mode = "add",
+}) => {
+  const [name, setName] = useState(initialValues.name ?? "");
+  const [description, setDescription] = useState(
+    initialValues.description ?? ""
+  );
+  const [price, setPrice] = useState(initialValues.price?.toString() ?? "");
+  const [isActive, setIsActive] = useState(initialValues.is_active ?? true);
+  const [productType, setProductType] = useState<"prepared_food" | "grocery">(
+    (initialValues.product_type as "prepared_food" | "grocery") ??
+      "prepared_food"
+  );
+
+  const [stores, setStores] = useState<StoreType[]>([]);
+  const [selectedStore, setSelectedStore] = useState<StoreType | null>(
+    (initialValues.store as StoreType) ?? null
+  );
+
+  const [categories, setCategories] = useState<CategoryType[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<CategoryType[]>(
+    (initialValues.category as CategoryType[]) ?? []
+  );
+
+  const [ingredients, setIngredients] = useState<IngredientType[]>([]);
+  const [selectedIngredients, setSelectedIngredients] = useState<
+    { ingredient: IngredientType; quantity: number; unit: string }[]
+  >((initialValues.ingredients as any) ?? []);
+
+  // Load data once
+  useEffect(() => {
+    (async () => {
+      try {
+        const [storeData, categoryData, ingredientData] = await Promise.all([
+          getListStore(),
+          getCategories({ is_active: true }),
+          getIngredients({ is_active: true }),
+        ]);
+
+        setStores(storeData.result ?? []);
+        setCategories(categoryData.result ?? []);
+        setIngredients(ingredientData.result ?? []);
+      } catch (err) {
+        console.error("Failed to load form data", err);
+      }
+    })();
+  }, []);
+
+  // Memoize submit handler
+  const handleSubmit = useCallback(async () => {
+    if (!name || !price || !selectedStore) {
+      Alert.alert("Validation Error", "Name, price, and store are required");
+      return;
+    }
+
+    const payload = {
+      ...initialValues,
+      name,
+      description,
+      store: selectedStore,
+      price: normalizeFloatingPoint(price),
+      is_active: isActive,
+      product_type: productType,
+      category: selectedCategories.map((c) => c._id),
+      ingredients: selectedIngredients.map((i) => ({
+        ingredient: i.ingredient._id,
+        quantity: i.quantity,
+        unit: i.unit,
+      })),
+    };
+
+    await onSubmit(payload);
+  }, [
+    name,
+    description,
+    price,
+    selectedStore,
+    isActive,
+    productType,
+    selectedCategories,
+    selectedIngredients,
+    initialValues,
+    onSubmit,
+  ]);
+
+  // Memoized category add
+  const handleAddNewCategory = useCallback(async (query: string) => {
+    try {
+      const newCategory = await createCategory({ name: query });
+
+      setCategories((prev) =>
+        prev.some((c) => c._id === newCategory._id)
+          ? prev
+          : [...prev, newCategory]
+      );
+
+      setSelectedCategories((prev) =>
+        prev.some((c) => c._id === newCategory._id)
+          ? prev
+          : [...prev, newCategory]
+      );
+
+      return newCategory;
+    } catch (err) {
+      console.error("Failed to create category", err);
+      Alert.alert("Error", "Could not create category");
+      throw err;
+    }
+  }, []);
+
+  // Memoized mapped values for MultiSelectWithChips
+  const mappedStores = useMemo(
+    () => ({
+      getId: (s: StoreType) => s._id,
+      getLabel: (s: StoreType) => s.name,
+    }),
+    []
+  );
+
+  const mappedCategories = useMemo(
+    () => ({
+      getId: (c: CategoryType) => c._id,
+      getLabel: (c: CategoryType) => c.name,
+    }),
+    []
+  );
+
+  return (
+    <ScrollView contentContainerStyle={{ padding: 16 }}>
+      <Text variant="titleLarge" style={{ marginBottom: 16 }}>
+        {mode === "edit" ? "Edit Product" : "Add New Product"}
+      </Text>
+
+      <TextInput
+        label="Product Name"
+        value={name}
+        onChangeText={setName}
+        mode="outlined"
+        style={{ marginBottom: 16 }}
+      />
+
+      <TextInput
+        label="Description"
+        value={description}
+        onChangeText={setDescription}
+        mode="outlined"
+        multiline
+        style={{ marginBottom: 16 }}
+      />
+
+      <MultiSelectWithChips<StoreType>
+        label="Select Store"
+        options={stores}
+        selected={selectedStore ? [selectedStore] : []}
+        onChange={(selected) => setSelectedStore(selected[0] ?? null)}
+        mapper={mappedStores}
+        allowCreate={false}
+      />
+
+      <TextInput
+        label="Price"
+        value={price}
+        onChangeText={setPrice}
+        keyboardType="numeric"
+        mode="outlined"
+        style={{ marginBottom: 16, marginTop: 16 }}
+      />
+
+      <MultiSelectWithChips<CategoryType>
+        label="Categories"
+        options={categories}
+        selected={selectedCategories}
+        onChange={setSelectedCategories}
+        mapper={mappedCategories}
+        onCreate={handleAddNewCategory}
+      />
+
+      <IngredientsSelector
+        options={ingredients}
+        value={selectedIngredients}
+        onChange={setSelectedIngredients}
+      />
+
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          marginVertical: 16,
+        }}
+      >
+        <Checkbox
+          status={isActive ? "checked" : "unchecked"}
+          onPress={() => setIsActive((prev) => !prev)}
+        />
+        <Text style={{ marginLeft: 8 }}>Active</Text>
+      </View>
+
+      <Text style={{ marginBottom: 8, fontWeight: "600" }}>Product Type</Text>
+      <RadioButton.Group
+        onValueChange={(value) =>
+          setProductType(value as "prepared_food" | "grocery")
+        }
+        value={productType}
+      >
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 8,
+          }}
+        >
+          <RadioButton value="prepared_food" />
+          <Text>Prepared Food</Text>
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 16,
+          }}
+        >
+          <RadioButton value="grocery" />
+          <Text>Product</Text>
+        </View>
+      </RadioButton.Group>
+
+      <Button mode="contained" onPress={handleSubmit}>
+        {mode === "edit" ? "Update Product" : "Save Product"}
+      </Button>
+    </ScrollView>
+  );
+};
+
+export default React.memo(ProductForm);

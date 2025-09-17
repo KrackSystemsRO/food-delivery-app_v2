@@ -1,0 +1,62 @@
+[
+  {
+    "name": "Peanuts",
+    "description": "Contains peanuts or peanut products",
+    "is_active": true
+  },
+  {
+    "name": "Tree Nuts",
+    "description": "Contains tree nuts such as almonds, walnuts, cashews, etc.",
+    "is_active": true
+  },
+  {
+    "name": "Milk",
+    "description": "Contains milk or milk-derived products",
+    "is_active": true
+  },
+  {
+    "name": "Eggs",
+    "description": "Contains eggs or egg-derived products",
+    "is_active": true
+  },
+  {
+    "name": "Fish",
+    "description": "Contains fish or fish-derived products",
+    "is_active": true
+  },
+  {
+    "name": "Shellfish",
+    "description": "Contains shellfish such as crab, lobster, shrimp, etc.",
+    "is_active": true
+  },
+  {
+    "name": "Soy",
+    "description": "Contains soy or soy-derived products",
+    "is_active": true
+  },
+  {
+    "name": "Wheat",
+    "description": "Contains wheat or wheat-derived products",
+    "is_active": true
+  },
+  {
+    "name": "Sesame",
+    "description": "Contains sesame seeds or sesame-derived products",
+    "is_active": true
+  },
+  {
+    "name": "Sulphites",
+    "description": "Contains sulphites used as preservatives",
+    "is_active": true
+  },
+  {
+    "name": "Mustard",
+    "description": "Contains mustard or mustard-derived products",
+    "is_active": true
+  },
+  {
+    "name": "Celery",
+    "description": "Contains celery or celery-derived products",
+    "is_active": true
+  }
+]

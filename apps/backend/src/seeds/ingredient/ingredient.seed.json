@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Tomato",
+    "description": "Fresh red tomato, commonly used in salads and sauces.",
+    "allergens": [],
+    "unit": "gram",
+    "is_active": true
+  },
+  {
+    "name": "Peanuts",
+    "description": "Roasted peanuts, common allergen.",
+    "allergens": ["Peanuts"],
+    "unit": "gram",
+    "is_active": true
+  },
+  {
+    "name": "Milk",
+    "description": "Whole milk from cows.",
+    "allergens": ["Milk"],
+    "unit": "liter",
+    "is_active": true
+  },
+  {
+    "name": "Eggs",
+    "description": "Fresh chicken egg.",
+    "allergens": ["64d12345abcd6789ef012347"],
+    "unit": "gram",
+    "is_active": true
+  },
+  {
+    "name": "Wheat Flour",
+    "description": "Fine wheat flour, used for baking.",
+    "allergens": ["Wheat"],
+    "unit": "gram",
+    "is_active": true
+  }
+]

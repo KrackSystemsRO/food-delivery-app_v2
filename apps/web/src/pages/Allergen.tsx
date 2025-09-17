@@ -1,0 +1,274 @@
+import { useEffect, useState, useCallback } from "react";
+import { Button } from "@/components/ui";
+import { Plus } from "lucide-react";
+import { showToast } from "@/utils/toast";
+import { useTranslation } from "react-i18next";
+
+import { ConfirmModal } from "@/components/user/confirm.modal";
+import { PaginationControls } from "@/components/common/pagination.common";
+import type { AllergenForm, AllergenType } from "@/types/allergen.type";
+import {
+  addAllergen,
+  deleteAllergen,
+  getAllergens,
+  updateAllergen,
+} from "@/services/allergen.service";
+import useAllergenStore from "@/stores/allergen.store";
+import { AllergenTable } from "@/components/allergen/data-table.allergen";
+import {
+  AllergenFilters,
+  type FiltersType,
+} from "@/components/allergen/filters.allergen";
+import AllergenModal from "@/components/allergen/allergen.modal";
+import usePersistedState from "@/hooks/use-persisted-state";
+
+const defaultFilters: FiltersType = {
+  search: "",
+  is_active: undefined,
+  limit: 10,
+};
+
+type SortKey = "name" | "createdAt" | "is_active";
+
+export default function AllergenManagementPage() {
+  const { t } = useTranslation();
+
+  const [allergenToDelete, setAllergenToDelete] = useState<AllergenType | null>(
+    null
+  );
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  const [form, setForm] = useState<AllergenForm>({
+    name: "",
+    description: "",
+    is_active: true,
+  });
+
+  const [filters, setFilters] = usePersistedState<FiltersType>(
+    "allergenFilters",
+    defaultFilters
+  );
+
+  const [sortConfig, setSortConfig] = useState<{
+    key: SortKey;
+    direction: "asc" | "desc";
+  }>({
+    key: "createdAt",
+    direction: "desc",
+  });
+
+  const {
+    allergensList: allergens,
+    setAllergensList,
+    clearAllergensList,
+    selectedAllergen,
+    setSelectedAllergen,
+    clearSelectedAllergen,
+    updateAllergenInList,
+  } = useAllergenStore();
+
+  const sortableKeys: SortKey[] = ["name", "createdAt", "is_active"];
+
+  const fetchAllergens = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await getAllergens({
+        search: filters.search,
+        is_active: filters.is_active,
+        page,
+        limit: filters.limit,
+        sort_by: sortConfig.key,
+        order: sortConfig.direction,
+      });
+      setAllergensList(res.result);
+      setTotalPages(res.totalPages || 1);
+    } catch {
+      showToast(
+        "error",
+        t("allergen.loadFailed") || "Failed to load allergens"
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [filters, page, sortConfig, setAllergensList, t]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [filters, sortConfig]);
+
+  useEffect(() => {
+    fetchAllergens();
+    return () => clearAllergensList();
+  }, [fetchAllergens, clearAllergensList, page]);
+
+  const handleSort = useCallback((key: keyof AllergenType) => {
+    if (!sortableKeys.includes(key as SortKey)) return; // skip unsupported keys
+
+    setSortConfig((current) => ({
+      key: key as SortKey,
+      direction:
+        current.key === key && current.direction === "asc" ? "desc" : "asc",
+    }));
+  }, []);
+
+  const openCreateModal = useCallback(() => {
+    clearSelectedAllergen();
+    setForm({ name: "", description: "", is_active: true });
+    setModalOpen(true);
+  }, [clearSelectedAllergen]);
+
+  const openEditModal = useCallback(
+    (allergen: AllergenType) => {
+      setSelectedAllergen(allergen);
+      setForm({
+        name: allergen.name,
+        description: allergen.description || "",
+        is_active: allergen.is_active,
+      });
+      setModalOpen(true);
+    },
+    [setSelectedAllergen]
+  );
+
+  const confirmDelete = useCallback((allergen: AllergenType) => {
+    setAllergenToDelete(allergen);
+    setDeleteModalOpen(true);
+  }, []);
+
+  const performDelete = useCallback(async () => {
+    if (!allergenToDelete) return;
+    setDeleteLoading(true);
+    try {
+      await deleteAllergen(allergenToDelete._id);
+      showToast("success", t("allergen.message.deleted") || "Allergen deleted");
+
+      // Handle page adjustment if last item deleted
+      if (allergens.length === 1 && page > 1) {
+        setPage((prev) => prev - 1);
+      } else {
+        fetchAllergens();
+      }
+    } catch {
+      showToast(
+        "error",
+        t("allergen.message.deleteFailed") || "Failed to delete allergen"
+      );
+    } finally {
+      setDeleteModalOpen(false);
+      setAllergenToDelete(null);
+      setDeleteLoading(false);
+    }
+  }, [allergenToDelete, fetchAllergens, t, allergens.length, page]);
+
+  const handleSubmit = useCallback(async () => {
+    if (!form.name) {
+      showToast("error", t("allergen.message.allFieldsRequired"));
+      return;
+    }
+    setSubmitLoading(true);
+    try {
+      if (selectedAllergen) {
+        const res = await updateAllergen(selectedAllergen._id, form);
+        if (res.status === 200) {
+          showToast("success", t("allergen.message.updated"));
+          updateAllergenInList(res.result);
+        } else throw new Error();
+      } else {
+        const res = await addAllergen(form);
+        if (res.status === 201) {
+          showToast("success", t("allergen.message.created"));
+          fetchAllergens();
+        } else throw new Error();
+      }
+
+      setModalOpen(false);
+      clearSelectedAllergen();
+    } catch {
+      showToast("error", t("allergen.message.submitFailed"));
+    } finally {
+      setSubmitLoading(false);
+    }
+  }, [
+    form,
+    selectedAllergen,
+    fetchAllergens,
+    updateAllergenInList,
+    clearSelectedAllergen,
+    t,
+  ]);
+
+  const resetFilters = useCallback(() => {
+    setFilters(defaultFilters);
+    setPage(1);
+    setSortConfig({ key: "createdAt", direction: "desc" });
+    localStorage.removeItem("allergenFilters");
+  }, [setFilters]);
+
+  return (
+    <div className="p-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-base font-bold">
+          {t("allergen.title") || "Manage Allergens"}
+        </h2>
+        <Button onClick={openCreateModal}>
+          <Plus className="mr-2 h-4 w-4" />
+          {t("allergen.createAllergen") || "Create Allergen"}
+        </Button>
+      </div>
+
+      <AllergenFilters
+        filters={filters}
+        setFilters={(updated: Partial<FiltersType>) => {
+          setFilters((prev) => ({ ...prev, ...updated }));
+        }}
+        resetFilters={resetFilters}
+      />
+
+      <AllergenTable
+        allergens={allergens}
+        sortKey={sortConfig.key}
+        sortDirection={sortConfig.direction}
+        loading={loading}
+        onSort={handleSort}
+        onEdit={openEditModal}
+        onDelete={confirmDelete}
+      />
+
+      <PaginationControls
+        page={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+      />
+
+      <AllergenModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmit={handleSubmit}
+        form={form}
+        setForm={setForm}
+        isEditing={!!selectedAllergen}
+        loading={submitLoading}
+      />
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={performDelete}
+        loading={deleteLoading}
+        title={t("allergen.message.confirmDeleteTitle") || "Confirm Delete"}
+        description={
+          t("allergen.message.confirmDeleteDesc") ||
+          "Are you sure you want to delete this allergen? This action cannot be undone."
+        }
+        confirmText={t("common.button.delete") || "Delete"}
+        cancelText={t("common.button.cancel") || "Cancel"}
+      />
+    </div>
+  );
+}

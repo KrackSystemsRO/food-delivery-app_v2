@@ -1,0 +1,52 @@
+[
+  {
+    "name": "Appetizers",
+    "description": "Small dishes served before the main course",
+    "is_active": true
+  },
+  {
+    "name": "Main Course",
+    "description": "Hearty and filling main dishes",
+    "is_active": true
+  },
+  {
+    "name": "Desserts",
+    "description": "Sweet treats and pastries",
+    "is_active": true
+  },
+  {
+    "name": "Beverages",
+    "description": "All kinds of drinks, alcoholic and non-alcoholic",
+    "is_active": true
+  },
+  {
+    "name": "Salads",
+    "description": "Fresh vegetable and fruit salads",
+    "is_active": true
+  },
+  {
+    "name": "Soups",
+    "description": "Warm and comforting soups",
+    "is_active": true
+  },
+  {
+    "name": "Sandwiches",
+    "description": "Sandwiches, wraps, and paninis",
+    "is_active": true
+  },
+  {
+    "name": "Pasta",
+    "description": "Italian pasta dishes",
+    "is_active": true
+  },
+  {
+    "name": "Pizza",
+    "description": "Classic and gourmet pizzas",
+    "is_active": true
+  },
+  {
+    "name": "Vegan",
+    "description": "Plant-based dishes",
+    "is_active": true
+  }
+]

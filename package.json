@@ -1,0 +1,9 @@
+{
+  "name": "test2",
+  "packageManager": "yarn@4.9.1",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

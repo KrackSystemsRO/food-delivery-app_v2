@@ -1,0 +1,84 @@
+{
+  "common": {
+    "currency": { "symbol": "LEI " },
+    "modal": {
+      "logout": {
+        "heading": "Confirm Logout",
+        "question": "Are you sure you want to logout?"
+      }
+    },
+    "buttons": {
+      "login": "Login",
+      "remove": "Remove",
+      "place_order": "Place Order",
+      "logout": "Logout",
+      "cancel": "Cancel",
+      "register": {
+        "submit": "Register",
+        "to_register": "Do you have not an account? Let's make one!",
+        "back_to_login": "Do you have an accout? Let's log in!"
+      },
+      "recover": {
+        "submit": "Recover account",
+        "to_recover": "Do you forget password? Let's reset it!",
+        "back_to_login": "To login page"
+      },
+      "resetPassword": "Reset Password"
+    },
+    "labels": {
+      "email": "Email",
+      "password": "Password",
+      "confirm_password": "Confirm password",
+      "name": "Name",
+      "role": "Role",
+      "company": "Company",
+      "department": "Department",
+      "phone": "Phone",
+      "language": "Language",
+      "first_name": "First name",
+      "last_name": "Last name",
+      "new_password": "New Password"
+    },
+    "message": {
+      "no_description": "No description available.",
+      "available": "Available",
+      "not_available": "Not Available",
+      "special_requests": "Any special requests or observations?",
+      "no_data_available": "No data available."
+    },
+    "heading": {
+      "stores": { "name": "Stores" },
+      "products": "Products",
+      "cart": {
+        "name": "Cart",
+        "your_cart": "Your Cart",
+        "notes": "Notes",
+        "subtotal": "Subtotal",
+        "delivery_fee": "Delivery fee",
+        "total": "Total"
+      },
+      "profile": { "name": "Profile", "your_profile": "Your Profile" }
+    }
+  },
+  "login": { "title": "Login" },
+  "register": { "title": "Register" },
+  "recover": {
+    "title": "Recover password",
+    "message": {
+      "success": "The email was send successfuly! Check it and follow steps from this.",
+      "error": "Something went wrong, try again."
+    }
+  },
+  "resetPassword": {
+    "title": "Reset Password",
+    "error": {
+      "passwords_do_not_match": "Passwords do not match",
+      "password_too_short": "Password must be at least 6 characters",
+      "failed": "Failed to reset password, try again"
+    }
+  },
+  "cart": {
+    "buttons": { "add_to_cart": "Add to Cart", "clear_cart": "Clear Cart" },
+    "message": { "cart_empty": "Your cart is empty." }
+  }
+}

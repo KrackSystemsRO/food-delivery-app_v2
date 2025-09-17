@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Peanut Butter Sandwich",
+    "description": "Simple sandwich with peanut butter and wheat bread",
+    "ingredients": [
+      { "ingredientName": "Peanuts", "quantity": "100g" },
+      { "ingredientName": "Wheat Flour", "quantity": "2 slices" }
+    ],
+    "steps": [
+      "Spread peanut butter on wheat bread slices",
+      "Put slices together and cut into halves"
+    ],
+    "is_active": true
+  },
+  {
+    "name": "Tomato Omelette",
+    "description": "Omelette with fresh tomato and eggs",
+    "ingredients": [
+      { "ingredientName": "Tomato", "quantity": "1 medium" },
+      { "ingredientName": "Eggs", "quantity": "2" },
+      { "ingredientName": "Milk", "quantity": "50ml" }
+    ],
+    "steps": [
+      "Beat eggs with milk",
+      "Chop tomato and add to eggs",
+      "Cook mixture in frying pan until done"
+    ],
+    "is_active": true
+  }
+]
