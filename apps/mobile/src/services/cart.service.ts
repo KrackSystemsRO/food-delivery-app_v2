@@ -1,3 +1,4 @@
+import { Types } from "@my-monorepo/shared";
 import axiosInstance from "../utils/request/authorizedRequest";
 
 export const addToCart = async ({
@@ -34,7 +35,7 @@ export const fetchCart = async () => {
 export const updateCartItemQuantity = async (
   product: string,
   quantity: number,
-  store: string
+  store: Types.Store.StoreType
 ) => {
   const response = await axiosInstance.post(`/cart/up`, {
     product,

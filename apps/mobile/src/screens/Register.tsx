@@ -1,12 +1,11 @@
-import React, { useState } from "react";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
-import { TextInput, Button, Text, IconButton } from "react-native-paper";
+import { useState } from "react";
+import { View, StyleSheet } from "react-native";
+import { TextInput, Button, Text } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 import { register as registerUser } from "../services/authentication.service";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AppStackParamList } from "@/types/navigation.type";
-import { MaterialCommunityIcons } from "@expo/vector-icons"; // or from react-native-vector-icons
 
 export default function RegisterScreen() {
   const { t } = useTranslation();

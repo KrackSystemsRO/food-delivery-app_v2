@@ -5,8 +5,8 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import { useTranslation } from "react-i18next";
 import { acceptOrder } from "@/services/order.service";
 import { getOrders } from "@/services/courier.service";
-import { OrderType } from "@/types/order.type";
 import { useAuth } from "@/context/authContext";
+import { Types } from "@my-monorepo/shared";
 
 /* ------------------ Order Card ------------------ */
 const OrderCard = React.memo(({ order, onAccept, t, navigation }: any) => (
@@ -52,7 +52,7 @@ const OrdersList = React.memo(
     navigation,
   }: any) => {
     const renderItem = useCallback(
-      ({ item }: { item: OrderType }) => (
+      ({ item }: { item: Types.Order.OrderType }) => (
         <OrderCard
           order={item}
           onAccept={onAccept}
@@ -92,7 +92,7 @@ export default function CourierOrdersPage({ navigation }: { navigation: any }) {
   const { t } = useTranslation();
   const { socket, user } = useAuth();
 
-  const [orders, setOrders] = useState<OrderType[]>([]);
+  const [orders, setOrders] = useState<Types.Order.OrderType[]>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -163,8 +163,8 @@ export default function CourierOrdersPage({ navigation }: { navigation: any }) {
 
   /* ------------------ Filter Orders ------------------ */
   const { activeOrders, futureOrders } = useMemo(() => {
-    const active: OrderType[] = [];
-    const future: OrderType[] = [];
+    const active: Types.Order.OrderType[] = [];
+    const future: Types.Order.OrderType[] = [];
     orders.forEach((o) => {
       if (o.status === "confirmed" || o.status === "delivering") active.push(o);
       else if (o.status === "pending") future.push(o);

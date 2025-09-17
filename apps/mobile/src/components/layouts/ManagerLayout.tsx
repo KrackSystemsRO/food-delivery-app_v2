@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 import { View } from "react-native";
 import { Button, Text } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
@@ -14,7 +14,7 @@ import AddProductScreen from "@/screens/manager_store/AddProduct.screen";
 import EditProductScreen from "@/screens/manager_store/EditProduct.screen";
 import OrderDetailScreen from "@/screens/manager_store/OrderDetails.sreen";
 import { useAuth } from "@/context/authContext";
-import { ProductType } from "@/types/product.type";
+import { Types } from "@my-monorepo/shared";
 
 /* ------------------ Types ------------------ */
 export type OrdersStackParamList = {
@@ -24,7 +24,7 @@ export type OrdersStackParamList = {
 export type ProductsStackParamList = {
   ProductsMain: undefined;
   AddProduct: undefined;
-  EditProduct: { product: ProductType };
+  EditProduct: { product: Types.Product.ProductType };
 };
 type AccountStackParamList = { AccountMain: undefined };
 

@@ -4,16 +4,19 @@ import {
   fetchCart,
   updateCartItemQuantity,
 } from "../services/cart.service";
-import { CartItemType, CartStateType } from "../types/cart.type";
+import { Types } from "@my-monorepo/shared";
 
 type Action =
-  | { type: "SET_CART"; cart: CartStateType }
+  | { type: "SET_CART"; cart: Types.Cart.CartStateType }
   | { type: "CLEAR_CART" };
 
 const CartContext = createContext<{
-  state: CartStateType;
+  state: Types.Cart.CartStateType;
   dispatch: React.Dispatch<Action>;
-  syncAddToCart: (item: CartItemType, store: string) => Promise<boolean>;
+  syncAddToCart: (
+    item: Types.Cart.CartItemType,
+    store: string
+  ) => Promise<boolean>;
   syncUpdateQuantity: (product: string, quantity: number) => Promise<void>;
   refreshCart: () => Promise<void>;
 }>({
@@ -24,7 +27,10 @@ const CartContext = createContext<{
   refreshCart: async () => {},
 });
 
-const cartReducer = (state: CartStateType, action: Action): CartStateType => {
+const cartReducer = (
+  state: Types.Cart.CartStateType,
+  action: Action
+): Types.Cart.CartStateType => {
   switch (action.type) {
     case "SET_CART":
       return {
@@ -50,7 +56,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const cartData = await fetchCart();
       if (cartData) {
-        const CartStateType: CartStateType = {
+        const CartStateType: Types.Cart.CartStateType = {
           store: cartData.store?._id || cartData.store,
           items: cartData.items.map((i: any) => ({
             product: i.product._id || i.product,
@@ -73,7 +79,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const syncAddToCart = async (
-    item: CartItemType,
+    item: Types.Cart.CartItemType,
     store: string
   ): Promise<boolean> => {
     const addToCart = await addToCartApi({

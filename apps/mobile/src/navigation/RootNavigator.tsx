@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useAuth } from "../context/authContext";
 import LoginScreen from "../screens/Login";
 import FadeOutLoading from "../components/animations/FadeOutLoading";
 import AuthenticatedLayout from "../components/layouts/AuthenticatedLayout";
-import { AppStackParamList } from "../types/navigation.type";
+import { AppStackParamList } from "@/types/navigation.type";
 import RegisterScreen from "@/screens/Register";
 import RecoverPasswordScreen from "@/screens/RecoverPassword";
 import CourierLayout from "@/components/layouts/CourierLayout";

@@ -1,15 +1,15 @@
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { View, Text, StyleSheet, FlatList, Dimensions } from "react-native";
 import { TabView, TabBar } from "react-native-tab-view";
 import { getOrders } from "@/services/courier.service";
-import { OrderType } from "@/types/order.type";
+import { Types } from "@my-monorepo/shared";
 import { useAuth } from "@/context/authContext";
 
 type OrdersRoute = { key: string; title: string };
 
 export default function OrdersScreen() {
   const { user, socket } = useAuth();
-  const [orders, setOrders] = useState<OrderType[]>([]);
+  const [orders, setOrders] = useState<Types.Order.OrderType[]>([]);
   const [index, setIndex] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -40,7 +40,7 @@ export default function OrdersScreen() {
     // Only run if we have a socket and this user is a CLIENT
     if (!socket || user?.role !== "CLIENT") return;
 
-    const handleOrderUpdate = (order: OrderType) => {
+    const handleOrderUpdate = (order: Types.Order.OrderType) => {
       setOrders((prev) => {
         const idx = prev.findIndex((o) => o._id === order._id);
         if (idx !== -1) {
@@ -71,7 +71,7 @@ export default function OrdersScreen() {
     (o) => o.status === "delivered" || o.status === "cancelled"
   );
 
-  const renderOrder = ({ item }: { item: OrderType }) => (
+  const renderOrder = ({ item }: { item: Types.Order.OrderType }) => (
     <View style={styles.orderCard}>
       <Text style={styles.storeName}>{item.store.name}</Text>
       <Text>Order ID: {item.orderId}</Text>

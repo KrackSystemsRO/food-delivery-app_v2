@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   View,
   Text,
@@ -14,14 +14,13 @@ import {
   fetchCart,
 } from "../../services/cart.service";
 import { placeOrder } from "../../services/order.service";
-import type { CartItemType } from "../../types/cart.type";
 import { showToast } from "../../utils/toast";
 import { useTranslation } from "react-i18next";
-
 import {
   GestureHandlerRootView,
   RefreshControl,
 } from "react-native-gesture-handler";
+import { Types } from "@my-monorepo/shared";
 
 export default function CartScreen() {
   const { state, dispatch, syncUpdateQuantity, refreshCart } = useCart();
@@ -85,7 +84,7 @@ export default function CartScreen() {
         return;
       }
 
-      const itemsToOrder = state.items.map((item: CartItemType) => ({
+      const itemsToOrder = state.items.map((item: Types.Cart.CartItemType) => ({
         product: item.product,
         quantity: item.quantity,
         observations: item.observations,

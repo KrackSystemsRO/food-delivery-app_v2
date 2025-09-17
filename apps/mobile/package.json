@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "start": "expo start --port 3001",
+    "dev": "expo start --port 3001",
     "android": "expo start --android --port 3001",
     "ios": "expo start --ios --port 3001",
     "web": "expo start --web --port 3001"

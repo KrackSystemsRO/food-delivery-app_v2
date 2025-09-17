@@ -14,18 +14,18 @@ import {
 } from "@/services/soket.connection/socket";
 import { getUserDetails } from "@/services/user.service";
 import { showToast } from "@/utils/toast";
-import { UserType } from "@/types/user.type";
+import { Types } from "@my-monorepo/shared";
 
 interface AuthContextType {
   accessToken: string | null;
   refreshToken: string | null;
-  user: UserType | null;
+  user: Types.User.UserType | null;
   socket: Socket | null;
   login: (accessToken: string, refreshToken: string) => Promise<void>;
   logout: () => Promise<void>;
   loading: boolean;
   refreshAuth: () => Promise<void>;
-  setUser: React.Dispatch<React.SetStateAction<UserType | null>>;
+  setUser: React.Dispatch<React.SetStateAction<Types.User.UserType | null>>;
   updateSelectedStores: (stores: SelectedStore[]) => void;
 }
 
@@ -43,7 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
-  const [user, setUser] = useState<UserType | null>(null);
+  const [user, setUser] = useState<Types.User.UserType | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -53,7 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   /** ---------------- Attach listeners to a socket ---------------- */
   const attachSocketListeners = useCallback(
-    (sock: Socket, currentUser: UserType) => {
+    (sock: Socket, currentUser: Types.User.UserType) => {
       sock.on("connect", () => {
         console.log("✅ Socket connected:", sock.id);
 

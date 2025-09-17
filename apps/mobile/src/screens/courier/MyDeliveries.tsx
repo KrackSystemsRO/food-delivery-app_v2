@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { View, FlatList, StyleSheet } from "react-native";
 import { Card, Text, Button } from "react-native-paper";
 import { useTranslation } from "react-i18next";
-import { fetchMyDeliveries } from "@/services/courier.service";
-import { OrderType } from "@/types/order.type";
+import { Types } from "@my-monorepo/shared";
 
 export default function MyDeliveriesPage() {
   const { t } = useTranslation();
-  const [orders, setOrders] = useState<OrderType[]>([]);
+  const [orders, setOrders] = useState<Types.Order.OrderType[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -17,8 +16,7 @@ export default function MyDeliveriesPage() {
   const loadDeliveries = async () => {
     setLoading(true);
     try {
-      const res = await fetchMyDeliveries(); // call API to fetch courier's deliveries
-      setOrders(res);
+      setOrders([]);
     } catch (err) {
       console.error("Error fetching deliveries", err);
     } finally {
@@ -31,7 +29,7 @@ export default function MyDeliveriesPage() {
     // TODO: call API to update order status to 'completed'
   };
 
-  const renderItem = ({ item }: { item: OrderType }) => (
+  const renderItem = ({ item }: { item: Types.Order.OrderType }) => (
     <Card style={{ margin: 8 }}>
       <Card.Content>
         <Text variant="titleMedium">{item.store.name}</Text>
@@ -48,7 +46,7 @@ export default function MyDeliveriesPage() {
           {t("status")}: {item.status}
         </Text>
       </Card.Content>
-      {item.status !== "completed" && (
+      {item.status !== "delivered" && (
         <Card.Actions>
           <Button
             mode="contained"

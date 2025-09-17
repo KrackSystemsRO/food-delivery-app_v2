@@ -9,12 +9,11 @@ import { getListStore } from "@/services/store.service";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { View, FlatList, Alert } from "react-native";
-import { Button, Card, Text } from "react-native-paper";
+import { Button, Card } from "react-native-paper";
 import MultiSelectWithChips from "@/components/select/MultiSelectWithChips";
-import { StoreType } from "@/types/store.type";
-import { ProductType } from "@/types/product.type";
 import LoadingSpin from "@/components/LoadingSpin";
 import { useFocusEffect } from "@react-navigation/native";
+import { Types } from "@my-monorepo/shared";
 
 type ProductsProps = NativeStackScreenProps<
   ProductsStackParamList,
@@ -23,10 +22,10 @@ type ProductsProps = NativeStackScreenProps<
 
 // Memoized Product Card
 const ProductCard: React.FC<{
-  product: ProductType;
-  onEdit: (product: ProductType) => void;
-  onToggleActive: (product: ProductType) => void;
-  onDelete: (product: ProductType) => void;
+  product: Types.Product.ProductType;
+  onEdit: (product: Types.Product.ProductType) => void;
+  onToggleActive: (product: Types.Product.ProductType) => void;
+  onDelete: (product: Types.Product.ProductType) => void;
 }> = React.memo(({ product, onEdit, onToggleActive, onDelete }) => {
   return (
     <Card style={{ marginBottom: 12 }}>
@@ -48,9 +47,11 @@ const ProductCard: React.FC<{
 });
 
 const ProductsScreen = ({ navigation }: ProductsProps) => {
-  const [stores, setStores] = useState<StoreType[]>([]);
-  const [selectedStores, setSelectedStores] = useState<StoreType[]>([]);
-  const [products, setProducts] = useState<ProductType[]>([]);
+  const [stores, setStores] = useState<Types.Store.StoreType[]>([]);
+  const [selectedStores, setSelectedStores] = useState<Types.Store.StoreType[]>(
+    []
+  );
+  const [products, setProducts] = useState<Types.Product.ProductType[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -58,7 +59,7 @@ const ProductsScreen = ({ navigation }: ProductsProps) => {
   useEffect(() => {
     (async () => {
       try {
-        const storeData = await getListStore();
+        const storeData = await getListStore({});
         setStores(storeData.result ?? []);
       } catch (err) {
         console.error("Failed to load stores", err);
@@ -76,7 +77,7 @@ const ProductsScreen = ({ navigation }: ProductsProps) => {
 
     setLoading(true);
     try {
-      const allProducts: ProductType[] = [];
+      const allProducts: Types.Product.ProductType[] = [];
       for (const store of selectedStores) {
         const response = await getUserProductsStore(store._id);
         if (response.result) allProducts.push(...response.result);
@@ -97,7 +98,7 @@ const ProductsScreen = ({ navigation }: ProductsProps) => {
       const response = await getUserProductsStores(selectedStores);
       setProducts(response ?? []);
 
-      const storeData = await getListStore();
+      const storeData = await getListStore({});
       setStores(storeData.result ?? []);
     } catch (err) {
       console.error("Failed to refresh products", err);
@@ -119,14 +120,14 @@ const ProductsScreen = ({ navigation }: ProductsProps) => {
   }, [navigation]);
 
   const handleEditProduct = useCallback(
-    (product: ProductType) => {
+    (product: Types.Product.ProductType) => {
       navigation.navigate("EditProduct", { product });
     },
     [navigation]
   );
 
   const handleToggleActive = useCallback(
-    async (product: ProductType) => {
+    async (product: Types.Product.ProductType) => {
       try {
         const newAvailable = !product.available;
         await updateProduct(product._id, { available: newAvailable });
@@ -140,7 +141,7 @@ const ProductsScreen = ({ navigation }: ProductsProps) => {
   );
 
   const handleDeleteProduct = useCallback(
-    (product: ProductType) => {
+    (product: Types.Product.ProductType) => {
       Alert.alert(
         "Delete Product",
         `Are you sure you want to delete ${product.name}?`,
@@ -173,7 +174,7 @@ const ProductsScreen = ({ navigation }: ProductsProps) => {
   const ListHeader = useMemo(
     () => (
       <View>
-        <MultiSelectWithChips<StoreType>
+        <MultiSelectWithChips<Types.Store.StoreType>
           label="Select Stores"
           options={stores}
           selected={selectedStores}

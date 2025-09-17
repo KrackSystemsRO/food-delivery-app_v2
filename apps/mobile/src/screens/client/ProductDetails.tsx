@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { StoresStackParamList } from "../../types/navigation.type";
+import { StoresStackParamList } from "@/types/navigation.type";
 import { useCart } from "../../context/CartContext";
 import { fetchCart } from "../../services/cart.service";
 import { showToast } from "../../utils/toast";

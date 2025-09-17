@@ -16,13 +16,11 @@ import {
 import { getIngredients } from "@/services/ingredient.service";
 import IngredientsSelector from "@/components/IngredientsSelector";
 import MultiSelectWithChips from "@/components/select/MultiSelectWithChips";
-import { StoreType } from "@/types/store.type";
-import { IngredientType } from "@/types/ingredient.type";
-import { ProductType } from "@/types/product.type";
+import { Types } from "@my-monorepo/shared";
 import { normalizeFloatingPoint } from "@/utils/tools";
 
 type ProductFormProps = {
-  initialValues?: Partial<ProductType>;
+  initialValues?: Partial<Types.Product.ProductType>;
   onSubmit: (data: any) => Promise<void> | void;
   mode?: "add" | "edit";
 };
@@ -43,19 +41,28 @@ const ProductForm: React.FC<ProductFormProps> = ({
       "prepared_food"
   );
 
-  const [stores, setStores] = useState<StoreType[]>([]);
-  const [selectedStore, setSelectedStore] = useState<StoreType | null>(
-    (initialValues.store as StoreType) ?? null
-  );
+  const [stores, setStores] = useState<Types.Store.StoreType[]>([]);
+  const [selectedStore, setSelectedStore] =
+    useState<Types.Store.StoreType | null>(
+      (initialValues.store as Types.Store.StoreType) ?? null
+    );
 
-  const [categories, setCategories] = useState<CategoryType[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<CategoryType[]>(
-    (initialValues.category as CategoryType[]) ?? []
+  const [categories, setCategories] = useState<Types.Category.CategoryType[]>(
+    []
   );
+  const [selectedCategories, setSelectedCategories] = useState<
+    Types.Category.CategoryType[]
+  >((initialValues.category as CategoryType[]) ?? []);
 
-  const [ingredients, setIngredients] = useState<IngredientType[]>([]);
+  const [ingredients, setIngredients] = useState<
+    Types.Ingredient.IngredientType[]
+  >([]);
   const [selectedIngredients, setSelectedIngredients] = useState<
-    { ingredient: IngredientType; quantity: number; unit: string }[]
+    {
+      ingredient: Types.Ingredient.IngredientType;
+      quantity: number;
+      unit: string;
+    }[]
   >((initialValues.ingredients as any) ?? []);
 
   // Load data once
@@ -63,7 +70,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     (async () => {
       try {
         const [storeData, categoryData, ingredientData] = await Promise.all([
-          getListStore(),
+          getListStore({}),
           getCategories({ is_active: true }),
           getIngredients({ is_active: true }),
         ]);
@@ -142,8 +149,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
   // Memoized mapped values for MultiSelectWithChips
   const mappedStores = useMemo(
     () => ({
-      getId: (s: StoreType) => s._id,
-      getLabel: (s: StoreType) => s.name,
+      getId: (s: Types.Store.StoreType) => s._id,
+      getLabel: (s: Types.Store.StoreType) => s.name,
     }),
     []
   );
@@ -179,7 +186,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         style={{ marginBottom: 16 }}
       />
 
-      <MultiSelectWithChips<StoreType>
+      <MultiSelectWithChips<Types.Store.StoreType>
         label="Select Store"
         options={stores}
         selected={selectedStore ? [selectedStore] : []}

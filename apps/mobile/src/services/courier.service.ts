@@ -1,6 +1,6 @@
-import { OrderType } from "@/types/order.type";
 import axiosInstance from "@/utils/request/authorizedRequest";
 import { GetOrdersParams, GetOrdersResponse } from "./order.service";
+import { Types } from "@my-monorepo/shared";
 
 /* ------------------ Services ------------------ */
 
@@ -31,7 +31,9 @@ export const getOrders = async (
 };
 
 // Fetch a single order by ID
-export const getOrderById = async (orderId: string): Promise<OrderType> => {
+export const getOrderById = async (
+  orderId: string
+): Promise<Types.Order.OrderType> => {
   try {
     const response = await axiosInstance.get(`/order/${orderId}`);
     return response.data.result;
@@ -42,7 +44,9 @@ export const getOrderById = async (orderId: string): Promise<OrderType> => {
 };
 
 // Accept an order
-export const acceptOrder = async (orderId: string): Promise<OrderType> => {
+export const acceptOrder = async (
+  orderId: string
+): Promise<Types.Order.OrderType> => {
   try {
     const response = await axiosInstance.post("/order/accept-order", {
       orderId,
@@ -55,7 +59,9 @@ export const acceptOrder = async (orderId: string): Promise<OrderType> => {
 };
 
 // Deny an order
-export const denyOrder = async (orderId: string): Promise<OrderType> => {
+export const denyOrder = async (
+  orderId: string
+): Promise<Types.Order.OrderType> => {
   const response = await axiosInstance.post("/order/deny-order", { orderId });
   return response.data.result;
 };

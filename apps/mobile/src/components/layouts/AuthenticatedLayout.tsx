@@ -1,4 +1,3 @@
-import React from "react";
 import { View, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -13,7 +12,7 @@ import CartStackNavigator from "@/navigation/CartStackNavigator";
 import ProfileStackNavigator from "@/navigation/ProfileStackNavigator";
 import { useCart } from "@/context/CartContext";
 import { AnimatedBadge } from "../animations/BadgeOnUpdate";
-import { StoresStackParamList } from "../../types/navigation.type";
+import { StoresStackParamList } from "@/types/navigation.type";
 import OrdersScreen from "@/screens/client/Orders";
 
 export type BottomTabsParamList = {

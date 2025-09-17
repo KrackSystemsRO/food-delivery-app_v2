@@ -1,11 +1,11 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import CourierOrdersPage from "@/screens/courier/CourierList.screen";
 import DeliveryDetailPage from "@/screens/courier/DeliveryDetail.screen";
-import { OrderType } from "@/types/order.type";
+import { Types } from "@my-monorepo/shared";
 
 export type CourierOrdersStackParamList = {
   Orders: undefined;
-  DeliveryDetail: { order: OrderType };
+  DeliveryDetail: { order: Types.Order.OrderType };
 };
 
 const Stack = createNativeStackNavigator<CourierOrdersStackParamList>();

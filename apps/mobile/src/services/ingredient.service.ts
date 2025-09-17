@@ -1,4 +1,4 @@
-import { IngredientType } from "@/types/ingredient.type";
+import { Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
 
 export interface GetIngredientParams {
@@ -11,7 +11,7 @@ export interface GetIngredientParams {
 }
 
 export interface GetIngredientsResponse {
-  result: IngredientType[];
+  result: Types.Ingredient.IngredientType[];
   status: number;
   message: string;
   totalCount: number;
@@ -38,21 +38,23 @@ export const getIngredients = async (
       ? response.data.result
       : [];
 
-    const mappedIngredients: IngredientType[] = results.map((i: any) => ({
-      _id: i._id,
-      name: i.name,
-      description: i.description || "",
-      allergens: i.allergens || [],
-      nutritionalInfo: {
-        calories: i.nutritionalInfo?.calories ?? 0,
-        protein: i.nutritionalInfo?.protein ?? 0,
-        fat: i.nutritionalInfo?.fat ?? 0,
-        fiber: i.nutritionalInfo?.fiber ?? 0,
-        sugar: i.nutritionalInfo?.sugar ?? 0,
-      },
-      unit: (i.unit as "gram" | "piece" | "liter") || "gram",
-      is_active: i.is_active ?? true,
-    }));
+    const mappedIngredients: Types.Ingredient.IngredientType[] = results.map(
+      (i: any) => ({
+        _id: i._id,
+        name: i.name,
+        description: i.description || "",
+        allergens: i.allergens || [],
+        nutritionalInfo: {
+          calories: i.nutritionalInfo?.calories ?? 0,
+          protein: i.nutritionalInfo?.protein ?? 0,
+          fat: i.nutritionalInfo?.fat ?? 0,
+          fiber: i.nutritionalInfo?.fiber ?? 0,
+          sugar: i.nutritionalInfo?.sugar ?? 0,
+        },
+        unit: (i.unit as "gram" | "piece" | "liter") || "gram",
+        is_active: i.is_active ?? true,
+      })
+    );
 
     return {
       result: mappedIngredients || [],

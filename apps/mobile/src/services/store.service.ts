@@ -1,7 +1,7 @@
-import { StoreListQuery } from "@/types/store.type";
+import { Types } from "@my-monorepo/shared";
 import authorizedAxios from "../utils/request/authorizedRequest";
 
-export const getListStore = async (params: StoreListQuery) => {
+export const getListStore = async (params: Types.Store.StoreListQuery) => {
   try {
     const response = await authorizedAxios.get("/store", { params });
     return response.data;

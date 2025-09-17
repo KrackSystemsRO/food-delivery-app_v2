@@ -1,7 +1,5 @@
-import { StoreType } from "@/types/store.type";
-import type { CartItemType } from "../types/cart.type";
+import { Types } from "@my-monorepo/shared";
 import axiosInstance from "../utils/request/authorizedRequest";
-import { OrderType } from "@/types/order.type";
 
 export interface GetOrdersParams {
   _id?: string;
@@ -15,7 +13,7 @@ export interface GetOrdersParams {
 }
 
 export interface GetOrdersResponse {
-  result: OrderType[];
+  result: Types.Order.OrderType[];
   status: number;
   message: string;
   totalCount: number;
@@ -24,14 +22,14 @@ export interface GetOrdersResponse {
 }
 
 export interface AcceptDenyOrderResponse {
-  result: OrderType;
+  result: Types.Order.OrderType;
   status: number;
   message: string;
 }
 
 export const placeOrder = async (orderData: {
-  store: StoreType;
-  items: CartItemType[];
+  store: Types.Store.StoreType;
+  items: Types.Cart.CartItemType[];
   deliveryLocation: {
     lat: number;
     lng: number;
