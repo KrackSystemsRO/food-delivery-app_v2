@@ -7,23 +7,15 @@ import { useTranslation } from "react-i18next";
 import { ConfirmModal } from "@/components/user/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
 
-import {
-  addDepartment,
-  deleteDepartment,
-  getDepartments,
-  updateDepartment,
-} from "@/services/department.service";
-
 import useDepartmentStore from "@/stores/department.store";
 import { DepartmentTable } from "@/components/department/data-table.department";
 import { DepartmentFilters } from "@/components/department/filters.department";
 import DepartmentModal from "@/components/department/department.modal";
 
 import useUserStore from "@/stores/user.store";
-import { getUsers } from "@/services/user.service";
-import { getCompanies } from "@/services/company.service";
 import useCompanyStore from "@/stores/company.store";
-import { Types } from "@my-monorepo/shared";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 const defaultFilters = {
   search: "",
@@ -93,7 +85,7 @@ export default function DepartmentManagementPage() {
   const fetchDepartments = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getDepartments({
+      const res = await Services.Department.getDepartments(axiosInstance, {
         search: filters.search,
         is_active: filters.is_active,
         company: filters.company,
@@ -117,8 +109,8 @@ export default function DepartmentManagementPage() {
   useEffect(() => {
     (async () => {
       const [usersRes, companiesRes] = await Promise.all([
-        getUsers({ is_active: true }),
-        getCompanies({ is_active: true }),
+        Services.User.getUsers(axiosInstance, { is_active: true }),
+        Services.Company.getCompanies(axiosInstance, { is_active: true }),
       ]);
       setUsersList(usersRes.result);
       setCompaniesList(companiesRes.result);
@@ -187,7 +179,10 @@ export default function DepartmentManagementPage() {
   const performDelete = useCallback(async () => {
     if (!departmentToDelete) return;
     try {
-      await deleteDepartment(departmentToDelete._id);
+      await Services.Department.deleteDepartment(
+        axiosInstance,
+        departmentToDelete._id
+      );
       fetchDepartments();
       showToast("success", t("department.message.deleted"));
     } catch {
@@ -206,13 +201,20 @@ export default function DepartmentManagementPage() {
 
     try {
       if (selectedDepartment) {
-        const res = await updateDepartment(selectedDepartment._id, form);
+        const res = await Services.Department.updateDepartment(
+          axiosInstance,
+          selectedDepartment._id,
+          form
+        );
         if (res.status === 200) {
           showToast("success", t("department.message.updated"));
           updateDepartmentInList(res.result);
         } else throw new Error();
       } else {
-        const res = await addDepartment(form);
+        const res = await Services.Department.addDepartment(
+          axiosInstance,
+          form
+        );
         if (res.status === 201) {
           showToast("success", t("department.message.created"));
           fetchDepartments();

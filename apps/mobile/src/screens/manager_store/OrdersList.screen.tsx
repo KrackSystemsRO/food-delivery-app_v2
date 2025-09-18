@@ -8,14 +8,10 @@ import React, {
 import { View, FlatList, ActivityIndicator } from "react-native";
 import { Card, Text, Button } from "react-native-paper";
 import MultiSelectWithChips from "@/components/select/MultiSelectWithChips";
-import {
-  acceptOrder,
-  denyOrder,
-  getUserOrdersByStores,
-} from "@/services/order.service";
-import { getListStore } from "@/services/store.service";
+
 import { useAuth } from "@/context/authContext";
-import { Types } from "@my-monorepo/shared";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 const OrderCard: React.FC<{
   order: Types.Order.OrderType;
@@ -87,7 +83,9 @@ const ManagerOrdersScreen: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const storeData = await getListStore({ is_active: true });
+        const storeData = await Services.Store.getStores(axiosInstance, {
+          is_active: true,
+        });
         setStores(storeData.result ?? []);
       } catch (err) {
         console.error("Failed to load stores", err);
@@ -105,7 +103,10 @@ const ManagerOrdersScreen: React.FC = () => {
     setLoading(true);
     try {
       const storeIds = selectedStores.map((s) => s._id);
-      const response = await getUserOrdersByStores(storeIds);
+      const response = await Services.Order.getUserOrdersByStores(
+        axiosInstance,
+        storeIds
+      );
       setOrders(response.result ?? []);
     } catch (err) {
       console.error("Failed to load orders", err);
@@ -174,10 +175,10 @@ const ManagerOrdersScreen: React.FC = () => {
 
   /** Accept / Deny */
   const handleAcceptOrder = useCallback(async (orderId: string) => {
-    await acceptOrder(orderId);
+    await Services.Order.acceptOrder(axiosInstance, orderId);
   }, []);
   const handleDenyOrder = useCallback(async (orderId: string) => {
-    await denyOrder(orderId);
+    await Services.Order.denyOrder(axiosInstance, orderId);
   }, []);
 
   /** Render order card */

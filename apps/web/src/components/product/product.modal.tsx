@@ -13,12 +13,11 @@ import { useTranslation } from "react-i18next";
 import MultiSelectWithChips from "./MultiSelectWithChips";
 import { IngredientsSelector } from "./IngredientsSelector";
 import StoreSelector from "./StoreSelector";
-import { getCategories } from "@/services/category.service";
 import { memo, useCallback, useEffect, useMemo } from "react";
 import useCategoryStore from "@/stores/category.store";
-import { getIngredients } from "@/services/ingredient.service";
 import useIngredientStore from "@/stores/ingredient.store";
-import { Types } from "@my-monorepo/shared";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 interface ProductModalProps {
   isOpen: boolean;
@@ -64,9 +63,14 @@ export function ProductModalComponent({
 
   useEffect(() => {
     (async () => {
-      const categories = await getCategories({ is_active: true });
+      const categories = await Services.Category.getCategories(axiosInstance, {
+        is_active: true,
+      });
       setCategoriesList(categories.result ?? []);
-      const ingredient = await getIngredients({ is_active: true });
+      const ingredient = await Services.Ingredient.getIngredients(
+        axiosInstance,
+        { is_active: true }
+      );
       setIngredientsList(ingredient.result ?? []);
     })();
   }, []);
@@ -77,7 +81,10 @@ export function ProductModalComponent({
         return categoriesList.map((c) => ({ _id: c._id, name: c.name }));
       }
 
-      const result = await getCategories({ is_active: true, search: input });
+      const result = await Services.Category.getCategories(axiosInstance, {
+        is_active: true,
+        search: input,
+      });
       return result.result.map((c) => ({ _id: c._id, name: c.name }));
     },
     [categoriesList]
@@ -89,7 +96,10 @@ export function ProductModalComponent({
         return ingredientsList.map((c) => ({ _id: c._id, name: c.name }));
       }
 
-      const result = await getIngredients({ is_active: true, search: input });
+      const result = await Services.Ingredient.getIngredients(axiosInstance, {
+        is_active: true,
+        search: input,
+      });
       return result.result.map((c) => ({ _id: c._id, name: c.name }));
     },
     [ingredientsList]

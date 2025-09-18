@@ -12,7 +12,8 @@ import { Label } from "@/components/ui/label";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { showToast } from "@/utils/toast";
-import { forgotPassword } from "@/services/authentication.service";
+import { default as request } from "@/utils/request/request";
+import { Services } from "@my-monorepo/shared";
 
 export default function ForgotPasswordPage({
   className,
@@ -26,7 +27,7 @@ export default function ForgotPasswordPage({
     e.preventDefault();
     setLoading(true);
     try {
-      await forgotPassword(email);
+      await Services.Auth.forgotPassword(request, email);
       showToast(
         "success",
         t("forgotPassword.message.success") || "Reset email sent"

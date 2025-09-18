@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { isEqual } from "@/utils/utils";
-import { getUsers } from "@/services/user.service";
 import useUserStore from "@/stores/user.store";
 import type { Types } from "@my-monorepo/shared";
+import { Services } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 export function useUsers(alwaysFetch = false) {
   const [loading, setLoading] = useState(false);
@@ -16,7 +17,7 @@ export function useUsers(alwaysFetch = false) {
       try {
         setLoading(true);
         if (!usersList.length || alwaysFetch) {
-          const response = await getUsers({});
+          const response = await Services.User.getUsers(axiosInstance, {});
           const fetchedUsers: Types.User.UserType[] = response?.result ?? [];
           if (isMounted && !isEqual(usersList, fetchedUsers)) {
             setUsersList(fetchedUsers);
@@ -31,7 +32,7 @@ export function useUsers(alwaysFetch = false) {
 
     const pollUsers = async () => {
       try {
-        const response = await getUsers({});
+        const response = await Services.User.getUsers(axiosInstance, {});
         const fetchedUsers: Types.User.UserType[] = response?.result ?? [];
         if (isMounted && !isEqual(usersList, fetchedUsers)) {
           setUsersList(fetchedUsers);

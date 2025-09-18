@@ -2,7 +2,7 @@ import axios from "axios";
 import Constants from "expo-constants";
 import * as SecureStore from "expo-secure-store";
 import { showToast } from "../toast";
-import { logout } from "@/services/authentication.service";
+import { Services } from "@my-monorepo/shared";
 
 const { API_URL } = Constants.expoConfig?.extra ?? {};
 
@@ -12,6 +12,7 @@ const axiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true,
 });
 
 axiosInstance.interceptors.request.use(
@@ -57,7 +58,7 @@ axiosInstance.interceptors.response.use(
       } catch (refreshError) {
         console.error("Token refresh failed", refreshError);
         showToast("error", "Session expired", "Please log in again.");
-        await logout();
+        await Services.Auth.logout();
         return Promise.reject(refreshError);
       }
     }

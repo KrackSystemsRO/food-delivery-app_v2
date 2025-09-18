@@ -1,0 +1,110 @@
+import type { Types } from "../../index";
+import { AxiosInstance } from "axios";
+
+export interface GetIngredientParams {
+  search?: string;
+  is_active?: boolean;
+  page?: number;
+  limit?: number;
+  sort_by?: keyof Types.Ingredient.IngredientType;
+  order?: "asc" | "desc";
+}
+
+export interface GetIngredientsResponse {
+  status: number;
+  message: string;
+  result: Types.Ingredient.IngredientType[];
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+}
+
+export const getIngredients = async (
+  axios: AxiosInstance,
+  params: GetIngredientParams
+): Promise<GetIngredientsResponse> => {
+  try {
+    const response = await axios.get("/ingredient", {
+      params: {
+        search: params.search,
+        is_active: params.is_active,
+        page: params.page,
+        limit: params.limit,
+        sort_by: params.sort_by,
+        order: params.order,
+      },
+    });
+
+    return {
+      result: response.data.result,
+      status: response.status,
+      message: response.data.message,
+      totalCount: response.data.totalCount,
+      totalPages: response.data.totalPages,
+      currentPage: response.data.currentPage,
+    };
+  } catch (error: any) {
+    console.error("Failed to fetch ingredients:", error);
+    return {
+      result: [],
+      status: error?.response?.status || 500,
+      message: error?.response?.data?.message || "Failed to fetch ingredients",
+      totalCount: 0,
+      totalPages: 0,
+      currentPage: 1,
+    };
+  }
+};
+
+export const addIngredient = async (
+  axios: AxiosInstance,
+  data: Types.Ingredient.IngredientForm
+) => {
+  try {
+    const response = await axios.post("/ingredient", data);
+    return response.data;
+  } catch (error) {
+    console.info("Failed to create ingredient");
+    return error;
+  }
+};
+
+export const updateIngredient = async (
+  axios: AxiosInstance,
+  id: string,
+  data: Types.Ingredient.IngredientForm
+) => {
+  try {
+    const response = await axios.put(`/ingredient/${id}`, data);
+    return response.data;
+  } catch (error) {
+    console.info("Failed to update ingredient");
+    return error;
+  }
+};
+
+export const deleteIngredient = async (axios: AxiosInstance, id: string) => {
+  try {
+    const response = await axios.delete(`/ingredient/${id}`);
+    return response.data;
+  } catch (error) {
+    console.info("Failed to delete ingredient");
+    return error;
+  }
+};
+
+export const checkIngredient = async (axios: AxiosInstance, name: string) => {
+  try {
+    const res = await axios.get(`/ingredient/check`, {
+      params: { name },
+    });
+
+    return res.data as {
+      exists: boolean;
+      ingredient?: Types.Ingredient.IngredientType;
+    };
+  } catch (err) {
+    console.info("Failed to check ingredient");
+    return err;
+  }
+};

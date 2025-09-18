@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { TextInput, Button, Text } from "react-native-paper";
-import { login } from "../services/authentication.service";
 import { useAuth } from "../context/authContext";
-import { getUserDetails } from "../services/user.service";
 import { useTranslation } from "react-i18next";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AppStackParamList } from "@/types/navigation.type";
+import { default as authorizedRequest } from "@/utils/request/authorizedRequest";
+import { default as request } from "@/utils/request/request";
+import { Services } from "@my-monorepo/shared";
 
 export default function LoginScreen() {
   const { login: loginWithToken, setUser } = useAuth();
@@ -26,9 +27,12 @@ export default function LoginScreen() {
     setError("");
 
     try {
-      const response = await login({ email, password });
+      const response = await Services.Auth.login(request, {
+        email,
+        password,
+      });
       loginWithToken(response.accessToken, response.refreshToken);
-      setUser((await getUserDetails()).result);
+      setUser((await Services.User.getUserDetails(authorizedRequest)).result);
     } catch (err) {
       setError("Invalid email or password");
     } finally {

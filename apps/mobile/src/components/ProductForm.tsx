@@ -7,17 +7,11 @@ import {
   Checkbox,
   RadioButton,
 } from "react-native-paper";
-import { getListStore } from "@/services/store.service";
-import {
-  CategoryType,
-  createCategory,
-  getCategories,
-} from "@/services/category.service";
-import { getIngredients } from "@/services/ingredient.service";
 import IngredientsSelector from "@/components/IngredientsSelector";
 import MultiSelectWithChips from "@/components/select/MultiSelectWithChips";
-import { Types } from "@my-monorepo/shared";
+import { Services, Types } from "@my-monorepo/shared";
 import { normalizeFloatingPoint } from "@/utils/tools";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 type ProductFormProps = {
   initialValues?: Partial<Types.Product.ProductType>;
@@ -52,7 +46,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   );
   const [selectedCategories, setSelectedCategories] = useState<
     Types.Category.CategoryType[]
-  >((initialValues.category as CategoryType[]) ?? []);
+  >((initialValues.category as Types.Category.CategoryType[]) ?? []);
 
   const [ingredients, setIngredients] = useState<
     Types.Ingredient.IngredientType[]
@@ -70,9 +64,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
     (async () => {
       try {
         const [storeData, categoryData, ingredientData] = await Promise.all([
-          getListStore({}),
-          getCategories({ is_active: true }),
-          getIngredients({ is_active: true }),
+          Services.Store.getStores(axiosInstance, {}),
+          Services.Category.getCategories(axiosInstance, { is_active: true }),
+          Services.Ingredient.getIngredients(axiosInstance, {
+            is_active: true,
+          }),
         ]);
 
         setStores(storeData.result ?? []);
@@ -124,7 +120,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
   // Memoized category add
   const handleAddNewCategory = useCallback(async (query: string) => {
     try {
-      const newCategory = await createCategory({ name: query });
+      const newCategory = await Services.Category.addCategory(axiosInstance, {
+        name: query,
+      });
 
       setCategories((prev) =>
         prev.some((c) => c._id === newCategory._id)
@@ -157,8 +155,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
   const mappedCategories = useMemo(
     () => ({
-      getId: (c: CategoryType) => c._id,
-      getLabel: (c: CategoryType) => c.name,
+      getId: (c: Types.Category.CategoryType) => c._id,
+      getLabel: (c: Types.Category.CategoryType) => c.name,
     }),
     []
   );
@@ -204,7 +202,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         style={{ marginBottom: 16, marginTop: 16 }}
       />
 
-      <MultiSelectWithChips<CategoryType>
+      <MultiSelectWithChips<Types.Category.CategoryType>
         label="Categories"
         options={categories}
         selected={selectedCategories}

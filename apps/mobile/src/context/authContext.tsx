@@ -12,9 +12,10 @@ import {
   connectSocket,
   disconnectSocket,
 } from "@/services/soket.connection/socket";
-import { getUserDetails } from "@/services/user.service";
+import { Services } from "@my-monorepo/shared";
 import { showToast } from "@/utils/toast";
 import { Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 interface AuthContextType {
   accessToken: string | null;
@@ -125,7 +126,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (storedAccess) {
         try {
-          const { result: userDetails } = await getUserDetails();
+          const { result: userDetails } = await Services.User.getUserDetails(
+            axiosInstance
+          );
           setUser(userDetails);
 
           // connect only if no active socket
@@ -161,7 +164,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setRefreshToken(newRefresh);
 
     try {
-      const { result: userDetails } = await getUserDetails();
+      const { result: userDetails } = await Services.User.getUserDetails(
+        axiosInstance
+      );
       setUser(userDetails);
 
       if (!socket || !socket.connected) {

@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { View, ActivityIndicator, Alert, FlatList } from "react-native";
-import { Button, Text, Card, Divider } from "react-native-paper";
-import { getOrderById, acceptOrder, denyOrder } from "@/services/order.service";
-import { Types } from "@my-monorepo/shared";
+import { Button, Text, Card } from "react-native-paper";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { OrdersStackParamList } from "@/components/layouts/ManagerLayout";
 import { getSocket } from "@/services/soket.connection/socket";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 export type OrderDetailProps = NativeStackScreenProps<
   OrdersStackParamList,
@@ -88,7 +88,7 @@ const OrderDetailScreen: React.FC<OrderDetailProps> = ({ route }) => {
   const fetchOrderDetail = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await getOrderById(_id);
+      const response = await Services.Order.getOrderById(axiosInstance, _id);
       setOrder(response.result);
     } catch (err) {
       console.error(err);
@@ -118,7 +118,7 @@ const OrderDetailScreen: React.FC<OrderDetailProps> = ({ route }) => {
 
   const handleAccept = useCallback(async () => {
     try {
-      await acceptOrder(_id);
+      await Services.Order.acceptOrder(axiosInstance, _id);
       Alert.alert("Success", "Order accepted");
     } catch {
       Alert.alert("Error", "Failed to accept order");
@@ -127,7 +127,7 @@ const OrderDetailScreen: React.FC<OrderDetailProps> = ({ route }) => {
 
   const handleDeny = useCallback(async () => {
     try {
-      await denyOrder(_id);
+      await Services.Order.denyOrder(axiosInstance, _id);
       Alert.alert("Success", "Order denied");
       fetchOrderDetail();
     } catch {

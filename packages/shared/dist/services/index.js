@@ -1,0 +1,11 @@
+export * as User from "./services/user";
+export * as Company from "./services/company";
+export * as Department from "./services/department";
+export * as Allergen from "./services/allergen";
+export * as Auth from "./services/auth";
+export * as Category from "./services/category";
+export * as Ingredient from "./services/ingredient";
+export * as Order from "./services/order";
+export * as Product from "./services/product";
+export * as Recipe from "./services/recipe";
+export * as Store from "./services/store";

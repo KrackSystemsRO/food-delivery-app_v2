@@ -6,19 +6,13 @@ import { useTranslation } from "react-i18next";
 
 import { ConfirmModal } from "@/components/user/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
-
-import {
-  addCategory,
-  deleteCategory,
-  getCategories,
-  updateCategory,
-} from "@/services/category.service";
 import useCategoryStore from "@/stores/category.store";
 import { CategoryTable } from "@/components/category/data-table.category";
 import { CategoryFilters } from "@/components/category/filters.category";
 import CategoryModal from "@/components/category/category.modal";
 
-import { Types } from "@my-monorepo/shared";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 const defaultFilters = {
   search: "",
@@ -82,7 +76,7 @@ export default function CategoryManagementPage() {
   const fetchCategories = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getCategories({
+      const res = await Services.Category.getCategories(axiosInstance, {
         search: filters.search,
         is_active: filters.is_active,
         page,
@@ -150,7 +144,10 @@ export default function CategoryManagementPage() {
   const performDelete = useCallback(async () => {
     if (!categoryToDelete) return;
     try {
-      await deleteCategory(categoryToDelete._id);
+      await Services.Category.deleteCategory(
+        axiosInstance,
+        categoryToDelete._id
+      );
       fetchCategories();
       showToast("success", t("category.message.deleted") || "Category deleted");
     } catch {
@@ -172,13 +169,17 @@ export default function CategoryManagementPage() {
 
     try {
       if (selectedCategory) {
-        const res = await updateCategory(selectedCategory._id, form);
+        const res = await Services.Category.updateCategory(
+          axiosInstance,
+          selectedCategory._id,
+          form
+        );
         if (res.status === 200) {
           showToast("success", t("category.message.updated"));
           updateCategoryInList(res.result);
         } else throw new Error();
       } else {
-        const res = await addCategory(form);
+        const res = await Services.Category.addCategory(axiosInstance, form);
         if (res.status === 201) {
           showToast("success", t("category.message.created"));
           fetchCategories();

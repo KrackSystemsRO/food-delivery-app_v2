@@ -3,10 +3,9 @@ import { View, StyleSheet, TouchableOpacity, FlatList } from "react-native";
 import { Card, Text, Button, ActivityIndicator } from "react-native-paper";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { useTranslation } from "react-i18next";
-import { acceptOrder } from "@/services/order.service";
-import { getOrders } from "@/services/courier.service";
 import { useAuth } from "@/context/authContext";
-import { Types } from "@my-monorepo/shared";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 /* ------------------ Order Card ------------------ */
 const OrderCard = React.memo(({ order, onAccept, t, navigation }: any) => (
@@ -100,7 +99,9 @@ export default function CourierOrdersPage({ navigation }: { navigation: any }) {
   const loadOrders = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await getOrders({ limit: 100 });
+      const response = await Services.Order.getOrders(axiosInstance, {
+        limit: 100,
+      });
       setOrders(response.result);
     } catch (err) {
       console.error("Error fetching orders", err);
@@ -118,7 +119,7 @@ export default function CourierOrdersPage({ navigation }: { navigation: any }) {
   /* ------------------ Accept Order ------------------ */
   const handleAcceptOrder = useCallback(async (orderId: string) => {
     try {
-      await acceptOrder(orderId);
+      await Services.Order.acceptOrder(axiosInstance, orderId);
     } catch (err) {
       console.error("Failed to accept order:", err);
     }

@@ -13,14 +13,14 @@ import {
   clearCart as clearCartApi,
   fetchCart,
 } from "../../services/cart.service";
-import { placeOrder } from "../../services/order.service";
 import { showToast } from "../../utils/toast";
 import { useTranslation } from "react-i18next";
 import {
   GestureHandlerRootView,
   RefreshControl,
 } from "react-native-gesture-handler";
-import { Types } from "@my-monorepo/shared";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 export default function CartScreen() {
   const { state, dispatch, syncUpdateQuantity, refreshCart } = useCart();
@@ -103,7 +103,7 @@ export default function CartScreen() {
         deliveryLocation: deliveryLocation,
       };
 
-      await placeOrder(orderData);
+      await Services.Order.placeOrder(axiosInstance, orderData);
       await clearCartApi();
       dispatch({ type: "CLEAR_CART" });
 

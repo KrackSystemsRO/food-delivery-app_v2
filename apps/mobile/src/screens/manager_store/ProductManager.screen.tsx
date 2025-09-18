@@ -1,11 +1,4 @@
 import { ProductsStackParamList } from "@/components/layouts/ManagerLayout";
-import {
-  deleteProduct,
-  getUserProductsStore,
-  getUserProductsStores,
-  updateProduct,
-} from "@/services/product.service";
-import { getListStore } from "@/services/store.service";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { View, FlatList, Alert } from "react-native";
@@ -13,7 +6,8 @@ import { Button, Card } from "react-native-paper";
 import MultiSelectWithChips from "@/components/select/MultiSelectWithChips";
 import LoadingSpin from "@/components/LoadingSpin";
 import { useFocusEffect } from "@react-navigation/native";
-import { Types } from "@my-monorepo/shared";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 type ProductsProps = NativeStackScreenProps<
   ProductsStackParamList,
@@ -59,7 +53,7 @@ const ProductsScreen = ({ navigation }: ProductsProps) => {
   useEffect(() => {
     (async () => {
       try {
-        const storeData = await getListStore({});
+        const storeData = await Services.Store.getStores(axiosInstance, {});
         setStores(storeData.result ?? []);
       } catch (err) {
         console.error("Failed to load stores", err);
@@ -79,7 +73,10 @@ const ProductsScreen = ({ navigation }: ProductsProps) => {
     try {
       const allProducts: Types.Product.ProductType[] = [];
       for (const store of selectedStores) {
-        const response = await getUserProductsStore(store._id);
+        const response = await Services.Product.getUserProductsStore(
+          axiosInstance,
+          store._id
+        );
         if (response.result) allProducts.push(...response.result);
       }
       setProducts(allProducts);
@@ -95,10 +92,13 @@ const ProductsScreen = ({ navigation }: ProductsProps) => {
     if (!selectedStores.length) return;
     setRefreshing(true);
     try {
-      const response = await getUserProductsStores(selectedStores);
+      const response = await Services.Product.getUserProductsStores(
+        axiosInstance,
+        selectedStores
+      );
       setProducts(response ?? []);
 
-      const storeData = await getListStore({});
+      const storeData = await Services.Store.getStores(axiosInstance, {});
       setStores(storeData.result ?? []);
     } catch (err) {
       console.error("Failed to refresh products", err);
@@ -130,7 +130,9 @@ const ProductsScreen = ({ navigation }: ProductsProps) => {
     async (product: Types.Product.ProductType) => {
       try {
         const newAvailable = !product.available;
-        await updateProduct(product._id, { available: newAvailable });
+        await Services.Product.updateProduct(axiosInstance, product._id, {
+          available: newAvailable,
+        });
         await handleRefreshProducts();
       } catch (err) {
         console.error("Failed to update availability", err);
@@ -152,7 +154,10 @@ const ProductsScreen = ({ navigation }: ProductsProps) => {
             style: "destructive",
             onPress: async () => {
               try {
-                await deleteProduct(product._id);
+                await Services.Product.deleteProduct(
+                  axiosInstance,
+                  product._id
+                );
                 await handleRefreshProducts();
                 Alert.alert("Success", "Product deleted successfully");
               } catch (err) {

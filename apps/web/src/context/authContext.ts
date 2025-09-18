@@ -7,10 +7,10 @@ import React, {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import authorizedAxios from "@/utils/request/authorizedRequest";
-import { getUserDetails } from "@/services/user.service";
 import { showToast } from "@/utils/toast";
 import Cookies from "js-cookie";
-import { Types } from "@my-monorepo/shared";
+import { Types, Services } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 interface AuthContextType {
   accessToken: string | null;
   refreshToken: string | null;
@@ -53,7 +53,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       if (storedAccessToken) {
         try {
-          const userDetails = await getUserDetails();
+          const userDetails = await Services.User.getUserDetails(axiosInstance);
           if (userDetails?.result) setUser(userDetails.result);
           else setUser(null);
         } catch (err) {
@@ -82,7 +82,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setRefreshToken(newRefreshToken);
 
     try {
-      const userDetails = await getUserDetails();
+      const userDetails = await Services.User.getUserDetails(axiosInstance);
       if (userDetails?.result) setUser(userDetails.result);
       else setUser(null);
     } catch (err) {

@@ -5,7 +5,9 @@ import { useTranslation } from "react-i18next";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AppStackParamList } from "@/types/navigation.type";
-import { resetPassword } from "../services/authentication.service"; // You need to implement this service
+// import { resetPassword } from "../services/authentication.service"; // You need to implement this service
+import { Services } from "@my-monorepo/shared";
+import { default as request } from "@/utils/request/request";
 
 export default function ResetPasswordScreen() {
   const { t } = useTranslation();
@@ -34,7 +36,10 @@ export default function ResetPasswordScreen() {
 
     setLoading(true);
     try {
-      await resetPassword({ token, new_password: password });
+      await Services.Auth.resetPassword(request, {
+        token,
+        new_password: password,
+      });
       navigation.navigate("Login");
     } catch (err) {
       setError(t("resetPassword.error.failed"));

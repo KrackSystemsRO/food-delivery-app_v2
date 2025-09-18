@@ -1,9 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { View, Text, StyleSheet, FlatList, Dimensions } from "react-native";
 import { TabView, TabBar } from "react-native-tab-view";
-import { getOrders } from "@/services/courier.service";
-import { Types } from "@my-monorepo/shared";
+import { Services, Types } from "@my-monorepo/shared";
 import { useAuth } from "@/context/authContext";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 type OrdersRoute = { key: string; title: string };
 
@@ -22,7 +22,7 @@ export default function OrdersScreen() {
   const fetchOrders = useCallback(async () => {
     setRefreshing(true);
     try {
-      const response = await getOrders({});
+      const response = await Services.Order.getOrders(axiosInstance, {});
       setOrders(response.result);
     } catch (err) {
       console.error("Failed to fetch orders:", err);

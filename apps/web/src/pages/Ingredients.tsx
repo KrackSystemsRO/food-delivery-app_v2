@@ -6,17 +6,18 @@ import { useTranslation } from "react-i18next";
 
 import { ConfirmModal } from "@/components/user/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
-import {
-  addIngredient,
-  deleteIngredient,
-  getIngredients,
-  updateIngredient,
-} from "@/services/ingredient.service";
+// import {
+//   addIngredient,
+//   deleteIngredient,
+//   getIngredients,
+//   updateIngredient,
+// } from "@/services/ingredient.service";
 import useIngredientStore from "@/stores/ingredient.store";
 import { IngredientTable } from "@/components/ingredient/data-table.ingredient";
 import { IngredientFilters } from "@/components/ingredient/filters.ingredient";
 import IngredientModal from "@/components/ingredient/ingredient.modal";
-import { Types } from "@my-monorepo/shared";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 const defaultFilters = {
   search: "",
   is_active: undefined,
@@ -79,7 +80,7 @@ export default function IngredientManagementPage() {
   const fetchIngredients = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getIngredients({
+      const res = await Services.Ingredient.getIngredients(axiosInstance, {
         search: filters.search,
         is_active: filters.is_active,
         page,
@@ -153,7 +154,10 @@ export default function IngredientManagementPage() {
   const performDelete = useCallback(async () => {
     if (!ingredientToDelete) return;
     try {
-      await deleteIngredient(ingredientToDelete._id);
+      await Services.Ingredient.deleteIngredient(
+        axiosInstance,
+        ingredientToDelete._id
+      );
       fetchIngredients();
       showToast(
         "success",
@@ -178,13 +182,20 @@ export default function IngredientManagementPage() {
 
     try {
       if (selectedIngredient) {
-        const res = await updateIngredient(selectedIngredient._id, form);
+        const res = await Services.Ingredient.updateIngredient(
+          axiosInstance,
+          selectedIngredient._id,
+          form
+        );
         if (res.status === 200) {
           showToast("success", t("ingredient.message.updated"));
           updateIngredientInList(res.result);
         } else throw new Error();
       } else {
-        const res = await addIngredient(form);
+        const res = await Services.Ingredient.addIngredient(
+          axiosInstance,
+          form
+        );
         if (res.status === 201) {
           showToast("success", t("ingredient.message.created"));
           fetchIngredients();

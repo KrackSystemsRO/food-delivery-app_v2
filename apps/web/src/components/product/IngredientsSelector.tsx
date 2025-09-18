@@ -3,8 +3,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 
-import { Types } from "@my-monorepo/shared";
-import { addIngredient, checkIngredient } from "@/services/ingredient.service";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 interface IngredientsSelectorProps {
   options: Types.Ingredient.IngredientType[];
@@ -90,7 +90,10 @@ function IngredientsSelectorComponent({
   const handleCreate = useCallback(async () => {
     if (!query.trim()) return;
     try {
-      const response = await addIngredient({ name: query.trim(), unit });
+      const response = await Services.Ingredient.addIngredient(axiosInstance, {
+        name: query.trim(),
+        unit,
+      });
       const newIng: Types.Ingredient.IngredientType = response.result;
       onChange([...value, { ingredient: newIng, quantity: "", unit }]);
       setQuery("");
@@ -110,7 +113,10 @@ function IngredientsSelectorComponent({
 
   const handleCheckIngredient = useCallback(
     async (query: string) => {
-      const res = await checkIngredient(query);
+      const res = await Services.Ingredient.checkIngredient(
+        axiosInstance,
+        query
+      );
       if (res.exists) {
         handleAdd(res.ingredient!);
       } else {

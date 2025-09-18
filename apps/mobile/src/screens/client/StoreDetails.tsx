@@ -9,10 +9,10 @@ import {
 } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { StoresStackParamList } from "@/types/navigation.type";
-import { getListProductsStore } from "../../services/product.service";
 import LoadingSpin from "../../components/LoadingSpin";
 import { useTranslation } from "react-i18next";
-import { Types } from "@my-monorepo/shared";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 type Props = NativeStackScreenProps<StoresStackParamList, "StoreDetails">;
 
@@ -25,7 +25,10 @@ export default function StoreDetailsScreen({ route, navigation }: Props) {
 
   const fetchProducts = useCallback(async () => {
     try {
-      const response = await getListProductsStore(store._id);
+      const response = await Services.Product.getListProductsStore(
+        axiosInstance,
+        store._id
+      );
       if (response.status === 200) {
         setProducts(response.result);
       } else {

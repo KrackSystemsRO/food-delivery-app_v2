@@ -9,13 +9,8 @@ import { UserFilters } from "@/components/user/filters.user";
 import { UserTable } from "@/components/user/data-table.user";
 import { PaginationControls } from "@/components/common/pagination.common";
 import useUserStore from "@/stores/user.store";
-import {
-  addUser,
-  deleteUser,
-  getUsers,
-  updateUser,
-} from "@/services/user.service";
-import { Types } from "@my-monorepo/shared";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 const defaultFilters: Types.User.UserFiltersType = {
   search: "",
@@ -81,7 +76,7 @@ export default function UserManagementPage() {
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getUsers({
+      const res = await Services.User.getUsers(axiosInstance, {
         ...filters,
         page,
         sort_by: sortConfig.key,
@@ -141,7 +136,7 @@ export default function UserManagementPage() {
   const performDelete = async () => {
     if (!userToDelete) return;
     try {
-      await deleteUser(userToDelete._id);
+      await Services.User.deleteUser(axiosInstance, userToDelete._id);
       showToast("success", t("user.message.deleted") || "User deleted");
       fetchUsers();
     } catch {
@@ -167,13 +162,17 @@ export default function UserManagementPage() {
 
     try {
       if (selectedUser) {
-        const res = await updateUser(selectedUser._id, form);
+        const res = await Services.User.updateUser(
+          axiosInstance,
+          selectedUser._id,
+          form
+        );
         if (res.status === 200) {
           showToast("success", t("user.message.updated") || "User updated");
           updateUserInList(res.result);
         } else throw new Error();
       } else {
-        const res = await addUser(form);
+        const res = await Services.User.addUser(axiosInstance, form);
         if (res.status === 201) {
           showToast("success", t("user.message.created") || "User created");
           fetchUsers();

@@ -3,25 +3,17 @@ import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
-
 import { ConfirmModal } from "@/components/user/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
-
-import {
-  addProduct,
-  deleteProduct,
-  getProducts,
-  updateProduct,
-} from "@/services/product.service";
 import useProductStore from "@/stores/product.store";
 import { ProductTable } from "@/components/product/data-table.product";
 import { ProductFilters } from "@/components/product/filters.product";
 import { ProductModal } from "@/components/product/product.modal";
-import { addCategory } from "@/services/category.service";
 import useCategoryStore from "@/stores/category.store";
 import useStore from "@/stores/store.store";
-import { getStores } from "@/services/store.service";
 import type { Types } from "@my-monorepo/shared";
+import { Services } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 const defaultFilters = {
   search: "",
@@ -106,7 +98,7 @@ export default function ProductManagementPage() {
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getProducts({
+      const res = await Services.Product.getProducts(axiosInstance, {
         search: filters.search,
         is_active: filters.is_active,
         page,
@@ -125,7 +117,9 @@ export default function ProductManagementPage() {
 
   useEffect(() => {
     (async () => {
-      const store = await getStores({ is_active: true });
+      const store = await Services.Store.getStores(axiosInstance, {
+        is_active: true,
+      });
       setStoresList(store.result);
     })();
   }, []);
@@ -213,7 +207,7 @@ export default function ProductManagementPage() {
   const performDelete = useCallback(async () => {
     if (!productToDelete) return;
     try {
-      await deleteProduct(productToDelete._id);
+      await Services.Product.deleteProduct(axiosInstance, productToDelete._id);
       fetchProducts();
       showToast("success", t("product.message.deleted") || "Product deleted");
     } catch {
@@ -241,7 +235,9 @@ export default function ProductManagementPage() {
       const createdCategories: Types.Category.CategoryType[] = [];
       for (const cat of newCategories) {
         try {
-          const created = await addCategory({ name: cat.name });
+          const created = await Services.Category.addCategory(axiosInstance, {
+            name: cat.name,
+          });
           createdCategories.push(created.result);
           updateCategoryInList(created.result);
         } catch (err) {
@@ -262,13 +258,17 @@ export default function ProductManagementPage() {
         category: finalCategories,
       };
       if (selectedProduct) {
-        const res = await updateProduct(selectedProduct._id, payload);
+        const res = await Services.Product.updateProduct(
+          axiosInstance,
+          selectedProduct._id,
+          payload
+        );
         if (res.status === 200) {
           showToast("success", t("product.message.updated"));
           updateProductInList(res.result);
         } else throw new Error();
       } else {
-        const res = await addProduct(payload);
+        const res = await Services.Product.addProduct(axiosInstance, payload);
         if (res.status === 201) {
           showToast("success", t("product.message.created"));
           fetchProducts();

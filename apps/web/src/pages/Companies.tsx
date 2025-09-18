@@ -6,19 +6,13 @@ import { useTranslation } from "react-i18next";
 
 import { ConfirmModal } from "@/components/user/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
-import {
-  addCompany,
-  deleteCompany,
-  getCompanies,
-  updateCompany,
-} from "@/services/company.service";
 import useCompanyStore from "@/stores/company.store";
 import { CompanyTable } from "@/components/company/data-table.company";
 import { CompanyFilters } from "@/components/company/filters.company";
 import CompanyModal from "@/components/company/company.modal";
 import useUserStore from "@/stores/user.store";
-import { getUsers } from "@/services/user.service";
-import { Types } from "@my-monorepo/shared";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 const defaultFilters = {
   search: "",
@@ -86,7 +80,7 @@ export default function CompanyManagementPage() {
   const fetchCompanies = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getCompanies({
+      const res = await Services.Company.getCompanies(axiosInstance, {
         search: filters.search,
         type: filters.type,
         is_active: filters.is_active,
@@ -106,7 +100,9 @@ export default function CompanyManagementPage() {
 
   useEffect(() => {
     (async () => {
-      const users = await getUsers({ is_active: true });
+      const users = await Services.User.getUsers(axiosInstance, {
+        is_active: true,
+      });
       setUsersList(users.result);
     })();
   }, [setUsersList]);
@@ -167,7 +163,7 @@ export default function CompanyManagementPage() {
   const performDelete = useCallback(async () => {
     if (!companyToDelete) return;
     try {
-      await deleteCompany(companyToDelete._id);
+      await Services.Company.deleteCompany(axiosInstance, companyToDelete._id);
       fetchCompanies();
       showToast("success", t("company.message.deleted") || "Company deleted");
     } catch {
@@ -189,13 +185,17 @@ export default function CompanyManagementPage() {
 
     try {
       if (selectedCompany) {
-        const res = await updateCompany(selectedCompany._id, form);
+        const res = await Services.Company.updateCompany(
+          axiosInstance,
+          selectedCompany._id,
+          form
+        );
         if (res.status === 200) {
           showToast("success", t("company.message.updated"));
           updateCompanyInList(res.result);
         } else throw new Error();
       } else {
-        const res = await addCompany(form);
+        const res = await Services.Company.addCompany(axiosInstance, form);
         if (res.status === 201) {
           showToast("success", t("company.message.created"));
           fetchCompanies();
