@@ -5,10 +5,10 @@ import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
 import { PaginationControls } from "@/components/common/pagination.common";
 import useOrderStore from "@/stores/order.store";
-import { OrderTable } from "@/components/order/data-table";
+import { DataTable, type ColumnDef } from "@/components/common/data-table";
 import { OrderFilters, type FiltersType } from "@/components/order/filters";
 import OrderModal from "@/components/order/order.modal";
-import { ConfirmModal } from "@/components/order/confirm.modal";
+import { ConfirmModal } from "@/components/common/confirm.modal";
 import usePersistedState from "@/hooks/use-persisted-state";
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
@@ -152,6 +152,24 @@ export default function OrderManagementPage() {
     localStorage.removeItem("orderFilters");
   }, [setFilters]);
 
+  const columns: ColumnDef<Types.Order.OrderType>[] = [
+    {
+      key: "user",
+      label: t("order.table.user"),
+      render: (row) => row.user?.first_name || "-",
+    },
+    {
+      key: "status",
+      label: t("order.table.status"),
+      render: (row) => t(`order.status.${row.status}`) || row.status,
+    },
+    {
+      key: "createdAt",
+      label: t("order.table.createdAt"),
+      render: (row) => new Date(row.createdAt).toLocaleString(),
+    },
+  ];
+
   // --- Render ---
   return (
     <div className="p-6 space-y-4">
@@ -171,14 +189,16 @@ export default function OrderManagementPage() {
         resetFilters={resetFilters}
       />
 
-      <OrderTable
-        orders={orders}
+      <DataTable
+        columns={columns}
+        data={orders}
         sortKey={sortConfig.key}
         sortDirection={sortConfig.direction}
         loading={loading}
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={confirmDelete}
+        noDataText={t("common.table.noData") || "No orders found."}
       />
 
       <PaginationControls

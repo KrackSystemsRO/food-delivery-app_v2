@@ -4,9 +4,9 @@ import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { showToast } from "@/utils/toast";
 import UserModal from "@/components/user/user.modal";
-import { ConfirmModal } from "@/components/user/confirm.modal";
+import { ConfirmModal } from "@/components/common/confirm.modal";
 import { UserFilters } from "@/components/user/filters.user";
-import { UserTable } from "@/components/user/data-table.user";
+import { DataTable, type ColumnDef } from "@/components/common/data-table";
 import { PaginationControls } from "@/components/common/pagination.common";
 import useUserStore from "@/stores/user.store";
 import { Services, Types } from "@my-monorepo/shared";
@@ -194,6 +194,18 @@ export default function UserManagementPage() {
     localStorage.removeItem("userFilters");
   };
 
+  const columns: ColumnDef<Types.User.UserType>[] = [
+    { key: "first_name", label: t("user.firstName") || "First Name" },
+    { key: "last_name", label: t("user.lastName") || "Last Name" },
+    { key: "email", label: t("user.email") || "Email" },
+    { key: "role", label: t("user.role") || "Role" },
+    {
+      key: "is_active",
+      label: t("user.active") || "Active",
+      render: (user) => (user.is_active ? "Yes" : "No"),
+    },
+  ];
+
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
@@ -218,14 +230,16 @@ export default function UserManagementPage() {
         resetFilters={resetFilters}
       />
 
-      <UserTable
-        users={users}
+      <DataTable
+        columns={columns}
+        data={users}
         sortKey={sortConfig.key}
         sortDirection={sortConfig.direction}
         loading={loading}
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={confirmDelete}
+        noDataText={t("user.noUsers") || "No users found."}
       />
 
       <PaginationControls

@@ -4,11 +4,11 @@ import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
 
-import { ConfirmModal } from "@/components/user/confirm.modal";
+import { ConfirmModal } from "@/components/common/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
 
 import useDepartmentStore from "@/stores/department.store";
-import { DepartmentTable } from "@/components/department/data-table.department";
+import { DataTable, type ColumnDef } from "@/components/common/data-table";
 import { DepartmentFilters } from "@/components/department/filters.department";
 import DepartmentModal from "@/components/department/department.modal";
 
@@ -242,6 +242,32 @@ export default function DepartmentManagementPage() {
     localStorage.removeItem("departmentFilters");
   }, []);
 
+  const columns: ColumnDef<Types.Department.DepartmentType>[] = [
+    { key: "name", label: t("common.table.name") },
+    {
+      key: "company",
+      label: t("common.table.company"),
+      render: (row) => row.company?.map((c) => c.name).join(", ") || "-",
+    },
+    {
+      key: "admin",
+      label: t("common.table.admins"),
+      render: (row) =>
+        row.admin?.map((u: Types.User.UserType) => u.first_name).join(", ") ||
+        "-",
+    },
+    {
+      key: "is_active",
+      label: t("common.table.is_active"),
+      render: (row) =>
+        row.is_active ? (
+          <span className="text-green-600">{t("common.active")}</span>
+        ) : (
+          <span className="text-red-600">{t("common.inactive")}</span>
+        ),
+    },
+  ];
+
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
@@ -264,14 +290,16 @@ export default function DepartmentManagementPage() {
         companies={companiesList}
       />
 
-      <DepartmentTable
-        departments={departmentsList}
+      <DataTable
+        columns={columns}
+        data={departmentsList}
         sortKey={sortConfig.key}
         sortDirection={sortConfig.direction}
         loading={loading}
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={confirmDelete}
+        noDataText={t("common.table.noData") || "No departments found."}
       />
 
       <PaginationControls

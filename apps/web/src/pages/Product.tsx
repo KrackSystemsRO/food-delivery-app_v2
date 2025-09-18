@@ -3,10 +3,10 @@ import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
-import { ConfirmModal } from "@/components/user/confirm.modal";
+import { ConfirmModal } from "@/components/common/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
 import useProductStore from "@/stores/product.store";
-import { ProductTable } from "@/components/product/data-table.product";
+import { DataTable, type ColumnDef } from "@/components/common/data-table";
 import { ProductFilters } from "@/components/product/filters.product";
 import { ProductModal } from "@/components/product/product.modal";
 import useCategoryStore from "@/stores/category.store";
@@ -296,6 +296,25 @@ export default function ProductManagementPage() {
     localStorage.removeItem("productFilters");
   }, []);
 
+  const columns: ColumnDef<Types.Product.ProductType>[] = [
+    { key: "name", label: t("product.name") || "Name" },
+    {
+      key: "price",
+      label: t("product.price") || "Price",
+      render: (p) => `$${p.price.toFixed(2)}`,
+    },
+    {
+      key: "is_active",
+      label: t("product.active") || "Active",
+      render: (p) => (p.is_active ? "Yes" : "No"),
+    },
+    {
+      key: "category",
+      label: t("product.category") || "Category",
+      render: (p) => p.category?.map((c) => c.name).join(", ") || "-",
+    },
+  ];
+
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
@@ -317,14 +336,16 @@ export default function ProductManagementPage() {
         resetFilters={resetFilters}
       />
 
-      <ProductTable
-        products={products}
+      <DataTable
+        columns={columns}
+        data={products}
         sortKey={sortConfig.key}
         sortDirection={sortConfig.direction}
         loading={loading}
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={confirmDelete}
+        noDataText={t("product.noProducts") || "No products found."}
       />
 
       <PaginationControls

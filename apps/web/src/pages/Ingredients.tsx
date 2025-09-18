@@ -3,17 +3,10 @@ import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
-
-import { ConfirmModal } from "@/components/user/confirm.modal";
+import { ConfirmModal } from "@/components/common/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
-// import {
-//   addIngredient,
-//   deleteIngredient,
-//   getIngredients,
-//   updateIngredient,
-// } from "@/services/ingredient.service";
 import useIngredientStore from "@/stores/ingredient.store";
-import { IngredientTable } from "@/components/ingredient/data-table.ingredient";
+import { DataTable, type ColumnDef } from "@/components/common/data-table";
 import { IngredientFilters } from "@/components/ingredient/filters.ingredient";
 import IngredientModal from "@/components/ingredient/ingredient.modal";
 import { Services, Types } from "@my-monorepo/shared";
@@ -223,6 +216,25 @@ export default function IngredientManagementPage() {
     localStorage.removeItem("ingredientFilters");
   }, []);
 
+  const columns: ColumnDef<Types.Ingredient.IngredientType>[] = [
+    { key: "name", label: t("common.table.name") },
+    {
+      key: "description",
+      label: t("common.table.description"),
+      render: (row) => row.description || "-",
+    },
+    {
+      key: "is_active",
+      label: t("common.table.is_active"),
+      render: (row) =>
+        row.is_active ? (
+          <span className="text-green-600">{t("common.active")}</span>
+        ) : (
+          <span className="text-red-600">{t("common.inactive")}</span>
+        ),
+    },
+  ];
+
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
@@ -234,7 +246,6 @@ export default function IngredientManagementPage() {
           {t("ingredient.createIngredient") || "Create Ingredient"}
         </Button>
       </div>
-
       <IngredientFilters
         filters={filters}
         setFilters={(updated: Partial<typeof filters>) => {
@@ -243,23 +254,23 @@ export default function IngredientManagementPage() {
         }}
         resetFilters={resetFilters}
       />
-
-      <IngredientTable
-        ingredients={ingredients}
+      +
+      <DataTable
+        columns={columns}
+        data={ingredients}
         sortKey={sortConfig.key}
         sortDirection={sortConfig.direction}
         loading={loading}
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={confirmDelete}
+        noDataText={t("common.table.noData") || "No ingredients found."}
       />
-
       <PaginationControls
         page={page}
         totalPages={totalPages}
         onPageChange={setPage}
       />
-
       <IngredientModal
         isOpen={isModalOpen}
         onClose={() => {
@@ -272,7 +283,6 @@ export default function IngredientManagementPage() {
         setForm={setForm}
         isEditing={!!selectedIngredient}
       />
-
       <ConfirmModal
         isOpen={isDeleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}

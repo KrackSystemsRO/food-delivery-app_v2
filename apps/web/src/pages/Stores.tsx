@@ -3,18 +3,9 @@ import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
-
-import { ConfirmModal } from "@/components/user/confirm.modal";
+import { ConfirmModal } from "@/components/common/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
-
-// import {
-//   addStore,
-//   deleteStore,
-//   getStores,
-//   updateStore,
-// } from "@/services/store.service";
-
-import { StoreTable } from "@/components/store/data-table.store";
+import { DataTable, type ColumnDef } from "@/components/common/data-table";
 import useUserStore from "@/stores/user.store";
 import useCompanyStore from "@/stores/company.store";
 import useStore from "@/stores/store.store";
@@ -261,6 +252,33 @@ export default function StoreManagementPage() {
     localStorage.removeItem("storeFilters");
   }, []);
 
+  const columns: ColumnDef<Types.Store.StoreType>[] = [
+    { key: "name", label: t("store.name") || "Name" },
+    { key: "type", label: t("store.type") || "Type" },
+    { key: "address", label: t("store.address") || "Address" },
+    {
+      key: "is_active",
+      label: t("store.active") || "Active",
+      render: (store) => (store.is_active ? "Yes" : "No"),
+    },
+    {
+      key: "is_open",
+      label: t("store.open") || "Open",
+      render: (store) => (store.is_open ? "Yes" : "No"),
+    },
+    {
+      key: "admin",
+      label: t("store.admin") || "Admin",
+      render: (store) =>
+        store.admin?.map((u) => u.first_name).join(", ") || "-",
+    },
+    {
+      key: "company",
+      label: t("store.company") || "Company",
+      render: (store) => store.company?.map((c) => c.name).join(", ") || "-",
+    },
+  ];
+
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
@@ -282,14 +300,16 @@ export default function StoreManagementPage() {
         storeTypes={storeTypes}
       />
 
-      <StoreTable
-        stores={stores}
+      <DataTable
+        columns={columns}
+        data={stores}
         sortKey={sortConfig.key}
         sortDirection={sortConfig.direction}
         loading={loading}
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={confirmDelete}
+        noDataText={t("store.noStores") || "No stores found."}
       />
 
       <PaginationControls

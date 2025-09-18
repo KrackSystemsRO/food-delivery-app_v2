@@ -4,10 +4,10 @@ import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
 
-import { ConfirmModal } from "@/components/user/confirm.modal";
+import { ConfirmModal } from "@/components/common/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
 import useCompanyStore from "@/stores/company.store";
-import { CompanyTable } from "@/components/company/data-table.company";
+import { DataTable, type ColumnDef } from "@/components/common/data-table";
 import { CompanyFilters } from "@/components/company/filters.company";
 import CompanyModal from "@/components/company/company.modal";
 import useUserStore from "@/stores/user.store";
@@ -223,6 +223,38 @@ export default function CompanyManagementPage() {
     localStorage.removeItem("companyFilters");
   }, []);
 
+  const columns: ColumnDef<Types.Company.CompanyType>[] = [
+    { key: "name", label: t("common.table.name") },
+    { key: "email", label: t("common.table.email") },
+    { key: "phone_number", label: t("common.table.phone") },
+    {
+      key: "type",
+      label: t("common.table.type"),
+      render: (row) => t(`company.type.${row.type}`) || row.type,
+    },
+    {
+      key: "is_active",
+      label: t("common.table.is_active"),
+      render: (row) =>
+        row.is_active ? (
+          <span className="text-green-600 font-medium">
+            {t("common.active")}
+          </span>
+        ) : (
+          <span className="text-red-600 font-medium">
+            {t("common.inactive")}
+          </span>
+        ),
+    },
+    {
+      key: "admin",
+      label: t("common.table.admins"),
+      render: (row) =>
+        row.admin?.map((u: Types.User.UserType) => u.first_name).join(", ") ||
+        "-",
+    },
+  ];
+
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
@@ -244,14 +276,16 @@ export default function CompanyManagementPage() {
         resetFilters={resetFilters}
       />
 
-      <CompanyTable
-        companies={companies}
+      <DataTable
+        columns={columns}
+        data={companies}
         sortKey={sortConfig.key}
         sortDirection={sortConfig.direction}
         loading={loading}
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={confirmDelete}
+        noDataText={t("common.table.noData") || "No companies found."}
       />
 
       <PaginationControls

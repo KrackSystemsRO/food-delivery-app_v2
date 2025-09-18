@@ -1,14 +1,14 @@
 import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui";
-import { Plus } from "lucide-react";
+import { Plus, Check, X } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
 
-import { ConfirmModal } from "@/components/user/confirm.modal";
+import { ConfirmModal } from "@/components/common/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
+import { DataTable, type ColumnDef } from "@/components/common/data-table";
 
 import useAllergenStore from "@/stores/allergen.store";
-import { AllergenTable } from "@/components/allergen/data-table.allergen";
 import {
   AllergenFilters,
   type FiltersType,
@@ -103,8 +103,7 @@ export default function AllergenManagementPage() {
   }, [fetchAllergens, clearAllergensList, page]);
 
   const handleSort = useCallback((key: keyof Types.Allergen.AllergenType) => {
-    if (!sortableKeys.includes(key as SortKey)) return; // skip unsupported keys
-
+    if (!sortableKeys.includes(key as SortKey)) return;
     setSortConfig((current) => ({
       key: key as SortKey,
       direction:
@@ -146,7 +145,6 @@ export default function AllergenManagementPage() {
       );
       showToast("success", t("allergen.message.deleted") || "Allergen deleted");
 
-      // Handle page adjustment if last item deleted
       if (allergens.length === 1 && page > 1) {
         setPage((prev) => prev - 1);
       } else {
@@ -212,6 +210,21 @@ export default function AllergenManagementPage() {
     localStorage.removeItem("allergenFilters");
   }, [setFilters]);
 
+  const columns: ColumnDef<Types.Allergen.AllergenType>[] = [
+    { key: "name", label: t("common.table.name") },
+    { key: "description", label: t("common.table.description") },
+    {
+      key: "is_active",
+      label: t("common.table.is_active"),
+      render: (row) =>
+        row.is_active ? (
+          <Check className="text-green-500 inline-block" />
+        ) : (
+          <X className="text-red-500 inline-block" />
+        ),
+    },
+  ];
+
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
@@ -226,20 +239,23 @@ export default function AllergenManagementPage() {
 
       <AllergenFilters
         filters={filters}
-        setFilters={(updated: Partial<FiltersType>) => {
-          setFilters((prev) => ({ ...prev, ...updated }));
-        }}
+        setFilters={(updated: Partial<FiltersType>) =>
+          setFilters((prev) => ({ ...prev, ...updated }))
+        }
         resetFilters={resetFilters}
       />
 
-      <AllergenTable
-        allergens={allergens}
+      {/* ✅ Generic DataTable usage */}
+      <DataTable
+        columns={columns}
+        data={allergens}
         sortKey={sortConfig.key}
         sortDirection={sortConfig.direction}
         loading={loading}
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={confirmDelete}
+        noDataText={t("common.table.noData") || "No allergens found."}
       />
 
       <PaginationControls

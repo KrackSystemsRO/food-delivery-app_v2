@@ -1,13 +1,14 @@
 import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui";
-import { Plus } from "lucide-react";
+import { Plus, Check, X } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
 
-import { ConfirmModal } from "@/components/user/confirm.modal";
+import { ConfirmModal } from "@/components/common/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
+import { DataTable, type ColumnDef } from "@/components/common/data-table";
+
 import useCategoryStore from "@/stores/category.store";
-import { CategoryTable } from "@/components/category/data-table.category";
 import { CategoryFilters } from "@/components/category/filters.category";
 import CategoryModal from "@/components/category/category.modal";
 
@@ -207,6 +208,21 @@ export default function CategoryManagementPage() {
     localStorage.removeItem("categoryFilters");
   }, []);
 
+  const columns: ColumnDef<Types.Category.CategoryType>[] = [
+    { key: "name", label: t("common.table.name") },
+    { key: "description", label: t("common.table.description") },
+    {
+      key: "is_active",
+      label: t("common.table.is_active"),
+      render: (row) =>
+        row.is_active ? (
+          <Check className="text-green-500 inline-block" />
+        ) : (
+          <X className="text-red-500 inline-block" />
+        ),
+    },
+  ];
+
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
@@ -228,14 +244,17 @@ export default function CategoryManagementPage() {
         resetFilters={resetFilters}
       />
 
-      <CategoryTable
-        categories={categories}
+      {/* ✅ Replaced CategoryTable with common DataTable */}
+      <DataTable
+        columns={columns}
+        data={categories}
         sortKey={sortConfig.key}
         sortDirection={sortConfig.direction}
         loading={loading}
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={confirmDelete}
+        noDataText={t("common.table.noData") || "No categories found."}
       />
 
       <PaginationControls
