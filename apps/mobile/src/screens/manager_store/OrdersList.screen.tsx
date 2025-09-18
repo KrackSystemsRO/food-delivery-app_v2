@@ -8,18 +8,13 @@ import React, {
 import { View, FlatList, ActivityIndicator } from "react-native";
 import { Card, Text, Button } from "react-native-paper";
 import MultiSelectWithChips from "@/components/select/MultiSelectWithChips";
-import {
-  acceptOrder,
-  denyOrder,
-  getUserOrdersByStores,
-} from "@/services/order.service";
-import { getListStore } from "@/services/store.service";
+
 import { useAuth } from "@/context/authContext";
-import { OrderType } from "@/types/order.type";
-import { StoreType } from "@/types/store.type";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 const OrderCard: React.FC<{
-  order: OrderType;
+  order: Types.Order.OrderType;
   onAccept: (id: string) => void;
   onDeny: (id: string) => void;
   onPress: () => void;
@@ -71,13 +66,15 @@ const OrderCard: React.FC<{
 
 const ManagerOrdersScreen: React.FC = () => {
   const { socket, user, updateSelectedStores } = useAuth();
-  const [stores, setStores] = useState<StoreType[]>([]);
-  const [selectedStores, setSelectedStores] = useState<StoreType[]>([]);
-  const [orders, setOrders] = useState<OrderType[]>([]);
+  const [stores, setStores] = useState<Types.Store.StoreType[]>([]);
+  const [selectedStores, setSelectedStores] = useState<Types.Store.StoreType[]>(
+    []
+  );
+  const [orders, setOrders] = useState<Types.Order.OrderType[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  const selectedStoresRef = useRef<StoreType[]>([]);
+  const selectedStoresRef = useRef<Types.Store.StoreType[]>([]);
   selectedStoresRef.current = selectedStores;
 
   const socketRef = useRef<any>(null);
@@ -86,7 +83,9 @@ const ManagerOrdersScreen: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const storeData = await getListStore({ is_active: true });
+        const storeData = await Services.Store.getStores(axiosInstance, {
+          is_active: true,
+        });
         setStores(storeData.result ?? []);
       } catch (err) {
         console.error("Failed to load stores", err);
@@ -104,7 +103,10 @@ const ManagerOrdersScreen: React.FC = () => {
     setLoading(true);
     try {
       const storeIds = selectedStores.map((s) => s._id);
-      const response = await getUserOrdersByStores(storeIds);
+      const response = await Services.Order.getUserOrdersByStores(
+        axiosInstance,
+        storeIds
+      );
       setOrders(response.result ?? []);
     } catch (err) {
       console.error("Failed to load orders", err);
@@ -122,12 +124,12 @@ const ManagerOrdersScreen: React.FC = () => {
     // Only run if a manager is logged in and the socket exists
     if (!socket || user?.role !== "MANAGER") return;
 
-    const handleNewOrder = (order: OrderType) => {
+    const handleNewOrder = (order: Types.Order.OrderType) => {
       // optional: filter by selected stores if needed
       setOrders((prev) => [order, ...prev.filter((o) => o._id !== order._id)]);
     };
 
-    const handleOrderUpdate = (order: OrderType) => {
+    const handleOrderUpdate = (order: Types.Order.OrderType) => {
       setOrders((prev) => {
         const idx = prev.findIndex((o) => o._id === order._id);
         if (idx !== -1) {
@@ -173,15 +175,15 @@ const ManagerOrdersScreen: React.FC = () => {
 
   /** Accept / Deny */
   const handleAcceptOrder = useCallback(async (orderId: string) => {
-    await acceptOrder(orderId);
+    await Services.Order.acceptOrder(axiosInstance, orderId);
   }, []);
   const handleDenyOrder = useCallback(async (orderId: string) => {
-    await denyOrder(orderId);
+    await Services.Order.denyOrder(axiosInstance, orderId);
   }, []);
 
   /** Render order card */
   const renderItem = useCallback(
-    ({ item }: { item: OrderType }) => (
+    ({ item }: { item: Types.Order.OrderType }) => (
       <OrderCard
         order={item}
         onAccept={handleAcceptOrder}
@@ -196,7 +198,7 @@ const ManagerOrdersScreen: React.FC = () => {
   const listHeader = useMemo(
     () => (
       <View style={{ marginBottom: 16 }}>
-        <MultiSelectWithChips<StoreType>
+        <MultiSelectWithChips<Types.Store.StoreType>
           label="Select Stores"
           options={stores}
           selected={selectedStores}

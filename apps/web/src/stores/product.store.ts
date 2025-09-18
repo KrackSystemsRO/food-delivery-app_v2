@@ -1,17 +1,17 @@
+import type { Types } from "@my-monorepo/shared";
 import { create } from "zustand";
-import type { ProductType } from "@/types/product.type";
 
 interface ProductState {
-  productsList: ProductType[];
-  selectedProduct: ProductType | null;
+  productsList: Types.Product.ProductType[];
+  selectedProduct: Types.Product.ProductType | null;
 
-  setProductsList: (products: ProductType[]) => void;
+  setProductsList: (products: Types.Product.ProductType[]) => void;
   clearProductsList: () => void;
 
-  setSelectedProduct: (product: ProductType | null) => void;
+  setSelectedProduct: (product: Types.Product.ProductType | null) => void;
   clearSelectedProduct: () => void;
 
-  updateProductInList: (updatedProduct: ProductType) => void;
+  updateProductInList: (updatedProduct: Types.Product.ProductType) => void;
 }
 
 const useProductStore = create<ProductState>((set) => ({

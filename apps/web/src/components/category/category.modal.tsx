@@ -15,15 +15,15 @@ import {
   SelectItem,
 } from "@/components/ui";
 import { useTranslation } from "react-i18next";
-import type { CategoryForm } from "@/types/category.type";
+// import type { CategoryForm } from "@/types/category.type";
 import { memo } from "react";
-
+import { Types } from "@my-monorepo/shared";
 interface CategoryModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: () => void;
-  form: CategoryForm;
-  setForm: (form: CategoryForm) => void;
+  form: Types.Category.CategoryForm;
+  setForm: (form: Types.Category.CategoryForm) => void;
   isEditing: boolean;
 }
 
@@ -54,7 +54,7 @@ export default memo(function CategoryModal({
 }: CategoryModalProps) {
   const { t } = useTranslation();
 
-  const updateForm = (field: keyof CategoryForm, value: any) => {
+  const updateForm = (field: keyof Types.Category.CategoryForm, value: any) => {
     setForm({ ...form, [field]: value });
   };
 

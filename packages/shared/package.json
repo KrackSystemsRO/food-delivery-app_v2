@@ -4,9 +4,11 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "tsc-watch --onSuccess \"echo Shared package rebuilt\""
   },
   "devDependencies": {
+    "tsc-watch": "^7.1.1",
     "typescript": "^5.9.2"
   }
 }

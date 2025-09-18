@@ -9,17 +9,17 @@ import {
 } from "@/components/ui";
 import { Pencil, Trash2, Check, X, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { CategoryType } from "@/types/category.type";
 import { useCallback, useMemo } from "react";
+import { Types } from "@my-monorepo/shared";
 
 interface CategoryTableProps {
-  categories: CategoryType[];
-  sortKey: keyof CategoryType;
+  categories: Types.Category.CategoryType[];
+  sortKey: keyof Types.Category.CategoryType;
   sortDirection: "asc" | "desc";
   loading: boolean;
-  onSort: (key: keyof CategoryType) => void;
-  onEdit: (category: CategoryType) => void;
-  onDelete: (category: CategoryType) => void;
+  onSort: (key: keyof Types.Category.CategoryType) => void;
+  onEdit: (category: Types.Category.CategoryType) => void;
+  onDelete: (category: Types.Category.CategoryType) => void;
 }
 
 export function CategoryTable({
@@ -33,20 +33,21 @@ export function CategoryTable({
 }: CategoryTableProps) {
   const { t } = useTranslation();
 
-  const columns: { key: keyof CategoryType; label: string }[] = useMemo(
-    () => [
-      { key: "name", label: t("common.table.name") || "Name" },
-      {
-        key: "description",
-        label: t("common.table.description") || "Description",
-      },
-      { key: "is_active", label: t("common.table.is_active") || "Status" },
-    ],
-    [t]
-  );
+  const columns: { key: keyof Types.Category.CategoryType; label: string }[] =
+    useMemo(
+      () => [
+        { key: "name", label: t("common.table.name") || "Name" },
+        {
+          key: "description",
+          label: t("common.table.description") || "Description",
+        },
+        { key: "is_active", label: t("common.table.is_active") || "Status" },
+      ],
+      [t]
+    );
 
   const renderRow = useCallback(
-    (category: CategoryType) => (
+    (category: Types.Category.CategoryType) => (
       <TableRow key={category._id}>
         <TableCell>{category.name}</TableCell>
         <TableCell>{category.description || "-"}</TableCell>

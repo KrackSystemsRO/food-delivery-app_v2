@@ -6,13 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import { ConfirmModal } from "@/components/user/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
-import type { AllergenForm, AllergenType } from "@/types/allergen.type";
-import {
-  addAllergen,
-  deleteAllergen,
-  getAllergens,
-  updateAllergen,
-} from "@/services/allergen.service";
+
 import useAllergenStore from "@/stores/allergen.store";
 import { AllergenTable } from "@/components/allergen/data-table.allergen";
 import {
@@ -21,6 +15,8 @@ import {
 } from "@/components/allergen/filters.allergen";
 import AllergenModal from "@/components/allergen/allergen.modal";
 import usePersistedState from "@/hooks/use-persisted-state";
+import { Types, Services } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 const defaultFilters: FiltersType = {
   search: "",
@@ -33,9 +29,8 @@ type SortKey = "name" | "createdAt" | "is_active";
 export default function AllergenManagementPage() {
   const { t } = useTranslation();
 
-  const [allergenToDelete, setAllergenToDelete] = useState<AllergenType | null>(
-    null
-  );
+  const [allergenToDelete, setAllergenToDelete] =
+    useState<Types.Allergen.AllergenType | null>(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
@@ -44,7 +39,7 @@ export default function AllergenManagementPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen, setModalOpen] = useState(false);
 
-  const [form, setForm] = useState<AllergenForm>({
+  const [form, setForm] = useState<Types.Allergen.AllergenForm>({
     name: "",
     description: "",
     is_active: true,
@@ -78,7 +73,7 @@ export default function AllergenManagementPage() {
   const fetchAllergens = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getAllergens({
+      const res = await Services.Allergen.getAllergens(axiosInstance, {
         search: filters.search,
         is_active: filters.is_active,
         page,
@@ -107,7 +102,7 @@ export default function AllergenManagementPage() {
     return () => clearAllergensList();
   }, [fetchAllergens, clearAllergensList, page]);
 
-  const handleSort = useCallback((key: keyof AllergenType) => {
+  const handleSort = useCallback((key: keyof Types.Allergen.AllergenType) => {
     if (!sortableKeys.includes(key as SortKey)) return; // skip unsupported keys
 
     setSortConfig((current) => ({
@@ -124,7 +119,7 @@ export default function AllergenManagementPage() {
   }, [clearSelectedAllergen]);
 
   const openEditModal = useCallback(
-    (allergen: AllergenType) => {
+    (allergen: Types.Allergen.AllergenType) => {
       setSelectedAllergen(allergen);
       setForm({
         name: allergen.name,
@@ -136,7 +131,7 @@ export default function AllergenManagementPage() {
     [setSelectedAllergen]
   );
 
-  const confirmDelete = useCallback((allergen: AllergenType) => {
+  const confirmDelete = useCallback((allergen: Types.Allergen.AllergenType) => {
     setAllergenToDelete(allergen);
     setDeleteModalOpen(true);
   }, []);
@@ -145,7 +140,10 @@ export default function AllergenManagementPage() {
     if (!allergenToDelete) return;
     setDeleteLoading(true);
     try {
-      await deleteAllergen(allergenToDelete._id);
+      await Services.Allergen.deleteAllergen(
+        axiosInstance,
+        allergenToDelete._id
+      );
       showToast("success", t("allergen.message.deleted") || "Allergen deleted");
 
       // Handle page adjustment if last item deleted
@@ -174,13 +172,17 @@ export default function AllergenManagementPage() {
     setSubmitLoading(true);
     try {
       if (selectedAllergen) {
-        const res = await updateAllergen(selectedAllergen._id, form);
+        const res = await Services.Allergen.updateAllergen(
+          axiosInstance,
+          selectedAllergen._id,
+          form
+        );
         if (res.status === 200) {
           showToast("success", t("allergen.message.updated"));
           updateAllergenInList(res.result);
         } else throw new Error();
       } else {
-        const res = await addAllergen(form);
+        const res = await Services.Allergen.addAllergen(axiosInstance, form);
         if (res.status === 201) {
           showToast("success", t("allergen.message.created"));
           fetchAllergens();

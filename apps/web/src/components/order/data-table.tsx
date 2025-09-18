@@ -10,16 +10,16 @@ import {
 } from "@/components/ui";
 import { Pencil, Trash2, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { OrderType } from "@/types/order.type";
+import { Types } from "@my-monorepo/shared";
 
 interface OrderTableProps {
-  orders: OrderType[];
-  sortKey: keyof OrderType;
+  orders: Types.Order.OrderType[];
+  sortKey: keyof Types.Order.OrderType;
   sortDirection: "asc" | "desc";
   loading: boolean;
-  onSort: (key: keyof OrderType) => void;
-  onEdit: (order: OrderType) => void;
-  onDelete: (order: OrderType) => void;
+  onSort: (key: keyof Types.Order.OrderType) => void;
+  onEdit: (order: Types.Order.OrderType) => void;
+  onDelete: (order: Types.Order.OrderType) => void;
 }
 
 const OrderRow = memo(function OrderRow({
@@ -27,9 +27,9 @@ const OrderRow = memo(function OrderRow({
   onEdit,
   onDelete,
 }: {
-  order: OrderType;
-  onEdit: (order: OrderType) => void;
-  onDelete: (order: OrderType) => void;
+  order: Types.Order.OrderType;
+  onEdit: (order: Types.Order.OrderType) => void;
+  onDelete: (order: Types.Order.OrderType) => void;
 }) {
   const handleEdit = useCallback(() => onEdit(order), [onEdit, order]);
   const handleDelete = useCallback(() => onDelete(order), [onDelete, order]);
@@ -77,19 +77,19 @@ export const OrderTable = memo(function OrderTable({
   const columns = useMemo(
     () => [
       {
-        key: "user" as keyof OrderType,
+        key: "user" as keyof Types.Order.OrderType,
         label: t("common.table.customer") || "Customer",
       },
       {
-        key: "total" as keyof OrderType,
+        key: "total" as keyof Types.Order.OrderType,
         label: t("common.table.total") || "Total",
       },
       {
-        key: "status" as keyof OrderType,
+        key: "status" as keyof Types.Order.OrderType,
         label: t("common.form.label.status") || "Status",
       },
       {
-        key: "createdAt" as keyof OrderType,
+        key: "createdAt" as keyof Types.Order.OrderType,
         label: t("common.table.createdAt") || "Created At",
       },
     ],
@@ -97,7 +97,7 @@ export const OrderTable = memo(function OrderTable({
   );
 
   const handleSort = useCallback(
-    (key: keyof OrderType) => () => onSort(key),
+    (key: keyof Types.Order.OrderType) => () => onSort(key),
     [onSort]
   );
 

@@ -6,19 +6,13 @@ import { useTranslation } from "react-i18next";
 
 import { ConfirmModal } from "@/components/user/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
-import type { CompanyForm, CompanyType } from "@/types/company.type";
-import {
-  addCompany,
-  deleteCompany,
-  getCompanies,
-  updateCompany,
-} from "@/services/company.service";
 import useCompanyStore from "@/stores/company.store";
 import { CompanyTable } from "@/components/company/data-table.company";
 import { CompanyFilters } from "@/components/company/filters.company";
 import CompanyModal from "@/components/company/company.modal";
 import useUserStore from "@/stores/user.store";
-import { getUsers } from "@/services/user.service";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 const defaultFilters = {
   search: "",
@@ -30,16 +24,15 @@ const defaultFilters = {
 export default function CompanyManagementPage() {
   const { t } = useTranslation();
 
-  const [companyToDelete, setCompanyToDelete] = useState<CompanyType | null>(
-    null
-  );
+  const [companyToDelete, setCompanyToDelete] =
+    useState<Types.Company.CompanyType | null>(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen, setModalOpen] = useState(false);
   const { usersList, setUsersList } = useUserStore();
-  const [form, setForm] = useState<CompanyForm>({
+  const [form, setForm] = useState<Types.Company.CompanyForm>({
     name: "",
     address: undefined,
     type: undefined,
@@ -67,7 +60,7 @@ export default function CompanyManagementPage() {
     return defaultFilters;
   });
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof CompanyType;
+    key: keyof Types.Company.CompanyType;
     direction: "asc" | "desc";
   }>({
     key: "createdAt",
@@ -87,7 +80,7 @@ export default function CompanyManagementPage() {
   const fetchCompanies = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getCompanies({
+      const res = await Services.Company.getCompanies(axiosInstance, {
         search: filters.search,
         type: filters.type,
         is_active: filters.is_active,
@@ -107,7 +100,9 @@ export default function CompanyManagementPage() {
 
   useEffect(() => {
     (async () => {
-      const users = await getUsers({ is_active: true });
+      const users = await Services.User.getUsers(axiosInstance, {
+        is_active: true,
+      });
       setUsersList(users.result);
     })();
   }, [setUsersList]);
@@ -121,7 +116,7 @@ export default function CompanyManagementPage() {
     localStorage.setItem("companyFilters", JSON.stringify(filters));
   }, [filters]);
 
-  const handleSort = useCallback((key: keyof CompanyType) => {
+  const handleSort = useCallback((key: keyof Types.Company.CompanyType) => {
     setSortConfig((current) => ({
       key,
       direction:
@@ -144,7 +139,7 @@ export default function CompanyManagementPage() {
   }, [clearSelectedCompany]);
 
   const openEditModal = useCallback(
-    (company: CompanyType) => {
+    (company: Types.Company.CompanyType) => {
       setSelectedCompany(company);
       setForm({
         name: company.name,
@@ -160,7 +155,7 @@ export default function CompanyManagementPage() {
     [setSelectedCompany]
   );
 
-  const confirmDelete = useCallback((company: CompanyType) => {
+  const confirmDelete = useCallback((company: Types.Company.CompanyType) => {
     setCompanyToDelete(company);
     setDeleteModalOpen(true);
   }, []);
@@ -168,7 +163,7 @@ export default function CompanyManagementPage() {
   const performDelete = useCallback(async () => {
     if (!companyToDelete) return;
     try {
-      await deleteCompany(companyToDelete._id);
+      await Services.Company.deleteCompany(axiosInstance, companyToDelete._id);
       fetchCompanies();
       showToast("success", t("company.message.deleted") || "Company deleted");
     } catch {
@@ -190,13 +185,17 @@ export default function CompanyManagementPage() {
 
     try {
       if (selectedCompany) {
-        const res = await updateCompany(selectedCompany._id, form);
+        const res = await Services.Company.updateCompany(
+          axiosInstance,
+          selectedCompany._id,
+          form
+        );
         if (res.status === 200) {
           showToast("success", t("company.message.updated"));
           updateCompanyInList(res.result);
         } else throw new Error();
       } else {
-        const res = await addCompany(form);
+        const res = await Services.Company.addCompany(axiosInstance, form);
         if (res.status === 201) {
           showToast("success", t("company.message.created"));
           fetchCompanies();

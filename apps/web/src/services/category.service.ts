@@ -1,19 +1,19 @@
-import type { CategoryForm, CategoryType } from "@/types/category.type";
 import authorizedAxios from "@/utils/request/authorizedRequest";
+import { Types } from "@my-monorepo/shared";
 
 export interface GetCategoryParams {
   search?: string;
   is_active?: boolean;
   page?: number;
   limit?: number;
-  sort_by?: keyof CategoryType;
+  sort_by?: keyof Types.Category.CategoryType;
   order?: "asc" | "desc";
 }
 
 export interface GetCategoriesResponse {
   status: number;
   message: string;
-  result: CategoryType[];
+  result: Types.Category.CategoryType[];
   totalCount: number;
   totalPages: number;
   currentPage: number;
@@ -55,7 +55,7 @@ export const getCategories = async (
   }
 };
 
-export const addCategory = async (data: CategoryForm) => {
+export const addCategory = async (data: Types.Category.CategoryForm) => {
   try {
     const response = await authorizedAxios.post("category", data);
     return response.data;
@@ -65,7 +65,10 @@ export const addCategory = async (data: CategoryForm) => {
   }
 };
 
-export const updateCategory = async (id: string, data: CategoryForm) => {
+export const updateCategory = async (
+  id: string,
+  data: Types.Category.CategoryForm
+) => {
   try {
     const response = await authorizedAxios.put(`category/${id}`, data);
     return response.data;

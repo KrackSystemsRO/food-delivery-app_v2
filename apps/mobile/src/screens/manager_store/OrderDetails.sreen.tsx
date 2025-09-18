@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { View, ActivityIndicator, Alert, FlatList } from "react-native";
-import { Button, Text, Card, Divider } from "react-native-paper";
-import { getOrderById, acceptOrder, denyOrder } from "@/services/order.service";
-import { OrderItemType, OrderType } from "@/types/order.type";
+import { Button, Text, Card } from "react-native-paper";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { OrdersStackParamList } from "@/components/layouts/ManagerLayout";
 import { getSocket } from "@/services/soket.connection/socket";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 export type OrderDetailProps = NativeStackScreenProps<
   OrdersStackParamList,
@@ -13,7 +13,7 @@ export type OrderDetailProps = NativeStackScreenProps<
 >;
 
 // Memoized Order Item
-const OrderItemCard: React.FC<{ item: OrderItemType }> = React.memo(
+const OrderItemCard: React.FC<{ item: Types.Order.OrderItemType }> = React.memo(
   ({ item }) => (
     <Card style={{ marginBottom: 12 }}>
       <Card.Title title={`${item.quantity} x ${item.product.name}`} />
@@ -31,7 +31,7 @@ const OrderItemCard: React.FC<{ item: OrderItemType }> = React.memo(
 
 // Memoized Header
 const OrderListHeader = React.memo<{
-  order: OrderType | null;
+  order: Types.Order.OrderType | null;
   statusColor: string;
 }>(({ order, statusColor }) => {
   if (!order) return null; // render nothing if order is null
@@ -62,7 +62,7 @@ const OrderListHeader = React.memo<{
 
 // Memoized Footer
 const OrderListFooter = React.memo<{
-  order: OrderType | null;
+  order: Types.Order.OrderType | null;
   onAccept: () => void;
   onDeny: () => void;
 }>(({ order, onAccept, onDeny }) => {
@@ -82,13 +82,13 @@ const OrderListFooter = React.memo<{
 
 const OrderDetailScreen: React.FC<OrderDetailProps> = ({ route }) => {
   const { _id } = route.params;
-  const [order, setOrder] = useState<OrderType | null>(null);
+  const [order, setOrder] = useState<Types.Order.OrderType | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchOrderDetail = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await getOrderById(_id);
+      const response = await Services.Order.getOrderById(axiosInstance, _id);
       setOrder(response.result);
     } catch (err) {
       console.error(err);
@@ -118,7 +118,7 @@ const OrderDetailScreen: React.FC<OrderDetailProps> = ({ route }) => {
 
   const handleAccept = useCallback(async () => {
     try {
-      await acceptOrder(_id);
+      await Services.Order.acceptOrder(axiosInstance, _id);
       Alert.alert("Success", "Order accepted");
     } catch {
       Alert.alert("Error", "Failed to accept order");
@@ -127,7 +127,7 @@ const OrderDetailScreen: React.FC<OrderDetailProps> = ({ route }) => {
 
   const handleDeny = useCallback(async () => {
     try {
-      await denyOrder(_id);
+      await Services.Order.denyOrder(axiosInstance, _id);
       Alert.alert("Success", "Order denied");
       fetchOrderDetail();
     } catch {
@@ -149,7 +149,9 @@ const OrderDetailScreen: React.FC<OrderDetailProps> = ({ route }) => {
   }, [order?.status]);
 
   const renderItem = useCallback(
-    ({ item }: { item: OrderItemType }) => <OrderItemCard item={item} />,
+    ({ item }: { item: Types.Order.OrderItemType }) => (
+      <OrderItemCard item={item} />
+    ),
     []
   );
 

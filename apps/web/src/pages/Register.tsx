@@ -14,7 +14,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/context/authContext";
 import { useState } from "react";
 import { showToast } from "@/utils/toast";
-import { register } from "@/services/authentication.service";
+import { Services } from "@my-monorepo/shared";
+import { default as request } from "@/utils/request/request";
 
 export default function RegisterPage({
   className,
@@ -40,12 +41,15 @@ export default function RegisterPage({
 
     setLoading(true);
     try {
-      const { accessToken, refreshToken } = await register({
-        email,
-        firstName,
-        lastName,
-        password,
-      });
+      const { accessToken, refreshToken } = await Services.Auth.register(
+        request,
+        {
+          email,
+          firstName,
+          lastName,
+          password,
+        }
+      );
 
       loginWithToken(accessToken, refreshToken);
       showToast(

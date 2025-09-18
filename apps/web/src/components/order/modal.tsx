@@ -16,14 +16,14 @@ import {
   SelectItem,
 } from "@/components/ui";
 import { useTranslation } from "react-i18next";
-import type { OrderForm } from "@/types/order.type";
+import { Types } from "@my-monorepo/shared";
 
 interface OrderModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: () => void;
-  form: OrderForm;
-  setForm: (form: OrderForm) => void;
+  form: Types.Order.OrderForm;
+  setForm: (form: Types.Order.OrderForm) => void;
   isEditing: boolean;
   loading?: boolean;
 }
@@ -88,7 +88,8 @@ function OrderModalComponent({
   );
 
   const handleStatusChange = useCallback(
-    (val: string) => setForm({ ...form, status: val as OrderForm["status"] }),
+    (val: string) =>
+      setForm({ ...form, status: val as Types.Order.OrderForm["status"] }),
     [form, setForm]
   );
 

@@ -1,11 +1,10 @@
-import { StoreType } from "@/types/store.type";
 import authorizedAxios from "../utils/request/authorizedRequest";
-import { ProductType } from "@/types/product.type";
+import { Types } from "@my-monorepo/shared";
 
 export interface CreateProductPayload {
   name: string;
   description?: string;
-  store: StoreType | null;
+  store: Types.Store.StoreType | null;
   price: number;
   is_active: boolean;
   product_type: "prepared_food" | "product";
@@ -45,7 +44,9 @@ export const getUserProductsStore = async (storeId: string | string[]) => {
   }
 };
 
-export const getUserProductsStores = async (stores: StoreType[]) => {
+export const getUserProductsStores = async (
+  stores: Types.Store.StoreType[]
+) => {
   try {
     const allProducts = await Promise.all(
       stores.map(async (storeId) => {
@@ -74,7 +75,10 @@ export const saveNewProduct = async (data: CreateProductPayload) => {
   }
 };
 
-export const updateProduct = async (id: string, data: Partial<ProductType>) => {
+export const updateProduct = async (
+  id: string,
+  data: Partial<Types.Product.ProductType>
+) => {
   try {
     const response = await authorizedAxios.put(`/product/${id}`, data);
     return response.data;

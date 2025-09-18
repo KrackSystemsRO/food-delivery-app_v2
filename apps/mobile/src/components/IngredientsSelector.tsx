@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   View,
   FlatList,
@@ -8,19 +8,18 @@ import {
   StyleSheet,
 } from "react-native";
 import { Button } from "react-native-paper";
-import type { IngredientType } from "@/types/ingredient.type";
-
+import { Types } from "@my-monorepo/shared";
 export type IngredientWithQuantity = {
-  ingredient: IngredientType;
+  ingredient: Types.Ingredient.IngredientType;
   quantity: number;
   unit: string;
 };
 
 interface IngredientsSelectorProps {
-  options: IngredientType[];
+  options: Types.Ingredient.IngredientType[];
   value: IngredientWithQuantity[];
   onChange: (val: IngredientWithQuantity[]) => void;
-  onInputChange?: (query: string) => Promise<IngredientType[]>;
+  onInputChange?: (query: string) => Promise<Types.Ingredient.IngredientType[]>;
 }
 
 const UNITS: IngredientWithQuantity["unit"][] = ["piece", "gram", "liter"];
@@ -34,7 +33,9 @@ export default function IngredientsSelector({
   const [query, setQuery] = useState("");
   const [quantity, setQuantity] = useState<number | undefined>(undefined);
   const [unit, setUnit] = useState<IngredientWithQuantity["unit"]>("gram");
-  const [filtered, setFiltered] = useState<IngredientType[]>([]);
+  const [filtered, setFiltered] = useState<Types.Ingredient.IngredientType[]>(
+    []
+  );
 
   const isExistingIngredient = useMemo(
     () => options.some((o) => o.name.toLowerCase() === query.toLowerCase()),
@@ -59,7 +60,7 @@ export default function IngredientsSelector({
   }, [query, options, onInputChange]);
 
   const handleAdd = useCallback(
-    (ingredient: IngredientType) => {
+    (ingredient: Types.Ingredient.IngredientType) => {
       if (!quantity) return;
       onChange([...value, { ingredient, quantity, unit }]);
       setQuery("");
@@ -77,7 +78,7 @@ export default function IngredientsSelector({
   );
 
   const handleSelectFiltered = useCallback(
-    (ingredient: IngredientType) => {
+    (ingredient: Types.Ingredient.IngredientType) => {
       if (!quantity) setQuery(ingredient.name);
       else handleAdd(ingredient);
     },

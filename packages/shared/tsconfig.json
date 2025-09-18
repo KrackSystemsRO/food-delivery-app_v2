@@ -1,13 +1,15 @@
 {
   "compilerOptions": {
-    "target": "ES6",
-    "module": "CommonJS",
+    "target": "ES2020",
+    "module": "ESNext",
     "declaration": true,
     "outDir": "dist",
     "rootDir": "src",
     "strict": true,
     "esModuleInterop": true,
-    "composite": true
+    "composite": true,
+    "skipLibCheck": true,
+    "moduleResolution": "bundler"
   },
-  "include": ["src", "src/types"]
+  "include": ["src"]
 }

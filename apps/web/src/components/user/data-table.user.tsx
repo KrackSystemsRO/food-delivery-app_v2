@@ -10,16 +10,15 @@ import {
 } from "@/components/ui";
 import { Pencil, Trash2, Check, X, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { UserType } from "@/types/user.type";
-
+import { Types } from "@my-monorepo/shared";
 interface UserTableProps {
-  users: UserType[];
-  sortKey: keyof UserType;
+  users: Types.User.UserType[];
+  sortKey: keyof Types.User.UserType;
   sortDirection: "asc" | "desc";
   loading: boolean;
-  onSort: (key: keyof UserType) => void;
-  onEdit: (user: UserType) => void;
-  onDelete: (user: UserType) => void;
+  onSort: (key: keyof Types.User.UserType) => void;
+  onEdit: (user: Types.User.UserType) => void;
+  onDelete: (user: Types.User.UserType) => void;
 }
 
 function UserTableComponent({
@@ -34,27 +33,27 @@ function UserTableComponent({
   const { t } = useTranslation();
 
   const handleSort = useCallback(
-    (field: keyof UserType) => {
+    (field: keyof Types.User.UserType) => {
       onSort(field);
     },
     [onSort]
   );
 
   const handleEdit = useCallback(
-    (user: UserType) => {
+    (user: Types.User.UserType) => {
       onEdit(user);
     },
     [onEdit]
   );
 
   const handleDelete = useCallback(
-    (user: UserType) => {
+    (user: Types.User.UserType) => {
       onDelete(user);
     },
     [onDelete]
   );
 
-  const fields: (keyof UserType)[] = [
+  const fields: (keyof Types.User.UserType)[] = [
     "first_name",
     "last_name",
     "email",

@@ -3,10 +3,9 @@ import { View, StyleSheet, TouchableOpacity, FlatList } from "react-native";
 import { Card, Text, Button, ActivityIndicator } from "react-native-paper";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { useTranslation } from "react-i18next";
-import { acceptOrder } from "@/services/order.service";
-import { getOrders } from "@/services/courier.service";
-import { OrderType } from "@/types/order.type";
 import { useAuth } from "@/context/authContext";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 /* ------------------ Order Card ------------------ */
 const OrderCard = React.memo(({ order, onAccept, t, navigation }: any) => (
@@ -52,7 +51,7 @@ const OrdersList = React.memo(
     navigation,
   }: any) => {
     const renderItem = useCallback(
-      ({ item }: { item: OrderType }) => (
+      ({ item }: { item: Types.Order.OrderType }) => (
         <OrderCard
           order={item}
           onAccept={onAccept}
@@ -92,7 +91,7 @@ export default function CourierOrdersPage({ navigation }: { navigation: any }) {
   const { t } = useTranslation();
   const { socket, user } = useAuth();
 
-  const [orders, setOrders] = useState<OrderType[]>([]);
+  const [orders, setOrders] = useState<Types.Order.OrderType[]>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -100,7 +99,9 @@ export default function CourierOrdersPage({ navigation }: { navigation: any }) {
   const loadOrders = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await getOrders({ limit: 100 });
+      const response = await Services.Order.getOrders(axiosInstance, {
+        limit: 100,
+      });
       setOrders(response.result);
     } catch (err) {
       console.error("Error fetching orders", err);
@@ -118,7 +119,7 @@ export default function CourierOrdersPage({ navigation }: { navigation: any }) {
   /* ------------------ Accept Order ------------------ */
   const handleAcceptOrder = useCallback(async (orderId: string) => {
     try {
-      await acceptOrder(orderId);
+      await Services.Order.acceptOrder(axiosInstance, orderId);
     } catch (err) {
       console.error("Failed to accept order:", err);
     }
@@ -163,8 +164,8 @@ export default function CourierOrdersPage({ navigation }: { navigation: any }) {
 
   /* ------------------ Filter Orders ------------------ */
   const { activeOrders, futureOrders } = useMemo(() => {
-    const active: OrderType[] = [];
-    const future: OrderType[] = [];
+    const active: Types.Order.OrderType[] = [];
+    const future: Types.Order.OrderType[] = [];
     orders.forEach((o) => {
       if (o.status === "confirmed" || o.status === "delivering") active.push(o);
       else if (o.status === "pending") future.push(o);

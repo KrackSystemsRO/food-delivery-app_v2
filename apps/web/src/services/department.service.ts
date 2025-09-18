@@ -1,5 +1,5 @@
-import type { DepartmentForm, DepartmentType } from "@/types/department.type";
 import authorizedAxios from "@/utils/request/authorizedRequest";
+import type { Types } from "@my-monorepo/shared";
 
 export interface GetDepartmentParams {
   search?: string;
@@ -7,14 +7,14 @@ export interface GetDepartmentParams {
   page?: number;
   company: string;
   limit?: number;
-  sort_by?: keyof DepartmentType;
+  sort_by?: keyof Types.Department.DepartmentType;
   order?: "asc" | "desc";
 }
 
 export interface GetDepartmentsResponse {
   status: number;
   message: string;
-  result: DepartmentType[];
+  result: Types.Department.DepartmentType[];
   totalCount: number;
   totalPages: number;
   currentPage: number;
@@ -57,7 +57,7 @@ export const getDepartments = async (
   }
 };
 
-export const addDepartment = async (data: DepartmentForm) => {
+export const addDepartment = async (data: Types.Department.DepartmentForm) => {
   try {
     const response = await authorizedAxios.post(`department`, data);
     return response.data;
@@ -67,7 +67,10 @@ export const addDepartment = async (data: DepartmentForm) => {
   }
 };
 
-export const updateDepartment = async (id: string, data: DepartmentForm) => {
+export const updateDepartment = async (
+  id: string,
+  data: Types.Department.DepartmentForm
+) => {
   try {
     const response = await authorizedAxios.put(`department/${id}`, data);
     return response.data;

@@ -1,0 +1,164 @@
+import type { Types } from "../../index";
+import { AxiosInstance } from "axios";
+
+export interface GetProductParams {
+  search?: string;
+  product_type?: "prepared_food" | "grocery";
+  is_active?: boolean;
+  page?: number;
+  limit?: number;
+  sort_by?: keyof Types.Product.ProductType;
+  order?: "asc" | "desc";
+}
+
+export interface GetProductsResponse {
+  status: number;
+  message: string;
+  result: Types.Product.ProductType[];
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+}
+
+export interface CreateProductPayload {
+  name: string;
+  description?: string;
+  store: Types.Store.StoreType | null;
+  price: number;
+  is_active: boolean;
+  product_type: "prepared_food" | "grocery";
+  categories: string[];
+  ingredients: {
+    ingredient: string;
+    quantity: number;
+    unit: string;
+  }[];
+}
+
+export const getProducts = async (
+  axios: AxiosInstance,
+  params: GetProductParams
+): Promise<GetProductsResponse> => {
+  try {
+    const response = await axios.get("/product", {
+      params: {
+        search: params.search,
+        product_type: params.product_type,
+        is_active: params.is_active,
+        page: params.page,
+        limit: params.limit,
+        sort_by: params.sort_by,
+        order: params.order,
+      },
+    });
+
+    return {
+      result: response.data.result,
+      status: response.status,
+      message: response.data.message,
+      totalCount: response.data.totalCount,
+      totalPages: response.data.totalPages,
+      currentPage: response.data.currentPage,
+    };
+  } catch (error: any) {
+    console.error("Failed to fetch products:", error);
+    return {
+      result: [],
+      status: error?.response?.status || 500,
+      message: error?.response?.data?.message || "Failed to fetch products",
+      totalCount: 0,
+      totalPages: 0,
+      currentPage: 1,
+    };
+  }
+};
+
+export const addProduct = async (
+  axios: AxiosInstance,
+  data: Types.Product.ProductForm | CreateProductPayload
+) => {
+  try {
+    const response = await axios.post("/product", data);
+    return response.data;
+  } catch (error) {
+    console.info("Failed to create product");
+    return error;
+  }
+};
+
+export const updateProduct = async (
+  axios: AxiosInstance,
+  id: string,
+  data: Types.Product.ProductForm
+) => {
+  try {
+    const response = await axios.put(`/product/${id}`, data);
+    return response.data;
+  } catch (error) {
+    console.info("Failed to update product");
+    return error;
+  }
+};
+
+export const deleteProduct = async (axios: AxiosInstance, id: string) => {
+  try {
+    const response = await axios.delete(`/product/${id}`);
+    return response.data;
+  } catch (error) {
+    console.info("Failed to delete product");
+    return error;
+  }
+};
+
+export const getListProductsStore = async (
+  axios: AxiosInstance,
+  idStore: string
+) => {
+  try {
+    const response = await axios.get(`/product?store=${idStore}`);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch products of store ", error);
+    throw error;
+  }
+};
+
+export const getUserProductsStore = async (
+  axios: AxiosInstance,
+  storeId: string | string[]
+) => {
+  try {
+    // Handle empty array or undefined by not adding store query
+    let url = "/product";
+    if (Array.isArray(storeId) && storeId.length > 0) {
+      url += `?store=${storeId.join(",")}`; // join multiple IDs
+    } else if (typeof storeId === "string" && storeId) {
+      url += `?store=${storeId}`;
+    }
+
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch products of store ", error);
+    throw error;
+  }
+};
+
+export const getUserProductsStores = async (
+  axios: AxiosInstance,
+  stores: Types.Store.StoreType[]
+) => {
+  try {
+    const allProducts = await Promise.all(
+      stores.map(async (storeId) => {
+        const response = await axios.get(`/product?store=${storeId._id}`);
+        return response.data.result ?? [];
+      })
+    );
+
+    return allProducts.flat();
+  } catch (error) {
+    console.error("Failed to fetch products of store ", error);
+    throw error;
+  }
+};

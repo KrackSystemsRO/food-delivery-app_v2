@@ -16,14 +16,13 @@ import {
   SelectItem,
 } from "@/components/ui";
 import { useTranslation } from "react-i18next";
-import type { AllergenForm } from "@/types/allergen.type";
-
+import { Types } from "@my-monorepo/shared";
 interface AllergenModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: () => void;
-  form: AllergenForm;
-  setForm: (form: AllergenForm) => void;
+  form: Types.Allergen.AllergenForm;
+  setForm: (form: Types.Allergen.AllergenForm) => void;
   isEditing: boolean;
   loading?: boolean;
 }

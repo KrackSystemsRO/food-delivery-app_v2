@@ -6,18 +6,18 @@ import { useTranslation } from "react-i18next";
 
 import { ConfirmModal } from "@/components/user/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
-import type { IngredientForm, IngredientType } from "@/types/ingredient.type";
-import {
-  addIngredient,
-  deleteIngredient,
-  getIngredients,
-  updateIngredient,
-} from "@/services/ingredient.service";
+// import {
+//   addIngredient,
+//   deleteIngredient,
+//   getIngredients,
+//   updateIngredient,
+// } from "@/services/ingredient.service";
 import useIngredientStore from "@/stores/ingredient.store";
 import { IngredientTable } from "@/components/ingredient/data-table.ingredient";
 import { IngredientFilters } from "@/components/ingredient/filters.ingredient";
 import IngredientModal from "@/components/ingredient/ingredient.modal";
-
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 const defaultFilters = {
   search: "",
   is_active: undefined,
@@ -28,14 +28,14 @@ export default function IngredientManagementPage() {
   const { t } = useTranslation();
 
   const [ingredientToDelete, setIngredientToDelete] =
-    useState<IngredientType | null>(null);
+    useState<Types.Ingredient.IngredientType | null>(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen, setModalOpen] = useState(false);
 
-  const [form, setForm] = useState<IngredientForm>({
+  const [form, setForm] = useState<Types.Ingredient.IngredientForm>({
     name: "",
     description: "",
     is_active: true,
@@ -60,7 +60,7 @@ export default function IngredientManagementPage() {
   });
 
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof IngredientType;
+    key: keyof Types.Ingredient.IngredientType;
     direction: "asc" | "desc";
   }>({
     key: "createdAt",
@@ -80,7 +80,7 @@ export default function IngredientManagementPage() {
   const fetchIngredients = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getIngredients({
+      const res = await Services.Ingredient.getIngredients(axiosInstance, {
         search: filters.search,
         is_active: filters.is_active,
         page,
@@ -109,13 +109,16 @@ export default function IngredientManagementPage() {
     localStorage.setItem("ingredientFilters", JSON.stringify(filters));
   }, [filters]);
 
-  const handleSort = useCallback((key: keyof IngredientType) => {
-    setSortConfig((current) => ({
-      key,
-      direction:
-        current.key === key && current.direction === "asc" ? "desc" : "asc",
-    }));
-  }, []);
+  const handleSort = useCallback(
+    (key: keyof Types.Ingredient.IngredientType) => {
+      setSortConfig((current) => ({
+        key,
+        direction:
+          current.key === key && current.direction === "asc" ? "desc" : "asc",
+      }));
+    },
+    []
+  );
 
   const openCreateModal = useCallback(() => {
     clearSelectedIngredient();
@@ -128,7 +131,7 @@ export default function IngredientManagementPage() {
   }, [clearSelectedIngredient]);
 
   const openEditModal = useCallback(
-    (ingredient: IngredientType) => {
+    (ingredient: Types.Ingredient.IngredientType) => {
       setSelectedIngredient(ingredient);
       setForm({
         name: ingredient.name,
@@ -140,15 +143,21 @@ export default function IngredientManagementPage() {
     [setSelectedIngredient]
   );
 
-  const confirmDelete = useCallback((ingredient: IngredientType) => {
-    setIngredientToDelete(ingredient);
-    setDeleteModalOpen(true);
-  }, []);
+  const confirmDelete = useCallback(
+    (ingredient: Types.Ingredient.IngredientType) => {
+      setIngredientToDelete(ingredient);
+      setDeleteModalOpen(true);
+    },
+    []
+  );
 
   const performDelete = useCallback(async () => {
     if (!ingredientToDelete) return;
     try {
-      await deleteIngredient(ingredientToDelete._id);
+      await Services.Ingredient.deleteIngredient(
+        axiosInstance,
+        ingredientToDelete._id
+      );
       fetchIngredients();
       showToast(
         "success",
@@ -173,13 +182,20 @@ export default function IngredientManagementPage() {
 
     try {
       if (selectedIngredient) {
-        const res = await updateIngredient(selectedIngredient._id, form);
+        const res = await Services.Ingredient.updateIngredient(
+          axiosInstance,
+          selectedIngredient._id,
+          form
+        );
         if (res.status === 200) {
           showToast("success", t("ingredient.message.updated"));
           updateIngredientInList(res.result);
         } else throw new Error();
       } else {
-        const res = await addIngredient(form);
+        const res = await Services.Ingredient.addIngredient(
+          axiosInstance,
+          form
+        );
         if (res.status === 201) {
           showToast("success", t("ingredient.message.created"));
           fetchIngredients();

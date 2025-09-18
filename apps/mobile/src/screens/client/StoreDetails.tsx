@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,24 +8,27 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { StoresStackParamList } from "../../types/navigation.type";
-import { ProductType } from "../../types/product.type";
-import { getListProductsStore } from "../../services/product.service";
+import { StoresStackParamList } from "@/types/navigation.type";
 import LoadingSpin from "../../components/LoadingSpin";
 import { useTranslation } from "react-i18next";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 type Props = NativeStackScreenProps<StoresStackParamList, "StoreDetails">;
 
 export default function StoreDetailsScreen({ route, navigation }: Props) {
   const { store } = route.params;
-  const [products, setProducts] = useState<ProductType[]>([]);
+  const [products, setProducts] = useState<Types.Product.ProductType[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const { t } = useTranslation();
 
   const fetchProducts = useCallback(async () => {
     try {
-      const response = await getListProductsStore(store._id);
+      const response = await Services.Product.getListProductsStore(
+        axiosInstance,
+        store._id
+      );
       if (response.status === 200) {
         setProducts(response.result);
       } else {

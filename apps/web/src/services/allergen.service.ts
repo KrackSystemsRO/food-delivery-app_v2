@@ -1,19 +1,18 @@
-import type { AllergenForm, AllergenType } from "@/types/allergen.type";
 import authorizedAxios from "@/utils/request/authorizedRequest";
-
+import { Types } from "@my-monorepo/shared";
 export interface GetAllergenParams {
   search?: string;
   is_active?: boolean;
   page?: number;
   limit?: number;
-  sort_by?: keyof AllergenType;
+  sort_by?: keyof Types.Allergen.AllergenType;
   order?: "asc" | "desc";
 }
 
 export interface GetAllergensResponse {
   status: number;
   message: string;
-  result: AllergenType[];
+  result: Types.Allergen.AllergenType[];
   totalCount: number;
   totalPages: number;
   currentPage: number;
@@ -54,7 +53,7 @@ export const getAllergens = async (
   }
 };
 
-export const addAllergen = async (data: AllergenForm) => {
+export const addAllergen = async (data: Types.Allergen.AllergenForm) => {
   try {
     const response = await authorizedAxios.post("/allergen", data);
     return response.data;
@@ -64,7 +63,10 @@ export const addAllergen = async (data: AllergenForm) => {
   }
 };
 
-export const updateAllergen = async (id: string, data: AllergenForm) => {
+export const updateAllergen = async (
+  id: string,
+  data: Types.Allergen.AllergenForm
+) => {
   try {
     const response = await authorizedAxios.put(`/allergen/${id}`, data);
     return response.data;

@@ -6,11 +6,11 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
-import type { OrderType } from "@/types/order.type";
+import { Types } from "@my-monorepo/shared";
 import { useTranslation } from "react-i18next";
 
 type OrderModalProps = {
-  order: OrderType | null;
+  order: Types.Order.OrderType | null;
   isOpen: boolean;
   onClose: () => void;
 };

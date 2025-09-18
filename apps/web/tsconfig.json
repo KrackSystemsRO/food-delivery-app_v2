@@ -8,8 +8,9 @@
   "compilerOptions": {
     "baseUrl": "src",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@my-monorepo/shared": ["../../packages/shared/src"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "../../deleted/web/types"]
 }

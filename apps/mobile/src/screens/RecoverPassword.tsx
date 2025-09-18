@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { TextInput, Button, Text } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AppStackParamList } from "@/types/navigation.type";
-import { forgotPassword } from "../services/authentication.service"; // You'll need to implement this
+import { Services } from "@my-monorepo/shared";
+import { default as request } from "@/utils/request/request";
 
 export default function RecoverPasswordScreen() {
   const { t } = useTranslation();
@@ -22,7 +23,7 @@ export default function RecoverPasswordScreen() {
     setError("");
     setMessage("");
     try {
-      await forgotPassword(email);
+      await Services.Auth.forgotPassword(request, email);
       setMessage(t("recover.message.success"));
     } catch (err) {
       setError(t("recover.message.error"));

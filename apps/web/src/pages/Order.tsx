@@ -3,16 +3,15 @@ import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
-
 import { PaginationControls } from "@/components/common/pagination.common";
-import type { OrderType } from "@/types/order.type";
-import { deleteOrder, getOrders } from "@/services/order.service";
 import useOrderStore from "@/stores/order.store";
 import { OrderTable } from "@/components/order/data-table";
 import { OrderFilters, type FiltersType } from "@/components/order/filters";
 import OrderModal from "@/components/order/order.modal";
 import { ConfirmModal } from "@/components/order/confirm.modal";
 import usePersistedState from "@/hooks/use-persisted-state";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 const defaultFilters: FiltersType = {
   search: "",
@@ -33,7 +32,8 @@ export default function OrderManagementPage() {
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [orderToDelete, setOrderToDelete] = useState<OrderType | null>(null);
+  const [orderToDelete, setOrderToDelete] =
+    useState<Types.Order.OrderType | null>(null);
 
   const [filters, setFilters] = usePersistedState<FiltersType>(
     "orderFilters",
@@ -66,7 +66,7 @@ export default function OrderManagementPage() {
   const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getOrders({
+      const res = await Services.Order.getOrders(axiosInstance, {
         ...filters,
         page,
         sort_by: sortConfig.key,
@@ -85,7 +85,7 @@ export default function OrderManagementPage() {
     if (!orderToDelete) return;
     setDeleteLoading(true);
     try {
-      await deleteOrder(orderToDelete._id);
+      await Services.Order.deleteOrder(axiosInstance, orderToDelete._id);
       showToast("success", t("order.message.deleted") || "Order deleted");
 
       // Refresh or go back a page if last item
@@ -114,7 +114,7 @@ export default function OrderManagementPage() {
   }, [fetchOrders, clearOrdersList, page]);
 
   // --- Handlers ---
-  const handleSort = useCallback((key: keyof OrderType) => {
+  const handleSort = useCallback((key: keyof Types.Order.OrderType) => {
     if (!sortableKeys.includes(key as SortKey)) return;
     setSortConfig((current) => ({
       key: key as SortKey,
@@ -129,7 +129,7 @@ export default function OrderManagementPage() {
   }, [clearSelectedOrder]);
 
   const openEditModal = useCallback(
-    (order: OrderType) => {
+    (order: Types.Order.OrderType) => {
       setSelectedOrder(order);
       setModalOpen(true);
     },
@@ -140,7 +140,7 @@ export default function OrderManagementPage() {
       setFilters((prev) => ({ ...prev, ...updated })),
     [setFilters]
   );
-  const confirmDelete = useCallback((order: OrderType) => {
+  const confirmDelete = useCallback((order: Types.Order.OrderType) => {
     setOrderToDelete(order);
     setDeleteModalOpen(true);
   }, []);

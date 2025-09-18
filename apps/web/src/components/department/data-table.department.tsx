@@ -9,16 +9,15 @@ import {
 } from "@/components/ui";
 import { Pencil, Trash2, Check, X, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { DepartmentType } from "@/types/department.type";
-
+import { Types } from "@my-monorepo/shared";
 interface DepartmentTableProps {
-  departments: DepartmentType[];
-  sortKey: keyof DepartmentType;
+  departments: Types.Department.DepartmentType[];
+  sortKey: keyof Types.Department.DepartmentType;
   sortDirection: "asc" | "desc";
   loading: boolean;
-  onSort: (key: keyof DepartmentType) => void;
-  onEdit: (department: DepartmentType) => void;
-  onDelete: (department: DepartmentType) => void;
+  onSort: (key: keyof Types.Department.DepartmentType) => void;
+  onEdit: (department: Types.Department.DepartmentType) => void;
+  onDelete: (department: Types.Department.DepartmentType) => void;
 }
 
 export function DepartmentTable({
@@ -32,7 +31,10 @@ export function DepartmentTable({
 }: DepartmentTableProps) {
   const { t } = useTranslation();
 
-  const columns: { key: keyof DepartmentType; label: string }[] = [
+  const columns: {
+    key: keyof Types.Department.DepartmentType;
+    label: string;
+  }[] = [
     { key: "name", label: t("common.table.name", "Name") },
     { key: "company", label: t("common.table.company", "Company") },
     { key: "admin", label: t("common.table.admin", "Admins") },

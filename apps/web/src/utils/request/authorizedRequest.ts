@@ -1,13 +1,13 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import { showToast } from "../toast";
-import { logout } from "@/services/authentication.service";
+import { Services } from "@my-monorepo/shared";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const IS_PRODUCTION = import.meta.env.VITE_STATE === "production";
 
 const axiosInstance = axios.create({
-  baseURL: API_URL,
+  baseURL: `${API_URL}/api/v1`,
   timeout: 5000,
   headers: {
     "Content-Type": "application/json",
@@ -72,7 +72,7 @@ axiosInstance.interceptors.response.use(
       } catch (refreshError) {
         console.error("Token refresh failed", refreshError);
         showToast("error", "Session expired", "Please log in again.");
-        await logout();
+        await Services.Auth.logout();
         return Promise.reject(refreshError);
       }
     }

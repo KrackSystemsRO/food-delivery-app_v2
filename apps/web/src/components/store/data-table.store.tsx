@@ -9,21 +9,21 @@ import {
 } from "@/components/ui";
 import { Pencil, Trash2, Check, X, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { StoreType } from "@/types/store.type";
+import { Types } from "@my-monorepo/shared";
 import { memo, useCallback } from "react";
 
 interface StoreTableProps {
-  stores: StoreType[];
-  sortKey: keyof StoreType;
+  stores: Types.Store.StoreType[];
+  sortKey: keyof Types.Store.StoreType;
   sortDirection: "asc" | "desc";
   loading: boolean;
-  onSort: (key: keyof StoreType) => void;
-  onEdit: (store: StoreType) => void;
-  onDelete: (store: StoreType) => void;
+  onSort: (key: keyof Types.Store.StoreType) => void;
+  onEdit: (store: Types.Store.StoreType) => void;
+  onDelete: (store: Types.Store.StoreType) => void;
 }
 
 const TABLE_COLUMNS: (
-  | keyof StoreType
+  | keyof Types.Store.StoreType
   | "company"
   | "admin"
   | "is_active"
@@ -41,17 +41,20 @@ export const StoreTable = memo(function StoreTable({
 }: StoreTableProps) {
   const { t } = useTranslation();
 
-  const renderCompanies = useCallback((companies: StoreType["company"]) => {
-    if (!companies || companies.length === 0) return "-";
-    return companies.map((c) => c.name).join(", ");
-  }, []);
+  const renderCompanies = useCallback(
+    (companies: Types.Store.StoreType["company"]) => {
+      if (!companies || companies.length === 0) return "-";
+      return companies.map((c) => c.name).join(", ");
+    },
+    []
+  );
 
-  const renderAdmins = useCallback((admins: StoreType["admin"]) => {
+  const renderAdmins = useCallback((admins: Types.Store.StoreType["admin"]) => {
     if (!admins || admins.length === 0) return "-";
     return admins.map((a) => `${a.first_name} ${a.last_name}`).join(", ");
   }, []);
 
-  const StoreRow = memo(({ store }: { store: StoreType }) => (
+  const StoreRow = memo(({ store }: { store: Types.Store.StoreType }) => (
     <TableRow key={store._id}>
       <TableCell>{store.name}</TableCell>
       <TableCell>{store.type}</TableCell>
@@ -90,7 +93,7 @@ export const StoreTable = memo(function StoreTable({
           {TABLE_COLUMNS.map((field) => (
             <TableHead
               key={field}
-              onClick={() => onSort(field as keyof StoreType)}
+              onClick={() => onSort(field as keyof Types.Store.StoreType)}
               className="cursor-pointer"
             >
               {t(`common.table.${field}`) || field}

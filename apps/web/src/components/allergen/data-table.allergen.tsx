@@ -10,16 +10,16 @@ import {
 } from "@/components/ui";
 import { Pencil, Trash2, Check, X, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { AllergenType } from "@/types/allergen.type";
+import { Types } from "@my-monorepo/shared";
 
 interface AllergenTableProps {
-  allergens: AllergenType[];
-  sortKey: keyof AllergenType;
+  allergens: Types.Allergen.AllergenType[];
+  sortKey: keyof Types.Allergen.AllergenType;
   sortDirection: "asc" | "desc";
   loading: boolean;
-  onSort: (key: keyof AllergenType) => void;
-  onEdit: (allergen: AllergenType) => void;
-  onDelete: (allergen: AllergenType) => void;
+  onSort: (key: keyof Types.Allergen.AllergenType) => void;
+  onEdit: (allergen: Types.Allergen.AllergenType) => void;
+  onDelete: (allergen: Types.Allergen.AllergenType) => void;
 }
 
 const AllergenRow = memo(function AllergenRow({
@@ -27,9 +27,9 @@ const AllergenRow = memo(function AllergenRow({
   onEdit,
   onDelete,
 }: {
-  allergen: AllergenType;
-  onEdit: (allergen: AllergenType) => void;
-  onDelete: (allergen: AllergenType) => void;
+  allergen: Types.Allergen.AllergenType;
+  onEdit: (allergen: Types.Allergen.AllergenType) => void;
+  onDelete: (allergen: Types.Allergen.AllergenType) => void;
 }) {
   const handleEdit = useCallback(() => onEdit(allergen), [onEdit, allergen]);
   const handleDelete = useCallback(
@@ -87,7 +87,7 @@ export const AllergenTable = memo(function AllergenTable({
   );
 
   const handleSort = useCallback(
-    (key: keyof AllergenType) => () => onSort(key),
+    (key: keyof Types.Allergen.AllergenType) => () => onSort(key),
     [onSort]
   );
 

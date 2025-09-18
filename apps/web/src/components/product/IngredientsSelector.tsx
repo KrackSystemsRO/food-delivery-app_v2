@@ -2,15 +2,15 @@ import { useEffect, useState, useCallback, useMemo, memo } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import type { IngredientWithQuantity } from "@/types/product.type";
-import type { IngredientType } from "@/types/ingredient.type";
-import { addIngredient, checkIngredient } from "@/services/ingredient.service";
+
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 interface IngredientsSelectorProps {
-  options: IngredientType[];
-  value: IngredientWithQuantity[];
-  onChange: (val: IngredientWithQuantity[]) => void;
-  onInputChange?: (query: string) => Promise<IngredientType[]>;
+  options: Types.Ingredient.IngredientType[];
+  value: Types.Ingredient.IngredientWithQuantity[];
+  onChange: (val: Types.Ingredient.IngredientWithQuantity[]) => void;
+  onInputChange?: (query: string) => Promise<Types.Ingredient.IngredientType[]>;
 }
 
 const IngredientItem = memo(
@@ -18,7 +18,7 @@ const IngredientItem = memo(
     v,
     onRemove,
   }: {
-    v: IngredientWithQuantity;
+    v: Types.Ingredient.IngredientWithQuantity;
     onRemove: (id: string) => void;
   }) => (
     <div className="flex justify-between items-center border rounded-md px-3 py-2">
@@ -48,7 +48,9 @@ function IngredientsSelectorComponent({
   const [query, setQuery] = useState("");
   const [quantity, setQuantity] = useState("");
   const [unit, setUnit] = useState("gram");
-  const [filtered, setFiltered] = useState<IngredientType[]>([]);
+  const [filtered, setFiltered] = useState<Types.Ingredient.IngredientType[]>(
+    []
+  );
 
   const isExistingIngredient = useMemo(
     () => options.some((o) => o.name.toLowerCase() === query.toLowerCase()),
@@ -75,7 +77,7 @@ function IngredientsSelectorComponent({
   }, [query, options, onInputChange]);
 
   const handleAdd = useCallback(
-    (ing: IngredientType) => {
+    (ing: Types.Ingredient.IngredientType) => {
       if (!quantity.trim()) return;
       onChange([...value, { ingredient: ing, quantity, unit }]);
       setQuery("");
@@ -88,8 +90,11 @@ function IngredientsSelectorComponent({
   const handleCreate = useCallback(async () => {
     if (!query.trim()) return;
     try {
-      const response = await addIngredient({ name: query.trim(), unit });
-      const newIng: IngredientType = response.result;
+      const response = await Services.Ingredient.addIngredient(axiosInstance, {
+        name: query.trim(),
+        unit,
+      });
+      const newIng: Types.Ingredient.IngredientType = response.result;
       onChange([...value, { ingredient: newIng, quantity: "", unit }]);
       setQuery("");
       setQuantity("");
@@ -108,7 +113,10 @@ function IngredientsSelectorComponent({
 
   const handleCheckIngredient = useCallback(
     async (query: string) => {
-      const res = await checkIngredient(query);
+      const res = await Services.Ingredient.checkIngredient(
+        axiosInstance,
+        query
+      );
       if (res.exists) {
         handleAdd(res.ingredient!);
       } else {
@@ -119,7 +127,7 @@ function IngredientsSelectorComponent({
   );
 
   const handleSelectFiltered = useCallback(
-    (opt: IngredientType) => {
+    (opt: Types.Ingredient.IngredientType) => {
       if (!quantity.trim()) {
         setQuery(opt.name);
         document.getElementById("ingredient-qty")?.focus();

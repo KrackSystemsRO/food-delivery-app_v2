@@ -1,23 +1,25 @@
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { FlatList, TouchableOpacity, StyleSheet, View } from "react-native";
 import { Text, Card } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
-import { getListStore } from "../../services/store.service";
-import { StoreType } from "../../types/store.type";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { StoresStackParamList } from "../../types/navigation.type";
+import { StoresStackParamList } from "@/types/navigation.type";
 import LoadingSpin from "../../components/LoadingSpin";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 export default function Stores() {
   const navigation =
     useNavigation<NativeStackNavigationProp<StoresStackParamList, "Stores">>();
-  const [stores, setStores] = useState<StoreType[]>([]);
+  const [stores, setStores] = useState<Types.Store.StoreType[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchStores = async () => {
     try {
-      const response = await getListStore({ is_active: true });
+      const response = await Services.Store.getStores(axiosInstance, {
+        is_active: true,
+      });
       if (response.status === 200) {
         setStores(response.result);
       } else {
@@ -40,7 +42,7 @@ export default function Stores() {
     fetchStores();
   }, []);
 
-  const handlePress = (store: StoreType) => {
+  const handlePress = (store: Types.Store.StoreType) => {
     navigation.navigate("StoreDetails", { store });
   };
 

@@ -1,5 +1,5 @@
-import { ProductType } from "./product.type";
-import { StoreType } from "./store.type";
+import { ProductType } from "../../../../deleted/mobile/types/product.type";
+import { StoreType } from "../../../../deleted/mobile/types/store.type";
 
 export type AppStackParamList = {
   Login: undefined;

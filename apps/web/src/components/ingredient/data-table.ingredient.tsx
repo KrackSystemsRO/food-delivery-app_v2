@@ -10,16 +10,15 @@ import {
 import { Pencil, Trash2, Check, X, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useCallback, useMemo } from "react";
-import type { IngredientType } from "@/types/ingredient.type";
-
+import { Types } from "@my-monorepo/shared";
 interface IngredientTableProps {
-  ingredients: IngredientType[];
-  sortKey: keyof IngredientType;
+  ingredients: Types.Ingredient.IngredientType[];
+  sortKey: keyof Types.Ingredient.IngredientType;
   sortDirection: "asc" | "desc";
   loading: boolean;
-  onSort: (key: keyof IngredientType) => void;
-  onEdit: (ingredient: IngredientType) => void;
-  onDelete: (ingredient: IngredientType) => void;
+  onSort: (key: keyof Types.Ingredient.IngredientType) => void;
+  onEdit: (ingredient: Types.Ingredient.IngredientType) => void;
+  onDelete: (ingredient: Types.Ingredient.IngredientType) => void;
 }
 
 export function IngredientTable({
@@ -36,15 +35,15 @@ export function IngredientTable({
   const columns = useMemo(
     () => [
       {
-        key: "name" as keyof IngredientType,
+        key: "name" as keyof Types.Ingredient.IngredientType,
         label: t("common.table.name") || "Name",
       },
       {
-        key: "description" as keyof IngredientType,
+        key: "description" as keyof Types.Ingredient.IngredientType,
         label: t("common.table.description") || "Description",
       },
       {
-        key: "is_active" as keyof IngredientType,
+        key: "is_active" as keyof Types.Ingredient.IngredientType,
         label: t("common.table.is_active") || "Status",
       },
     ],
@@ -52,7 +51,10 @@ export function IngredientTable({
   );
 
   const renderCell = useCallback(
-    (ingredient: IngredientType, key: keyof IngredientType) => {
+    (
+      ingredient: Types.Ingredient.IngredientType,
+      key: keyof Types.Ingredient.IngredientType
+    ) => {
       const value = ingredient[key];
 
       if (key === "is_active") {

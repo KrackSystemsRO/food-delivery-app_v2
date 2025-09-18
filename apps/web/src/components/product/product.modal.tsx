@@ -10,26 +10,23 @@ import {
   DialogDescription,
 } from "@/components/ui";
 import { useTranslation } from "react-i18next";
-import type { ProductForm } from "@/types/product.type";
-import type { CategoryType } from "@/types/category.type";
 import MultiSelectWithChips from "./MultiSelectWithChips";
 import { IngredientsSelector } from "./IngredientsSelector";
 import StoreSelector from "./StoreSelector";
-import type { StoreType } from "@/types/store.type";
-import { getCategories } from "@/services/category.service";
 import { memo, useCallback, useEffect, useMemo } from "react";
 import useCategoryStore from "@/stores/category.store";
-import { getIngredients } from "@/services/ingredient.service";
 import useIngredientStore from "@/stores/ingredient.store";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 interface ProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: () => void;
-  form: ProductForm;
-  setForm: (form: ProductForm) => void;
+  form: Types.Product.ProductForm;
+  setForm: (form: Types.Product.ProductForm) => void;
   isEditing: boolean;
-  storesList: StoreType[];
+  storesList: Types.Store.StoreType[];
 }
 
 const LabeledInput = memo(
@@ -66,9 +63,14 @@ export function ProductModalComponent({
 
   useEffect(() => {
     (async () => {
-      const categories = await getCategories({ is_active: true });
+      const categories = await Services.Category.getCategories(axiosInstance, {
+        is_active: true,
+      });
       setCategoriesList(categories.result ?? []);
-      const ingredient = await getIngredients({ is_active: true });
+      const ingredient = await Services.Ingredient.getIngredients(
+        axiosInstance,
+        { is_active: true }
+      );
       setIngredientsList(ingredient.result ?? []);
     })();
   }, []);
@@ -79,7 +81,10 @@ export function ProductModalComponent({
         return categoriesList.map((c) => ({ _id: c._id, name: c.name }));
       }
 
-      const result = await getCategories({ is_active: true, search: input });
+      const result = await Services.Category.getCategories(axiosInstance, {
+        is_active: true,
+        search: input,
+      });
       return result.result.map((c) => ({ _id: c._id, name: c.name }));
     },
     [categoriesList]
@@ -91,7 +96,10 @@ export function ProductModalComponent({
         return ingredientsList.map((c) => ({ _id: c._id, name: c.name }));
       }
 
-      const result = await getIngredients({ is_active: true, search: input });
+      const result = await Services.Ingredient.getIngredients(axiosInstance, {
+        is_active: true,
+        search: input,
+      });
       return result.result.map((c) => ({ _id: c._id, name: c.name }));
     },
     [ingredientsList]
@@ -150,10 +158,11 @@ export function ProductModalComponent({
               allowCreate={true}
               onInputChange={handleCategorySearch}
               onChange={(newCats) => {
-                const mapped: CategoryType[] = newCats.map((c) => ({
-                  _id: c._id,
-                  name: c.name,
-                }));
+                const mapped: Partial<Types.Category.CategoryType[]> =
+                  newCats.map((c) => ({
+                    _id: c._id,
+                    name: c.name,
+                  }));
                 setForm({ ...form, category: mapped });
               }}
             />

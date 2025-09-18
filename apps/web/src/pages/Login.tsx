@@ -14,7 +14,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/authContext";
 import { useState } from "react";
 import { showToast } from "@/utils/toast";
-import { login } from "@/services/authentication.service";
+import { Services } from "@my-monorepo/shared";
+import { default as request } from "@/utils/request/request";
 
 export default function LoginPage({
   className,
@@ -34,7 +35,10 @@ export default function LoginPage({
 
     setLoading(true);
     try {
-      const loginResponse = await login({ email, password });
+      const loginResponse = await Services.Auth.login(request, {
+        email,
+        password,
+      });
       loginWithToken(loginResponse.accessToken, loginResponse.refreshToken);
       showToast(
         "success",

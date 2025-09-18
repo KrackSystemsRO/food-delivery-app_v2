@@ -9,10 +9,8 @@ import {
 } from "../ui";
 import { RotateCcw } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { CompanyType } from "../../types/company.type";
-import type { UserType } from "@/types/user.type";
 import { memo, useCallback } from "react";
-
+import { Types } from "@my-monorepo/shared";
 interface FiltersType {
   search: string;
   company: string;
@@ -27,8 +25,8 @@ interface StoreFiltersProps {
   filters: FiltersType;
   setFilters: (updated: Partial<FiltersType>) => void;
   resetFilters: () => void;
-  companies: CompanyType[];
-  admins: UserType[];
+  companies: Types.Company.CompanyType[];
+  admins: Types.User.UserType[];
   storeTypes: string[];
 }
 

@@ -7,24 +7,22 @@ import { useTranslation } from "react-i18next";
 import { ConfirmModal } from "@/components/user/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
 
-import type { StoreForm, StoreType } from "@/types/store.type";
-
-import {
-  addStore,
-  deleteStore,
-  getStores,
-  updateStore,
-} from "@/services/store.service";
+// import {
+//   addStore,
+//   deleteStore,
+//   getStores,
+//   updateStore,
+// } from "@/services/store.service";
 
 import { StoreTable } from "@/components/store/data-table.store";
 import useUserStore from "@/stores/user.store";
-import { getUsers } from "@/services/user.service";
 import useCompanyStore from "@/stores/company.store";
-import { getCompanies } from "@/services/company.service";
 import useStore from "@/stores/store.store";
 import { StoreFilters } from "@/components/store/filters.store";
 import StoreModal from "@/components/store/store.modal";
 import { useDebounce } from "use-debounce";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 const defaultFilters = {
   search: "",
@@ -52,14 +50,15 @@ export default function StoreManagementPage() {
   const { usersList, setUsersList } = useUserStore();
   const { companiesList, setCompaniesList } = useCompanyStore();
 
-  const [itemToDelete, setItemToDelete] = useState<StoreType | null>(null);
+  const [itemToDelete, setItemToDelete] =
+    useState<Types.Store.StoreType | null>(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen, setModalOpen] = useState(false);
 
-  const [form, setForm] = useState<StoreForm>({
+  const [form, setForm] = useState<Types.Store.StoreForm>({
     name: "",
     type: "RESTAURANT",
     address: "",
@@ -94,7 +93,7 @@ export default function StoreManagementPage() {
   const [debouncedFilters] = useDebounce(filters, 10);
 
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof StoreType;
+    key: keyof Types.Store.StoreType;
     direction: "asc" | "desc";
   }>({
     key: "createdAt",
@@ -103,7 +102,7 @@ export default function StoreManagementPage() {
   const fetchStores = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getStores({
+      const res = await Services.Store.getStores(axiosInstance, {
         search: filters.search,
         company: filters.company,
         admin: filters.admin,
@@ -126,9 +125,13 @@ export default function StoreManagementPage() {
 
   useEffect(() => {
     (async () => {
-      const usersRes = await getUsers({ is_active: true });
+      const usersRes = await Services.User.getUsers(axiosInstance, {
+        is_active: true,
+      });
       setUsersList(usersRes.result);
-      const companyRes = await getCompanies({ is_active: true });
+      const companyRes = await Services.Company.getCompanies(axiosInstance, {
+        is_active: true,
+      });
       setCompaniesList(companyRes.result);
     })();
   }, [setUsersList, setCompaniesList]);
@@ -141,7 +144,7 @@ export default function StoreManagementPage() {
     localStorage.setItem("storeFilters", JSON.stringify(filters));
   }, [filters]);
 
-  const handleSort = useCallback((key: keyof StoreType) => {
+  const handleSort = useCallback((key: keyof Types.Store.StoreType) => {
     setSortConfig((current) => ({
       key,
       direction:
@@ -162,13 +165,17 @@ export default function StoreManagementPage() {
 
     try {
       if (selectedStore) {
-        const res = await updateStore(selectedStore._id, form);
+        const res = await Services.Store.updateStore(
+          axiosInstance,
+          selectedStore._id,
+          form
+        );
         if (res.status === 200) {
           showToast("success", t("store.message.updated"));
           updateStoreInList(res.result);
         } else throw new Error();
       } else {
-        const res = await addStore(form);
+        const res = await Services.Store.addStore(axiosInstance, form);
         if (res.status === 201) {
           showToast("success", t("store.message.created"));
           fetchStores();
@@ -206,7 +213,7 @@ export default function StoreManagementPage() {
   }, [clearSelectedStore]);
 
   const openEditModal = useCallback(
-    (store: StoreType) => {
+    (store: Types.Store.StoreType) => {
       setSelectedStore(store);
       setForm({
         name: store.name,
@@ -225,7 +232,7 @@ export default function StoreManagementPage() {
     [setSelectedStore]
   );
 
-  const confirmDelete = useCallback((store: StoreType) => {
+  const confirmDelete = useCallback((store: Types.Store.StoreType) => {
     setItemToDelete(store);
     setDeleteModalOpen(true);
   }, []);
@@ -233,7 +240,7 @@ export default function StoreManagementPage() {
   const performDelete = useCallback(async () => {
     if (!itemToDelete) return;
     try {
-      await deleteStore(itemToDelete._id);
+      await Services.Store.deleteStore(axiosInstance, itemToDelete._id);
       fetchStores();
       showToast("success", t("store.message.deleted") || "Restaurant deleted");
     } catch {

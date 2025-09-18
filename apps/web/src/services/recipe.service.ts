@@ -1,19 +1,19 @@
-import type { RecipeForm, RecipeType } from "@/types/recipe.type";
 import authorizedAxios from "@/utils/request/authorizedRequest";
+import type { Types } from "@my-monorepo/shared";
 
 export interface GetRecipeParams {
   search?: string;
   is_active?: boolean;
   page?: number;
   limit?: number;
-  sort_by?: keyof RecipeType;
+  sort_by?: keyof Types.Recipe.RecipeType;
   order?: "asc" | "desc";
 }
 
 export interface GetRecipesResponse {
   status: number;
   message: string;
-  result: RecipeType[];
+  result: Types.Recipe.RecipeType[];
   totalCount: number;
   totalPages: number;
   currentPage: number;
@@ -54,7 +54,7 @@ export const getRecipes = async (
   }
 };
 
-export const addRecipe = async (data: RecipeForm) => {
+export const addRecipe = async (data: Types.Recipe.RecipeForm) => {
   try {
     const response = await authorizedAxios.post("/recipe", data);
     return response.data;
@@ -64,7 +64,10 @@ export const addRecipe = async (data: RecipeForm) => {
   }
 };
 
-export const updateRecipe = async (id: string, data: RecipeForm) => {
+export const updateRecipe = async (
+  id: string,
+  data: Types.Recipe.RecipeForm
+) => {
   try {
     const response = await authorizedAxios.put(`/recipe/${id}`, data);
     return response.data;

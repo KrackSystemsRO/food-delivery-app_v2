@@ -11,14 +11,13 @@ import {
 } from "@/components/ui";
 import { useTranslation } from "react-i18next";
 import { memo, useCallback, useMemo } from "react";
-import type { IngredientForm } from "@/types/ingredient.type";
-
+import { Types } from "@my-monorepo/shared";
 interface IngredientModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: () => void;
-  form: IngredientForm;
-  setForm: (form: IngredientForm) => void;
+  form: Types.Ingredient.IngredientForm;
+  setForm: (form: Types.Ingredient.IngredientForm) => void;
   isEditing: boolean;
 }
 

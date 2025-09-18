@@ -6,17 +6,13 @@ import { useTranslation } from "react-i18next";
 
 import { ConfirmModal } from "@/components/user/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
-import type { CategoryForm, CategoryType } from "@/types/category.type";
-import {
-  addCategory,
-  deleteCategory,
-  getCategories,
-  updateCategory,
-} from "@/services/category.service";
 import useCategoryStore from "@/stores/category.store";
 import { CategoryTable } from "@/components/category/data-table.category";
 import { CategoryFilters } from "@/components/category/filters.category";
 import CategoryModal from "@/components/category/category.modal";
+
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 const defaultFilters = {
   search: "",
@@ -27,16 +23,15 @@ const defaultFilters = {
 export default function CategoryManagementPage() {
   const { t } = useTranslation();
 
-  const [categoryToDelete, setCategoryToDelete] = useState<CategoryType | null>(
-    null
-  );
+  const [categoryToDelete, setCategoryToDelete] =
+    useState<Types.Category.CategoryType | null>(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen, setModalOpen] = useState(false);
 
-  const [form, setForm] = useState<CategoryForm>({
+  const [form, setForm] = useState<Types.Category.CategoryForm>({
     name: "",
     description: "",
     is_active: true,
@@ -61,7 +56,7 @@ export default function CategoryManagementPage() {
   });
 
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof CategoryType;
+    key: keyof Types.Category.CategoryType;
     direction: "asc" | "desc";
   }>({
     key: "createdAt",
@@ -81,7 +76,7 @@ export default function CategoryManagementPage() {
   const fetchCategories = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getCategories({
+      const res = await Services.Category.getCategories(axiosInstance, {
         search: filters.search,
         is_active: filters.is_active,
         page,
@@ -110,7 +105,7 @@ export default function CategoryManagementPage() {
     localStorage.setItem("categoryFilters", JSON.stringify(filters));
   }, [filters]);
 
-  const handleSort = useCallback((key: keyof CategoryType) => {
+  const handleSort = useCallback((key: keyof Types.Category.CategoryType) => {
     setSortConfig((current) => ({
       key,
       direction:
@@ -129,7 +124,7 @@ export default function CategoryManagementPage() {
   }, [clearSelectedCategory]);
 
   const openEditModal = useCallback(
-    (category: CategoryType) => {
+    (category: Types.Category.CategoryType) => {
       setSelectedCategory(category);
       setForm({
         name: category.name,
@@ -141,7 +136,7 @@ export default function CategoryManagementPage() {
     [setSelectedCategory]
   );
 
-  const confirmDelete = useCallback((category: CategoryType) => {
+  const confirmDelete = useCallback((category: Types.Category.CategoryType) => {
     setCategoryToDelete(category);
     setDeleteModalOpen(true);
   }, []);
@@ -149,7 +144,10 @@ export default function CategoryManagementPage() {
   const performDelete = useCallback(async () => {
     if (!categoryToDelete) return;
     try {
-      await deleteCategory(categoryToDelete._id);
+      await Services.Category.deleteCategory(
+        axiosInstance,
+        categoryToDelete._id
+      );
       fetchCategories();
       showToast("success", t("category.message.deleted") || "Category deleted");
     } catch {
@@ -171,13 +169,17 @@ export default function CategoryManagementPage() {
 
     try {
       if (selectedCategory) {
-        const res = await updateCategory(selectedCategory._id, form);
+        const res = await Services.Category.updateCategory(
+          axiosInstance,
+          selectedCategory._id,
+          form
+        );
         if (res.status === 200) {
           showToast("success", t("category.message.updated"));
           updateCategoryInList(res.result);
         } else throw new Error();
       } else {
-        const res = await addCategory(form);
+        const res = await Services.Category.addCategory(axiosInstance, form);
         if (res.status === 201) {
           showToast("success", t("category.message.created"));
           fetchCategories();

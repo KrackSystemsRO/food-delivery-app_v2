@@ -1,17 +1,17 @@
+import type { Types } from "@my-monorepo/shared";
 import { create } from "zustand";
-import type { StoreType } from "@/types/store.type";
 
 interface StoreState {
-  storesList: StoreType[];
-  selectedStore: StoreType | null;
+  storesList: Types.Store.StoreType[];
+  selectedStore: Types.Store.StoreType | null;
 
-  setStoresList: (stores: StoreType[]) => void;
+  setStoresList: (stores: Types.Store.StoreType[]) => void;
   clearStoresList: () => void;
 
-  setSelectedStore: (store: StoreType | null) => void;
+  setSelectedStore: (store: Types.Store.StoreType | null) => void;
   clearSelectedStore: () => void;
 
-  updateStoreInList: (updatedStore: StoreType) => void;
+  updateStoreInList: (updatedStore: Types.Store.StoreType) => void;
 }
 
 const useStore = create<StoreState>((set) => ({
