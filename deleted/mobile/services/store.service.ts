@@ -1,5 +1,5 @@
 import { Types } from "@my-monorepo/shared";
-import authorizedAxios from "../utils/request/authorizedRequest";
+import authorizedAxios from "../../../apps/mobile/src/utils/request/authorizedRequest";
 
 export const getListStore = async (params: Types.Store.StoreListQuery) => {
   try {

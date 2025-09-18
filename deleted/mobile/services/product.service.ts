@@ -1,4 +1,4 @@
-import authorizedAxios from "../utils/request/authorizedRequest";
+import authorizedAxios from "../../../apps/mobile/src/utils/request/authorizedRequest";
 import { Types } from "@my-monorepo/shared";
 
 export interface CreateProductPayload {

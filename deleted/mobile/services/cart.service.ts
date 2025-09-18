@@ -1,5 +1,5 @@
 import { Types } from "@my-monorepo/shared";
-import axiosInstance from "../utils/request/authorizedRequest";
+import axiosInstance from "../../../apps/mobile/src/utils/request/authorizedRequest";
 
 export const addToCart = async ({
   product,

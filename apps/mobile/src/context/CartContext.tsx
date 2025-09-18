@@ -1,10 +1,6 @@
 import React, { createContext, useContext, useEffect, useReducer } from "react";
-import {
-  addToCart as addToCartApi,
-  fetchCart,
-  updateCartItemQuantity,
-} from "../services/cart.service";
-import { Types } from "@my-monorepo/shared";
+import { Services, Types } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 type Action =
   | { type: "SET_CART"; cart: Types.Cart.CartStateType }
@@ -54,7 +50,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const refreshCart = async () => {
     try {
-      const cartData = await fetchCart();
+      const cartData = await Services.Cart.fetchCart(axiosInstance);
       if (cartData) {
         const CartStateType: Types.Cart.CartStateType = {
           store: cartData.store?._id || cartData.store,
@@ -82,7 +78,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     item: Types.Cart.CartItemType,
     store: string
   ): Promise<boolean> => {
-    const addToCart = await addToCartApi({
+    const addToCart = await Services.Cart.addToCart(axiosInstance, {
       product: item.product,
       quantity: item.quantity,
       store,
@@ -102,7 +98,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   const syncUpdateQuantity = async (product: string, quantity: number) => {
     if (!state.store) throw new Error("No store set");
 
-    await updateCartItemQuantity(product, quantity, state.store);
+    await Services.Cart.updateCartItemQuantity(
+      axiosInstance,
+      product,
+      quantity,
+      state.store
+    );
 
     await refreshCart();
   };

@@ -1,4 +1,4 @@
-import axios from "../utils/request/request";
+import axios from "../../../apps/mobile/src/utils/request/request";
 import * as SecureStore from "expo-secure-store";
 
 export interface LoginData {

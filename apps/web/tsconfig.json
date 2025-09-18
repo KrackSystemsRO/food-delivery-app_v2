@@ -12,5 +12,19 @@
       "@my-monorepo/shared": ["../../packages/shared/src"]
     }
   },
-  "include": ["src", "../../deleted/web/types"]
+  "include": [
+    "src",
+    "../../deleted/web/types",
+    "../../deleted/web/services/allergen.service.ts",
+    "../../deleted/web/services/authentication.service.ts",
+    "../../deleted/web/services/category.service.ts",
+    "../../deleted/web/services/company.service.ts",
+    "../../deleted/web/services/department.service.ts",
+    "../../deleted/web/services/ingredient.service.ts",
+    "../../deleted/web/services/order.service.ts",
+    "../../deleted/web/services/product.service.ts",
+    "../../deleted/web/services/recipe.service.ts",
+    "../../deleted/web/services/store.service.ts",
+    "../../deleted/web/services/user.service.ts"
+  ]
 }
