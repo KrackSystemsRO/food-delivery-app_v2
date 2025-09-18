@@ -20,17 +20,16 @@ import {
 import { ChevronDownIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { memo, useCallback, useMemo } from "react";
-import type { CompanyForm } from "@/types/company.type";
-import type { UserType } from "@/types/user.type";
+import { Types } from "@my-monorepo/shared";
 
 interface CompanyModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: () => void;
-  form: CompanyForm;
-  setForm: (form: CompanyForm) => void;
+  form: Types.Company.CompanyForm;
+  setForm: (form: Types.Company.CompanyForm) => void;
   isEditing: boolean;
-  users: UserType[];
+  users: Types.User.UserType[];
 }
 
 interface LabeledInputProps {
@@ -107,9 +106,11 @@ export default function CompanyModal({
 
   const toggleAdminUser = useCallback(
     (userId: string) => {
-      const isSelected = form.admin.some((u) => u._id === userId);
+      const isSelected = form.admin.some(
+        (u: Types.User.UserType) => u._id === userId
+      );
       const updatedAdmins = isSelected
-        ? form.admin.filter((u) => u._id !== userId)
+        ? form.admin.filter((u: Types.User.UserType) => u._id !== userId)
         : [...form.admin, users.find((u) => u._id === userId)!];
       setForm({ ...form, admin: updatedAdmins });
     },

@@ -55,7 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const attachSocketListeners = useCallback(
     (sock: Socket, currentUser: Types.User.UserType) => {
       sock.on("connect", () => {
-        console.log("✅ Socket connected:", sock.id);
+        console.log("✅ Socket connected (Auth connection):", sock.id);
 
         switch (currentUser.role) {
           case "CLIENT":

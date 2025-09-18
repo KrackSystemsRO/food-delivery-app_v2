@@ -7,7 +7,6 @@ import { useTranslation } from "react-i18next";
 import { ConfirmModal } from "@/components/user/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
 
-import type { DepartmentForm, DepartmentType } from "@/types/department.type";
 import {
   addDepartment,
   deleteDepartment,
@@ -24,6 +23,7 @@ import useUserStore from "@/stores/user.store";
 import { getUsers } from "@/services/user.service";
 import { getCompanies } from "@/services/company.service";
 import useCompanyStore from "@/stores/company.store";
+import { Types } from "@my-monorepo/shared";
 
 const defaultFilters = {
   search: "",
@@ -36,7 +36,7 @@ export default function DepartmentManagementPage() {
   const { t } = useTranslation();
 
   const [departmentToDelete, setDepartmentToDelete] =
-    useState<DepartmentType | null>(null);
+    useState<Types.Department.DepartmentType | null>(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -46,7 +46,7 @@ export default function DepartmentManagementPage() {
   const { usersList, setUsersList } = useUserStore();
   const { companiesList, setCompaniesList } = useCompanyStore();
 
-  const [form, setForm] = useState<DepartmentForm>({
+  const [form, setForm] = useState<Types.Department.DepartmentForm>({
     name: "",
     description: undefined,
     is_active: true,
@@ -73,7 +73,7 @@ export default function DepartmentManagementPage() {
   });
 
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof DepartmentType;
+    key: keyof Types.Department.DepartmentType;
     direction: "asc" | "desc";
   }>({
     key: "createdAt",
@@ -134,17 +134,20 @@ export default function DepartmentManagementPage() {
     localStorage.setItem("departmentFilters", JSON.stringify(filters));
   }, [filters]);
 
-  const handleSort = useCallback((key: keyof DepartmentType) => {
-    setSortConfig((current) => ({
-      key,
-      direction:
-        current.key === key
-          ? current.direction === "asc"
-            ? "desc"
-            : "asc"
-          : "asc",
-    }));
-  }, []);
+  const handleSort = useCallback(
+    (key: keyof Types.Department.DepartmentType) => {
+      setSortConfig((current) => ({
+        key,
+        direction:
+          current.key === key
+            ? current.direction === "asc"
+              ? "desc"
+              : "asc"
+            : "asc",
+      }));
+    },
+    []
+  );
 
   const openCreateModal = useCallback(() => {
     clearSelectedDepartment();
@@ -159,7 +162,7 @@ export default function DepartmentManagementPage() {
   }, [clearSelectedDepartment]);
 
   const openEditModal = useCallback(
-    (department: DepartmentType) => {
+    (department: Types.Department.DepartmentType) => {
       setSelectedDepartment(department);
       setForm({
         name: department.name,
@@ -173,10 +176,13 @@ export default function DepartmentManagementPage() {
     [setSelectedDepartment]
   );
 
-  const confirmDelete = useCallback((department: DepartmentType) => {
-    setDepartmentToDelete(department);
-    setDeleteModalOpen(true);
-  }, []);
+  const confirmDelete = useCallback(
+    (department: Types.Department.DepartmentType) => {
+      setDepartmentToDelete(department);
+      setDeleteModalOpen(true);
+    },
+    []
+  );
 
   const performDelete = useCallback(async () => {
     if (!departmentToDelete) return;

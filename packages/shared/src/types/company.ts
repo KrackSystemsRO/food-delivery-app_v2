@@ -1,11 +1,26 @@
+import { UserType } from "./user";
+
 export interface CompanyType {
   _id: string;
   name: string;
-  type: string;
+  email: string;
+  phone_number: string;
+  address: string;
+  type: "PROVIDER" | "CLIENT" | undefined;
   is_active: boolean;
-  createdAt: string; // ISO string
-  updatedAt: string; // ISO string
+  createdAt: string;
+  updatedAt: string;
   companyId: number;
   __v: number;
-  admin: any[]; // Replace with actual admin type if available
+  admin: UserType[];
+}
+
+export interface CompanyForm {
+  name: string;
+  address?: string;
+  type?: "PROVIDER" | "CLIENT";
+  email?: string;
+  phone_number?: string;
+  is_active: boolean;
+  admin: UserType[];
 }

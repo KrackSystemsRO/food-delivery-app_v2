@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 
 import { ConfirmModal } from "@/components/user/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
-import type { CompanyForm, CompanyType } from "@/types/company.type";
 import {
   addCompany,
   deleteCompany,
@@ -19,6 +18,7 @@ import { CompanyFilters } from "@/components/company/filters.company";
 import CompanyModal from "@/components/company/company.modal";
 import useUserStore from "@/stores/user.store";
 import { getUsers } from "@/services/user.service";
+import { Types } from "@my-monorepo/shared";
 
 const defaultFilters = {
   search: "",
@@ -30,16 +30,15 @@ const defaultFilters = {
 export default function CompanyManagementPage() {
   const { t } = useTranslation();
 
-  const [companyToDelete, setCompanyToDelete] = useState<CompanyType | null>(
-    null
-  );
+  const [companyToDelete, setCompanyToDelete] =
+    useState<Types.Company.CompanyType | null>(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen, setModalOpen] = useState(false);
   const { usersList, setUsersList } = useUserStore();
-  const [form, setForm] = useState<CompanyForm>({
+  const [form, setForm] = useState<Types.Company.CompanyForm>({
     name: "",
     address: undefined,
     type: undefined,
@@ -67,7 +66,7 @@ export default function CompanyManagementPage() {
     return defaultFilters;
   });
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof CompanyType;
+    key: keyof Types.Company.CompanyType;
     direction: "asc" | "desc";
   }>({
     key: "createdAt",
@@ -121,7 +120,7 @@ export default function CompanyManagementPage() {
     localStorage.setItem("companyFilters", JSON.stringify(filters));
   }, [filters]);
 
-  const handleSort = useCallback((key: keyof CompanyType) => {
+  const handleSort = useCallback((key: keyof Types.Company.CompanyType) => {
     setSortConfig((current) => ({
       key,
       direction:
@@ -144,7 +143,7 @@ export default function CompanyManagementPage() {
   }, [clearSelectedCompany]);
 
   const openEditModal = useCallback(
-    (company: CompanyType) => {
+    (company: Types.Company.CompanyType) => {
       setSelectedCompany(company);
       setForm({
         name: company.name,
@@ -160,7 +159,7 @@ export default function CompanyManagementPage() {
     [setSelectedCompany]
   );
 
-  const confirmDelete = useCallback((company: CompanyType) => {
+  const confirmDelete = useCallback((company: Types.Company.CompanyType) => {
     setCompanyToDelete(company);
     setDeleteModalOpen(true);
   }, []);

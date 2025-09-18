@@ -16,15 +16,15 @@ import {
   SelectValue,
 } from "@/components/ui";
 import { useTranslation } from "react-i18next";
-import type { StoreForm } from "@/types/store.type";
+
 import { Types } from "@my-monorepo/shared";
 
 interface StoreModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: () => void;
-  form: StoreForm;
-  setForm: (form: StoreForm) => void;
+  form: Types.Store.StoreForm;
+  setForm: (form: Types.Store.StoreForm) => void;
   isEditing: boolean;
   companies: Types.Company.CompanyType[];
   users: Types.User.UserType[];
@@ -48,9 +48,16 @@ export default function StoreModal({
 
   const toggleAdminUser = useCallback(
     (userId: string) => {
-      const isSelected = form.admin.some((u) => u._id === userId);
+      const isSelected = form.admin.some(
+        (u: Types.User.UserType) => u._id === userId
+      );
       if (isSelected) {
-        setForm({ ...form, admin: form.admin.filter((u) => u._id !== userId) });
+        setForm({
+          ...form,
+          admin: form.admin.filter(
+            (u: Types.User.UserType) => u._id !== userId
+          ),
+        });
       } else {
         const userToAdd = users.find((u) => u._id === userId);
         if (userToAdd) setForm({ ...form, admin: [...form.admin, userToAdd] });
@@ -61,11 +68,15 @@ export default function StoreModal({
 
   const toggleCompany = useCallback(
     (companyId: string) => {
-      const isSelected = form.company.some((c) => c._id === companyId);
+      const isSelected = form.company.some(
+        (c: Types.Company.CompanyType) => c._id === companyId
+      );
       if (isSelected) {
         setForm({
           ...form,
-          company: form.company.filter((c) => c._id !== companyId),
+          company: form.company.filter(
+            (c: Types.Company.CompanyType) => c._id !== companyId
+          ),
         });
       } else {
         const companyToAdd = companies.find((c) => c._id === companyId);
@@ -118,14 +129,16 @@ export default function StoreModal({
               >
                 <SelectValue>
                   {form.company.length > 0
-                    ? form.company.map((c) => c.name).join(", ")
+                    ? form.company
+                        .map((c: Types.Company.CompanyType) => c.name)
+                        .join(", ")
                     : t("common.form.select.company") || "Select company"}
                 </SelectValue>
               </SelectTrigger>
               <SelectContent className="max-h-60 overflow-auto rounded-md p-1">
                 {companies.map((company) => {
                   const isSelected = form.company.some(
-                    (c) => c._id === company._id
+                    (c: Types.Company.CompanyType) => c._id === company._id
                   );
                   return (
                     <SelectItemMemo
@@ -162,7 +175,8 @@ export default function StoreModal({
                   {form.admin.length > 0
                     ? form.admin
                         .map(
-                          (u) => `${u.first_name} ${u.last_name} (${u.email})`
+                          (u: Types.User.UserType) =>
+                            `${u.first_name} ${u.last_name} (${u.email})`
                         )
                         .join(", ")
                     : t("common.form.select.admins") || "Select admins"}
@@ -170,7 +184,9 @@ export default function StoreModal({
               </SelectTrigger>
               <SelectContent className="max-h-60 overflow-auto rounded-md p-1">
                 {users.map((user) => {
-                  const isSelected = form.admin.some((u) => u._id === user._id);
+                  const isSelected = form.admin.some(
+                    (u: Types.User.UserType) => u._id === user._id
+                  );
                   return (
                     <SelectItemMemo
                       key={user._id}

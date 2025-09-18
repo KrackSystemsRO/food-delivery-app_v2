@@ -2,14 +2,14 @@ import { useEffect, useState, useCallback, useMemo, memo } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import type { IngredientWithQuantity } from "@/types/product.type";
+
 import { Types } from "@my-monorepo/shared";
 import { addIngredient, checkIngredient } from "@/services/ingredient.service";
 
 interface IngredientsSelectorProps {
   options: Types.Ingredient.IngredientType[];
-  value: IngredientWithQuantity[];
-  onChange: (val: IngredientWithQuantity[]) => void;
+  value: Types.Ingredient.IngredientWithQuantity[];
+  onChange: (val: Types.Ingredient.IngredientWithQuantity[]) => void;
   onInputChange?: (query: string) => Promise<Types.Ingredient.IngredientType[]>;
 }
 
@@ -18,7 +18,7 @@ const IngredientItem = memo(
     v,
     onRemove,
   }: {
-    v: IngredientWithQuantity;
+    v: Types.Ingredient.IngredientWithQuantity;
     onRemove: (id: string) => void;
   }) => (
     <div className="flex justify-between items-center border rounded-md px-3 py-2">

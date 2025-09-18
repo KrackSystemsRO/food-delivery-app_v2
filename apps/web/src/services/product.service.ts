@@ -1,5 +1,5 @@
-import type { ProductForm, ProductType } from "@/types/product.type";
 import authorizedAxios from "@/utils/request/authorizedRequest";
+import type { Types } from "@my-monorepo/shared";
 
 export interface GetProductParams {
   search?: string;
@@ -7,14 +7,14 @@ export interface GetProductParams {
   is_active?: boolean;
   page?: number;
   limit?: number;
-  sort_by?: keyof ProductType;
+  sort_by?: keyof Types.Product.ProductType;
   order?: "asc" | "desc";
 }
 
 export interface GetProductsResponse {
   status: number;
   message: string;
-  result: ProductType[];
+  result: Types.Product.ProductType[];
   totalCount: number;
   totalPages: number;
   currentPage: number;
@@ -58,7 +58,7 @@ export const getProducts = async (
   }
 };
 
-export const addProduct = async (data: ProductForm) => {
+export const addProduct = async (data: Types.Product.ProductForm) => {
   try {
     const response = await authorizedAxios.post("/product", data);
     return response.data;
@@ -68,7 +68,10 @@ export const addProduct = async (data: ProductForm) => {
   }
 };
 
-export const updateProduct = async (id: string, data: ProductForm) => {
+export const updateProduct = async (
+  id: string,
+  data: Types.Product.ProductForm
+) => {
   try {
     const response = await authorizedAxios.put(`/product/${id}`, data);
     return response.data;

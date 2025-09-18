@@ -1,19 +1,19 @@
-import type { IngredientForm, IngredientType } from "@/types/ingredient.type";
 import authorizedAxios from "@/utils/request/authorizedRequest";
+import type { Types } from "@my-monorepo/shared";
 
 export interface GetIngredientParams {
   search?: string;
   is_active?: boolean;
   page?: number;
   limit?: number;
-  sort_by?: keyof IngredientType;
+  sort_by?: keyof Types.Ingredient.IngredientType;
   order?: "asc" | "desc";
 }
 
 export interface GetIngredientsResponse {
   status: number;
   message: string;
-  result: IngredientType[];
+  result: Types.Ingredient.IngredientType[];
   totalCount: number;
   totalPages: number;
   currentPage: number;
@@ -55,7 +55,7 @@ export const getIngredients = async (
   }
 };
 
-export const addIngredient = async (data: IngredientForm) => {
+export const addIngredient = async (data: Types.Ingredient.IngredientForm) => {
   try {
     const response = await authorizedAxios.post("/ingredient", data);
     return response.data;
@@ -65,7 +65,10 @@ export const addIngredient = async (data: IngredientForm) => {
   }
 };
 
-export const updateIngredient = async (id: string, data: IngredientForm) => {
+export const updateIngredient = async (
+  id: string,
+  data: Types.Ingredient.IngredientForm
+) => {
   try {
     const response = await authorizedAxios.put(`/ingredient/${id}`, data);
     return response.data;
@@ -90,5 +93,8 @@ export const checkIngredient = async (name: string) => {
     params: { name },
   });
   console.log(res);
-  return res.data as { exists: boolean; ingredient?: IngredientType };
+  return res.data as {
+    exists: boolean;
+    ingredient?: Types.Ingredient.IngredientType;
+  };
 };

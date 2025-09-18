@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import { ConfirmModal } from "@/components/user/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
-import type { CategoryForm, CategoryType } from "@/types/category.type";
+
 import {
   addCategory,
   deleteCategory,
@@ -18,6 +18,8 @@ import { CategoryTable } from "@/components/category/data-table.category";
 import { CategoryFilters } from "@/components/category/filters.category";
 import CategoryModal from "@/components/category/category.modal";
 
+import { Types } from "@my-monorepo/shared";
+
 const defaultFilters = {
   search: "",
   is_active: undefined,
@@ -27,16 +29,15 @@ const defaultFilters = {
 export default function CategoryManagementPage() {
   const { t } = useTranslation();
 
-  const [categoryToDelete, setCategoryToDelete] = useState<CategoryType | null>(
-    null
-  );
+  const [categoryToDelete, setCategoryToDelete] =
+    useState<Types.Category.CategoryType | null>(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen, setModalOpen] = useState(false);
 
-  const [form, setForm] = useState<CategoryForm>({
+  const [form, setForm] = useState<Types.Category.CategoryForm>({
     name: "",
     description: "",
     is_active: true,
@@ -61,7 +62,7 @@ export default function CategoryManagementPage() {
   });
 
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof CategoryType;
+    key: keyof Types.Category.CategoryType;
     direction: "asc" | "desc";
   }>({
     key: "createdAt",
@@ -110,7 +111,7 @@ export default function CategoryManagementPage() {
     localStorage.setItem("categoryFilters", JSON.stringify(filters));
   }, [filters]);
 
-  const handleSort = useCallback((key: keyof CategoryType) => {
+  const handleSort = useCallback((key: keyof Types.Category.CategoryType) => {
     setSortConfig((current) => ({
       key,
       direction:
@@ -129,7 +130,7 @@ export default function CategoryManagementPage() {
   }, [clearSelectedCategory]);
 
   const openEditModal = useCallback(
-    (category: CategoryType) => {
+    (category: Types.Category.CategoryType) => {
       setSelectedCategory(category);
       setForm({
         name: category.name,
@@ -141,7 +142,7 @@ export default function CategoryManagementPage() {
     [setSelectedCategory]
   );
 
-  const confirmDelete = useCallback((category: CategoryType) => {
+  const confirmDelete = useCallback((category: Types.Category.CategoryType) => {
     setCategoryToDelete(category);
     setDeleteModalOpen(true);
   }, []);

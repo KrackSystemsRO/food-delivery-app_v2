@@ -41,3 +41,20 @@ export interface StoreListQuery {
   is_open?: boolean;
   company?: string;
 }
+
+export interface StoreForm {
+  _id?: string;
+  name: string;
+  type: "RESTAURANT" | "GROCERY" | "BAKERY" | "CAFE" | "OTHER";
+  address: string;
+  phone_number?: string;
+  description?: string;
+  is_active: boolean;
+  is_open: boolean;
+  company: CompanyType[];
+  admin: UserType[];
+  location?: {
+    lat?: number;
+    lng?: number;
+  };
+}

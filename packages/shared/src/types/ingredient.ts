@@ -22,3 +22,18 @@ export type IngredientType = {
   unit?: "piece" | "gram" | "liter";
   is_active?: boolean;
 };
+
+export interface IngredientForm {
+  name: string;
+  description?: string;
+  allergens?: string[];
+  nutritionalInfo?: Partial<NutritionalInfo>;
+  unit?: string;
+  is_active?: boolean;
+}
+
+export interface IngredientWithQuantity {
+  ingredient: IngredientType;
+  quantity?: string;
+  unit: string;
+}

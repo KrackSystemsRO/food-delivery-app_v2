@@ -1,5 +1,5 @@
-import type { CompanyForm, CompanyType } from "@/types/company.type";
 import authorizedAxios from "@/utils/request/authorizedRequest";
+import type { Types } from "@my-monorepo/shared";
 
 export interface GetCompanyParams {
   search?: string;
@@ -7,14 +7,14 @@ export interface GetCompanyParams {
   is_active?: boolean;
   page?: number;
   limit?: number;
-  sort_by?: keyof CompanyType;
+  sort_by?: keyof Types.Company.CompanyType;
   order?: "asc" | "desc";
 }
 
 export interface GetCompaniesResponse {
   status: number;
   message: string;
-  result: CompanyType[];
+  result: Types.Company.CompanyType[];
   totalCount: number;
   totalPages: number;
   currentPage: number;
@@ -57,7 +57,7 @@ export const getCompanies = async (
   }
 };
 
-export const addCompany = async (data: CompanyForm) => {
+export const addCompany = async (data: Types.Company.CompanyForm) => {
   try {
     const response = await authorizedAxios.post(`company`, data);
     return response.data;
@@ -67,7 +67,10 @@ export const addCompany = async (data: CompanyForm) => {
   }
 };
 
-export const updateCompany = async (id: string, data: CompanyForm) => {
+export const updateCompany = async (
+  id: string,
+  data: Types.Company.CompanyForm
+) => {
   try {
     const response = await authorizedAxios.put(`company/${id}`, data);
     return response.data;

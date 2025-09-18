@@ -1,19 +1,19 @@
-import type { OrderForm, OrderType } from "@/types/order.type";
 import authorizedAxios from "@/utils/request/authorizedRequest";
+import type { Types } from "@my-monorepo/shared";
 
 export interface GetOrderParams {
   search?: string;
   status?: string; // optional filter by order status
   page?: number;
   limit?: number;
-  sort_by?: keyof OrderType;
+  sort_by?: keyof Types.Order.OrderType;
   order?: "asc" | "desc";
 }
 
 export interface GetOrdersResponse {
   status: number;
   message: string;
-  result: OrderType[];
+  result: Types.Order.OrderType[];
   totalCount: number;
   totalPages: number;
   currentPage: number;
@@ -55,7 +55,7 @@ export const getOrders = async (
   }
 };
 
-export const addOrder = async (data: OrderForm) => {
+export const addOrder = async (data: Types.Order.OrderForm) => {
   try {
     const response = await authorizedAxios.post("/order", data);
     return response.data;
@@ -65,7 +65,7 @@ export const addOrder = async (data: OrderForm) => {
   }
 };
 
-export const updateOrder = async (id: string, data: OrderForm) => {
+export const updateOrder = async (id: string, data: Types.Order.OrderForm) => {
   try {
     const response = await authorizedAxios.put(`/order/${id}`, data);
     return response.data;

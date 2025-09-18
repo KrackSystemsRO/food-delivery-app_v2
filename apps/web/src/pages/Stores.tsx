@@ -7,8 +7,6 @@ import { useTranslation } from "react-i18next";
 import { ConfirmModal } from "@/components/user/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
 
-import type { StoreForm, StoreType } from "@/types/store.type";
-
 import {
   addStore,
   deleteStore,
@@ -25,6 +23,7 @@ import useStore from "@/stores/store.store";
 import { StoreFilters } from "@/components/store/filters.store";
 import StoreModal from "@/components/store/store.modal";
 import { useDebounce } from "use-debounce";
+import { Types } from "@my-monorepo/shared";
 
 const defaultFilters = {
   search: "",
@@ -52,14 +51,15 @@ export default function StoreManagementPage() {
   const { usersList, setUsersList } = useUserStore();
   const { companiesList, setCompaniesList } = useCompanyStore();
 
-  const [itemToDelete, setItemToDelete] = useState<StoreType | null>(null);
+  const [itemToDelete, setItemToDelete] =
+    useState<Types.Store.StoreType | null>(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen, setModalOpen] = useState(false);
 
-  const [form, setForm] = useState<StoreForm>({
+  const [form, setForm] = useState<Types.Store.StoreForm>({
     name: "",
     type: "RESTAURANT",
     address: "",
@@ -94,7 +94,7 @@ export default function StoreManagementPage() {
   const [debouncedFilters] = useDebounce(filters, 10);
 
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof StoreType;
+    key: keyof Types.Store.StoreType;
     direction: "asc" | "desc";
   }>({
     key: "createdAt",
@@ -141,7 +141,7 @@ export default function StoreManagementPage() {
     localStorage.setItem("storeFilters", JSON.stringify(filters));
   }, [filters]);
 
-  const handleSort = useCallback((key: keyof StoreType) => {
+  const handleSort = useCallback((key: keyof Types.Store.StoreType) => {
     setSortConfig((current) => ({
       key,
       direction:
@@ -206,7 +206,7 @@ export default function StoreManagementPage() {
   }, [clearSelectedStore]);
 
   const openEditModal = useCallback(
-    (store: StoreType) => {
+    (store: Types.Store.StoreType) => {
       setSelectedStore(store);
       setForm({
         name: store.name,
@@ -225,7 +225,7 @@ export default function StoreManagementPage() {
     [setSelectedStore]
   );
 
-  const confirmDelete = useCallback((store: StoreType) => {
+  const confirmDelete = useCallback((store: Types.Store.StoreType) => {
     setItemToDelete(store);
     setDeleteModalOpen(true);
   }, []);

@@ -5,7 +5,6 @@ import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
 
 import { PaginationControls } from "@/components/common/pagination.common";
-import type { OrderType } from "@/types/order.type";
 import { deleteOrder, getOrders } from "@/services/order.service";
 import useOrderStore from "@/stores/order.store";
 import { OrderTable } from "@/components/order/data-table";
@@ -13,7 +12,7 @@ import { OrderFilters, type FiltersType } from "@/components/order/filters";
 import OrderModal from "@/components/order/order.modal";
 import { ConfirmModal } from "@/components/order/confirm.modal";
 import usePersistedState from "@/hooks/use-persisted-state";
-
+import { Types } from "@my-monorepo/shared";
 const defaultFilters: FiltersType = {
   search: "",
   status: undefined,
@@ -33,7 +32,8 @@ export default function OrderManagementPage() {
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [orderToDelete, setOrderToDelete] = useState<OrderType | null>(null);
+  const [orderToDelete, setOrderToDelete] =
+    useState<Types.Order.OrderType | null>(null);
 
   const [filters, setFilters] = usePersistedState<FiltersType>(
     "orderFilters",
@@ -114,7 +114,7 @@ export default function OrderManagementPage() {
   }, [fetchOrders, clearOrdersList, page]);
 
   // --- Handlers ---
-  const handleSort = useCallback((key: keyof OrderType) => {
+  const handleSort = useCallback((key: keyof Types.Order.OrderType) => {
     if (!sortableKeys.includes(key as SortKey)) return;
     setSortConfig((current) => ({
       key: key as SortKey,
@@ -129,7 +129,7 @@ export default function OrderManagementPage() {
   }, [clearSelectedOrder]);
 
   const openEditModal = useCallback(
-    (order: OrderType) => {
+    (order: Types.Order.OrderType) => {
       setSelectedOrder(order);
       setModalOpen(true);
     },
@@ -140,7 +140,7 @@ export default function OrderManagementPage() {
       setFilters((prev) => ({ ...prev, ...updated })),
     [setFilters]
   );
-  const confirmDelete = useCallback((order: OrderType) => {
+  const confirmDelete = useCallback((order: Types.Order.OrderType) => {
     setOrderToDelete(order);
     setDeleteModalOpen(true);
   }, []);

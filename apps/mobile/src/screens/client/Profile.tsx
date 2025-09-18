@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,14 +8,13 @@ import {
   Modal,
   Button,
 } from "react-native";
-import { AuthContext, useAuth } from "../../context/authContext";
+import { useAuth } from "../../context/authContext";
 import LoadingSpin from "../../components/LoadingSpin";
 import { useTranslation } from "react-i18next";
 import LanguageSwitch from "@/components/buttons/LanguageSwitch";
 
 export default function ProfileScreen() {
-  const { logout } = useAuth();
-  const { user } = useContext(AuthContext);
+  const { logout, user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
 

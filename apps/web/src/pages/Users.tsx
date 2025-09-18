@@ -3,14 +3,11 @@ import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { showToast } from "@/utils/toast";
-
-import type { UserType } from "@/types/user.type";
 import UserModal from "@/components/user/user.modal";
 import { ConfirmModal } from "@/components/user/confirm.modal";
 import { UserFilters } from "@/components/user/filters.user";
 import { UserTable } from "@/components/user/data-table.user";
 import { PaginationControls } from "@/components/common/pagination.common";
-
 import useUserStore from "@/stores/user.store";
 import {
   addUser,
@@ -18,27 +15,14 @@ import {
   getUsers,
   updateUser,
 } from "@/services/user.service";
+import { Types } from "@my-monorepo/shared";
 
-interface UserFiltersType {
-  search: string;
-  role: string;
-  is_active?: boolean;
-  limit: number;
-}
-
-const defaultFilters: UserFiltersType = {
+const defaultFilters: Types.User.UserFiltersType = {
   search: "",
   role: "",
   is_active: undefined,
   limit: 10,
 };
-
-export interface UserForm {
-  first_name: string;
-  last_name: string;
-  email: string;
-  role: string;
-}
 
 export default function UserManagementPage() {
   const { t } = useTranslation();
@@ -49,13 +33,15 @@ export default function UserManagementPage() {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
 
-  const [form, setForm] = useState<UserForm>({
+  const [form, setForm] = useState<Types.User.UserForm>({
     first_name: "",
     last_name: "",
     email: "",
     role: "",
   });
-  const [userToDelete, setUserToDelete] = useState<UserType | null>(null);
+  const [userToDelete, setUserToDelete] = useState<Types.User.UserType | null>(
+    null
+  );
   const [filters, setFilters] = useState(() => {
     const saved = localStorage.getItem("userFilters");
     if (saved) {
@@ -74,7 +60,7 @@ export default function UserManagementPage() {
   });
 
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof UserType;
+    key: keyof Types.User.UserType;
     direction: "asc" | "desc";
   }>({
     key: "createdAt",
@@ -120,7 +106,7 @@ export default function UserManagementPage() {
   }, [filters]);
 
   // Sorting handler
-  const handleSort = (key: keyof UserType) =>
+  const handleSort = (key: keyof Types.User.UserType) =>
     setSortConfig((current) => ({
       key,
       direction:
@@ -134,7 +120,7 @@ export default function UserManagementPage() {
   }, [clearSelectedUser]);
 
   const openEditModal = useCallback(
-    (user: UserType) => {
+    (user: Types.User.UserType) => {
       setSelectedUser(user);
       setForm({
         first_name: user.first_name,
@@ -147,7 +133,7 @@ export default function UserManagementPage() {
     [setSelectedUser]
   );
 
-  const confirmDelete = useCallback((user: UserType) => {
+  const confirmDelete = useCallback((user: Types.User.UserType) => {
     setUserToDelete(user);
     setDeleteModalOpen(true);
   }, []);
@@ -224,7 +210,10 @@ export default function UserManagementPage() {
       <UserFilters
         filters={filters}
         setFilters={(updated: Partial<typeof filters>) => {
-          setFilters((prev: UserFiltersType) => ({ ...prev, ...updated }));
+          setFilters((prev: Types.User.UserFiltersType) => ({
+            ...prev,
+            ...updated,
+          }));
           setPage(1);
         }}
         resetFilters={resetFilters}

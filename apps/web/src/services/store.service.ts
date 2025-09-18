@@ -1,5 +1,5 @@
-import type { StoreForm, StoreType } from "@/types/store.type";
 import authorizedAxios from "@/utils/request/authorizedRequest";
+import type { Types } from "@my-monorepo/shared";
 
 export interface GetStoreParams {
   search?: string;
@@ -10,14 +10,14 @@ export interface GetStoreParams {
   is_open?: boolean;
   page?: number;
   limit?: number;
-  sort_by?: keyof StoreType;
+  sort_by?: keyof Types.Store.StoreType;
   order?: "asc" | "desc";
 }
 
 export interface GetStoresResponse {
   status: number;
   message: string;
-  result: StoreType[];
+  result: Types.Store.StoreType[];
   totalCount: number;
   totalPages: number;
   currentPage: number;
@@ -63,7 +63,7 @@ export const getStores = async (
   }
 };
 
-export const addStore = async (data: StoreForm) => {
+export const addStore = async (data: Types.Store.StoreForm) => {
   try {
     const response = await authorizedAxios.post(`/store`, data);
     return response.data;
@@ -73,7 +73,7 @@ export const addStore = async (data: StoreForm) => {
   }
 };
 
-export const updateStore = async (id: string, data: StoreForm) => {
+export const updateStore = async (id: string, data: Types.Store.StoreForm) => {
   try {
     const response = await authorizedAxios.put(`/store/${id}`, data);
     return response.data;

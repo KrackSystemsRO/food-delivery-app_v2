@@ -1,13 +1,23 @@
 import { CompanyType } from "./company";
+import { UserType } from "./user";
 
 export interface DepartmentType {
   _id: string;
   name: string;
   is_active: boolean;
-  createdAt: string; // ISO string
-  updatedAt: string; // ISO string
+  createdAt: string;
+  updatedAt: string;
+  description: string;
   departmentId: number;
   __v: number;
-  admin: any[]; // Replace with actual admin type if available
-  company: Partial<CompanyType>[]; // Minimal company with is_active in your response
+  admin: UserType[];
+  company: Partial<CompanyType>[];
+}
+
+export interface DepartmentForm {
+  name: string;
+  description?: string;
+  is_active: boolean;
+  company: CompanyType[];
+  admin: UserType[];
 }

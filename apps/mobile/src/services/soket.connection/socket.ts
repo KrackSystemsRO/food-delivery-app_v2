@@ -19,7 +19,7 @@ export function connectSocket(token: string): Socket {
     });
 
     socket.on("connect", () => {
-      console.log("✅ Socket connected:", socket?.id);
+      console.log("✅ Socket connected (connection socket):", socket?.id);
     });
 
     socket.on("connect_error", (err) => {

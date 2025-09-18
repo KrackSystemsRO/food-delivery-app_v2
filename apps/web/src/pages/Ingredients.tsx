@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 
 import { ConfirmModal } from "@/components/user/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
-import type { IngredientForm, IngredientType } from "@/types/ingredient.type";
 import {
   addIngredient,
   deleteIngredient,
@@ -17,7 +16,7 @@ import useIngredientStore from "@/stores/ingredient.store";
 import { IngredientTable } from "@/components/ingredient/data-table.ingredient";
 import { IngredientFilters } from "@/components/ingredient/filters.ingredient";
 import IngredientModal from "@/components/ingredient/ingredient.modal";
-
+import { Types } from "@my-monorepo/shared";
 const defaultFilters = {
   search: "",
   is_active: undefined,
@@ -28,14 +27,14 @@ export default function IngredientManagementPage() {
   const { t } = useTranslation();
 
   const [ingredientToDelete, setIngredientToDelete] =
-    useState<IngredientType | null>(null);
+    useState<Types.Ingredient.IngredientType | null>(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen, setModalOpen] = useState(false);
 
-  const [form, setForm] = useState<IngredientForm>({
+  const [form, setForm] = useState<Types.Ingredient.IngredientForm>({
     name: "",
     description: "",
     is_active: true,
@@ -60,7 +59,7 @@ export default function IngredientManagementPage() {
   });
 
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof IngredientType;
+    key: keyof Types.Ingredient.IngredientType;
     direction: "asc" | "desc";
   }>({
     key: "createdAt",
@@ -109,13 +108,16 @@ export default function IngredientManagementPage() {
     localStorage.setItem("ingredientFilters", JSON.stringify(filters));
   }, [filters]);
 
-  const handleSort = useCallback((key: keyof IngredientType) => {
-    setSortConfig((current) => ({
-      key,
-      direction:
-        current.key === key && current.direction === "asc" ? "desc" : "asc",
-    }));
-  }, []);
+  const handleSort = useCallback(
+    (key: keyof Types.Ingredient.IngredientType) => {
+      setSortConfig((current) => ({
+        key,
+        direction:
+          current.key === key && current.direction === "asc" ? "desc" : "asc",
+      }));
+    },
+    []
+  );
 
   const openCreateModal = useCallback(() => {
     clearSelectedIngredient();
@@ -128,7 +130,7 @@ export default function IngredientManagementPage() {
   }, [clearSelectedIngredient]);
 
   const openEditModal = useCallback(
-    (ingredient: IngredientType) => {
+    (ingredient: Types.Ingredient.IngredientType) => {
       setSelectedIngredient(ingredient);
       setForm({
         name: ingredient.name,
@@ -140,10 +142,13 @@ export default function IngredientManagementPage() {
     [setSelectedIngredient]
   );
 
-  const confirmDelete = useCallback((ingredient: IngredientType) => {
-    setIngredientToDelete(ingredient);
-    setDeleteModalOpen(true);
-  }, []);
+  const confirmDelete = useCallback(
+    (ingredient: Types.Ingredient.IngredientType) => {
+      setIngredientToDelete(ingredient);
+      setDeleteModalOpen(true);
+    },
+    []
+  );
 
   const performDelete = useCallback(async () => {
     if (!ingredientToDelete) return;

@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import { ConfirmModal } from "@/components/user/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
-import type { ProductForm, ProductType } from "@/types/product.type";
+
 import {
   addProduct,
   deleteProduct,
@@ -21,7 +21,7 @@ import { addCategory } from "@/services/category.service";
 import useCategoryStore from "@/stores/category.store";
 import useStore from "@/stores/store.store";
 import { getStores } from "@/services/store.service";
-import type { CategoryType } from "@/types/category.type";
+import type { Types } from "@my-monorepo/shared";
 
 const defaultFilters = {
   search: "",
@@ -32,9 +32,8 @@ const defaultFilters = {
 export default function ProductManagementPage() {
   const { t } = useTranslation();
 
-  const [productToDelete, setProductToDelete] = useState<ProductType | null>(
-    null
-  );
+  const [productToDelete, setProductToDelete] =
+    useState<Types.Product.ProductType | null>(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -44,7 +43,7 @@ export default function ProductManagementPage() {
   const { storesList, setStoresList } = useStore();
   const { updateCategoryInList } = useCategoryStore();
 
-  const [form, setForm] = useState<ProductForm>({
+  const [form, setForm] = useState<Types.Product.ProductForm>({
     name: "",
     description: "",
     price: 0,
@@ -87,7 +86,7 @@ export default function ProductManagementPage() {
   });
 
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof ProductType;
+    key: keyof Types.Product.ProductType;
     direction: "asc" | "desc";
   }>({
     key: "createdAt",
@@ -140,7 +139,7 @@ export default function ProductManagementPage() {
     localStorage.setItem("productFilters", JSON.stringify(filters));
   }, [filters]);
 
-  const handleSort = useCallback((key: keyof ProductType) => {
+  const handleSort = useCallback((key: keyof Types.Product.ProductType) => {
     setSortConfig((current) => ({
       key,
       direction:
@@ -177,14 +176,12 @@ export default function ProductManagementPage() {
   }, [clearSelectedProduct]);
 
   const openEditModal = useCallback(
-    (product: ProductType) => {
+    (product: Types.Product.ProductType) => {
       setSelectedProduct(product);
       setForm({
         name: product.name,
         description: product.description || "",
         price: product.price,
-        brand: product.brand || "",
-        unit: product.unit || "",
         weight: product.weight || 0,
         is_active: product.is_active,
         category: product.category || [],
@@ -208,7 +205,7 @@ export default function ProductManagementPage() {
     [setSelectedProduct]
   );
 
-  const confirmDelete = useCallback((product: ProductType) => {
+  const confirmDelete = useCallback((product: Types.Product.ProductType) => {
     setProductToDelete(product);
     setDeleteModalOpen(true);
   }, []);
@@ -241,7 +238,7 @@ export default function ProductManagementPage() {
         c._id?.startsWith("temp_")
       );
 
-      const createdCategories: CategoryType[] = [];
+      const createdCategories: Types.Category.CategoryType[] = [];
       for (const cat of newCategories) {
         try {
           const created = await addCategory({ name: cat.name });

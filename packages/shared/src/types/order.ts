@@ -49,3 +49,20 @@ export type OrdersResponse = {
   totalPages: number;
   currentPage: number;
 };
+
+export interface OrderForm {
+  user: string;
+  store: string;
+  items: {
+    product: string;
+    quantity: number;
+    observations?: string;
+  }[];
+  total: number;
+  status?: "pending" | "preparing" | "on_the_way" | "delivered" | "cancelled";
+  deliveryLocation: {
+    lat: number;
+    lng: number;
+    address: string;
+  };
+}

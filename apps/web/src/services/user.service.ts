@@ -1,6 +1,5 @@
-import type { UserForm } from "@/pages/Users";
-import type { UserType } from "@/types/user.type";
 import authorizedAxios from "@/utils/request/authorizedRequest";
+import type { Types } from "@my-monorepo/shared";
 
 interface GetUsersParams {
   search?: string;
@@ -13,7 +12,7 @@ interface GetUsersParams {
 }
 
 interface GetUsersResponse {
-  result: UserType[];
+  result: Types.User.UserType[];
   status: number;
   message?: string;
   totalCount?: number;
@@ -65,7 +64,7 @@ export const getUsers = async (
   }
 };
 
-export const addUser = async (data: UserForm) => {
+export const addUser = async (data: Types.User.UserForm) => {
   try {
     const response = await authorizedAxios.post(`user`, data);
     return response.data;
@@ -75,7 +74,7 @@ export const addUser = async (data: UserForm) => {
   }
 };
 
-export const updateUser = async (id: string, data: UserForm) => {
+export const updateUser = async (id: string, data: Types.User.UserForm) => {
   try {
     const response = await authorizedAxios.put(`user/${id}`, data);
     return response.data;

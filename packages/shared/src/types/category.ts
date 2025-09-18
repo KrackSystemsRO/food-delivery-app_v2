@@ -8,3 +8,9 @@ export interface CategoryType {
   updatedAt?: string;
   __v: number;
 }
+
+export interface CategoryForm {
+  name: string;
+  description?: string;
+  is_active?: boolean;
+}
