@@ -7,7 +7,7 @@ import { PaginationControls } from "@/components/common/pagination.common";
 import useOrderStore from "@/stores/order.store";
 import { DataTable, type ColumnDef } from "@/components/common/data-table";
 import { OrderFilters, type FiltersType } from "@/components/order/filters";
-import OrderModal from "@/components/order/order.modal";
+import { FormModal } from "@/components/common/form-modal";
 import { ConfirmModal } from "@/components/common/confirm.modal";
 import usePersistedState from "@/hooks/use-persisted-state";
 import { Services, Types } from "@my-monorepo/shared";
@@ -209,11 +209,69 @@ export default function OrderManagementPage() {
 
       {/* Order modal */}
       {isModalOpen && (
-        <OrderModal
-          order={selectedOrder}
+        <FormModal
           isOpen={isModalOpen}
           onClose={() => setModalOpen(false)}
-        />
+          onSubmit={() => {
+            // TODO: Implement save logic (create or update order)
+            showToast("success", t("order.message.saved") || "Order saved");
+            setModalOpen(false);
+          }}
+          title={
+            selectedOrder
+              ? t("order.editTitle") || "Edit Order"
+              : t("order.createTitle") || "Create Order"
+          }
+          description={
+            selectedOrder
+              ? t("order.editDesc") || "Update order details below."
+              : t("order.createDesc") ||
+                "Fill in details to create a new order."
+          }
+          submitLabel={
+            selectedOrder
+              ? t("common.button.update") || "Update"
+              : t("common.button.save") || "Save"
+          }
+          cancelLabel={t("common.button.cancel") || "Cancel"}
+          loading={loading}
+        >
+          {/* --- Form fields go here --- */}
+          <div className="space-y-4">
+            {/* Example: User */}
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                {t("order.form.user") || "User"}
+              </label>
+              <input
+                type="text"
+                className="w-full border rounded px-3 py-2"
+                defaultValue={selectedOrder?.user?.first_name || ""}
+                disabled={!!selectedOrder}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                {t("order.form.status") || "Status"}
+              </label>
+              <select
+                className="w-full border rounded px-3 py-2"
+                defaultValue={selectedOrder?.status || "pending"}
+              >
+                <option value="pending">
+                  {t("order.status.pending") || "Pending"}
+                </option>
+                <option value="completed">
+                  {t("order.status.completed") || "Completed"}
+                </option>
+                <option value="canceled">
+                  {t("order.status.canceled") || "Canceled"}
+                </option>
+              </select>
+            </div>
+          </div>
+        </FormModal>
       )}
 
       {/* Confirm delete */}

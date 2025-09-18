@@ -5,15 +5,17 @@ import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
 
 import { ConfirmModal } from "@/components/common/confirm.modal";
+import { FormModal } from "@/components/common/form-modal";
 import { PaginationControls } from "@/components/common/pagination.common";
+import { LabeledInput } from "@/components/common/label-input";
+import { CustomSelect } from "@/components/common/custom-select";
 
 import useDepartmentStore from "@/stores/department.store";
-import { DataTable, type ColumnDef } from "@/components/common/data-table";
-import { DepartmentFilters } from "@/components/department/filters.department";
-import DepartmentModal from "@/components/department/department.modal";
-
 import useUserStore from "@/stores/user.store";
 import useCompanyStore from "@/stores/company.store";
+import { DataTable, type ColumnDef } from "@/components/common/data-table";
+import { DepartmentFilters } from "@/components/department/filters.department";
+
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
 
@@ -38,9 +40,19 @@ export default function DepartmentManagementPage() {
   const { usersList, setUsersList } = useUserStore();
   const { companiesList, setCompaniesList } = useCompanyStore();
 
+  const {
+    departmentsList,
+    setDepartmentsList,
+    clearDepartmentsList,
+    selectedDepartment,
+    setSelectedDepartment,
+    clearSelectedDepartment,
+    updateDepartmentInList,
+  } = useDepartmentStore();
+
   const [form, setForm] = useState<Types.Department.DepartmentForm>({
     name: "",
-    description: undefined,
+    description: "",
     is_active: true,
     company: [],
     admin: [],
@@ -71,16 +83,6 @@ export default function DepartmentManagementPage() {
     key: "createdAt",
     direction: "desc",
   });
-
-  const {
-    departmentsList,
-    setDepartmentsList,
-    clearDepartmentsList,
-    selectedDepartment,
-    setSelectedDepartment,
-    clearSelectedDepartment,
-    updateDepartmentInList,
-  } = useDepartmentStore();
 
   const fetchDepartments = useCallback(async () => {
     setLoading(true);
@@ -145,7 +147,7 @@ export default function DepartmentManagementPage() {
     clearSelectedDepartment();
     setForm({
       name: "",
-      description: undefined,
+      description: "",
       is_active: true,
       company: [],
       admin: [],
@@ -158,7 +160,7 @@ export default function DepartmentManagementPage() {
       setSelectedDepartment(department);
       setForm({
         name: department.name,
-        description: department.description,
+        description: department.description || "",
         is_active: department.is_active,
         company: department.company || [],
         admin: department.admin || [],
@@ -308,20 +310,70 @@ export default function DepartmentManagementPage() {
         onPageChange={setPage}
       />
 
-      <DepartmentModal
+      <FormModal
         isOpen={isModalOpen}
-        onClose={() => {
-          setModalOpen(false);
-          clearDepartmentsList();
-          fetchDepartments();
-        }}
+        onClose={() => setModalOpen(false)}
         onSubmit={handleSubmit}
-        form={form}
-        setForm={setForm}
-        isEditing={!!selectedDepartment}
-        users={usersList}
-        companies={companiesList}
-      />
+        title={
+          selectedDepartment
+            ? t("department.editDepartment") || "Edit Department"
+            : t("department.createDepartment") || "Create Department"
+        }
+        submitLabel={
+          selectedDepartment
+            ? t("common.button.update") || "Update"
+            : t("common.button.create") || "Create"
+        }
+        cancelLabel={t("common.button.cancel") || "Cancel"}
+        loading={loading}
+      >
+        <LabeledInput
+          label={t("common.form.label.name") || "Name"}
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+        />
+        <LabeledInput
+          label={t("common.form.label.description") || "Description"}
+          value={form.description || ""}
+          onChange={(e) => setForm({ ...form, description: e.target.value })}
+        />
+        <CustomSelect
+          label={t("common.form.label.companies") || "Companies"}
+          multiple
+          value={form.company.map((c) => c._id).filter(Boolean) as string[]}
+          onValueChange={(vals: string[]) => {
+            const selected = companiesList.filter((c) => vals.includes(c._id));
+            setForm({ ...form, company: selected });
+          }}
+          options={companiesList.map((c) => ({ value: c._id, label: c.name }))}
+        />
+
+        <CustomSelect
+          label={t("common.form.label.admins") || "Admins"}
+          multiple
+          value={form.admin.map((u) => u._id).filter(Boolean) as string[]}
+          onValueChange={(vals: string[]) => {
+            const selected = usersList.filter((u) => vals.includes(u._id));
+            setForm({ ...form, admin: selected });
+          }}
+          options={usersList.map((u) => ({
+            value: u._id,
+            label: u.first_name,
+          }))}
+        />
+
+        <CustomSelect<"active" | "inactive">
+          label={t("common.form.label.status") || "Status"}
+          value={form.is_active ? "active" : "inactive"}
+          onValueChange={(val) =>
+            setForm({ ...form, is_active: val === "active" })
+          }
+          options={[
+            { value: "active", label: t("common.active") || "Active" },
+            { value: "inactive", label: t("common.inactive") || "Inactive" },
+          ]}
+        />
+      </FormModal>
 
       <ConfirmModal
         isOpen={isDeleteModalOpen}

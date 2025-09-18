@@ -10,7 +10,7 @@ import useUserStore from "@/stores/user.store";
 import useCompanyStore from "@/stores/company.store";
 import useStore from "@/stores/store.store";
 import { StoreFilters } from "@/components/store/filters.store";
-import StoreModal from "@/components/store/store.modal";
+import { FormModal } from "@/components/common/form-modal";
 import { useDebounce } from "use-debounce";
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
@@ -318,16 +318,170 @@ export default function StoreManagementPage() {
         onPageChange={setPage}
       />
 
-      <StoreModal
+      <FormModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         onSubmit={handleSubmit}
-        form={form}
-        setForm={setForm}
-        isEditing={!!selectedStore}
-        companies={companiesList || []}
-        users={usersList || []}
-      />
+        title={
+          selectedStore
+            ? t("store.editTitle") || "Edit Store"
+            : t("store.createTitle") || "Create Store"
+        }
+        description={
+          selectedStore
+            ? t("store.editDesc") || "Update store details."
+            : t("store.createDesc") ||
+              "Fill in the details to create a new store."
+        }
+        submitLabel={
+          selectedStore
+            ? t("common.button.update") || "Update"
+            : t("common.button.save") || "Save"
+        }
+        cancelLabel={t("common.button.cancel") || "Cancel"}
+      >
+        {/* ----------- Store Form Fields ----------- */}
+        <div className="space-y-4">
+          {/* Name */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              {t("store.name") || "Name"}
+            </label>
+            <input
+              type="text"
+              className="w-full border rounded px-3 py-2"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+            />
+          </div>
+
+          {/* Type */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              {t("store.type") || "Type"}
+            </label>
+            <select
+              className="w-full border rounded px-3 py-2"
+              value={form.type}
+              onChange={(e) => setForm({ ...form, type: e.target.value })}
+            >
+              {storeTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Address */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              {t("store.address") || "Address"}
+            </label>
+            <input
+              type="text"
+              className="w-full border rounded px-3 py-2"
+              value={form.address}
+              onChange={(e) => setForm({ ...form, address: e.target.value })}
+            />
+          </div>
+
+          {/* Phone Number */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              {t("store.phone") || "Phone Number"}
+            </label>
+            <input
+              type="text"
+              className="w-full border rounded px-3 py-2"
+              value={form.phone_number}
+              onChange={(e) =>
+                setForm({ ...form, phone_number: e.target.value })
+              }
+            />
+          </div>
+
+          {/* Active & Open toggles */}
+          <div className="flex items-center space-x-4">
+            <label className="flex items-center space-x-1">
+              <input
+                type="checkbox"
+                checked={form.is_active}
+                onChange={(e) =>
+                  setForm({ ...form, is_active: e.target.checked })
+                }
+              />
+              <span>{t("store.active") || "Active"}</span>
+            </label>
+            <label className="flex items-center space-x-1">
+              <input
+                type="checkbox"
+                checked={form.is_open}
+                onChange={(e) =>
+                  setForm({ ...form, is_open: e.target.checked })
+                }
+              />
+              <span>{t("store.open") || "Open"}</span>
+            </label>
+          </div>
+
+          {/* Company selection */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              {t("store.company") || "Company"}
+            </label>
+            <select
+              multiple
+              className="w-full border rounded px-3 py-2"
+              value={form.company.map((c) => c._id)}
+              onChange={(e) => {
+                const selected = Array.from(e.target.selectedOptions).map(
+                  (o) => o.value
+                );
+                const newCompanies = companiesList.filter((c) =>
+                  selected.includes(c._id)
+                );
+                setForm({ ...form, company: newCompanies });
+              }}
+            >
+              {companiesList.map((c) => (
+                <option key={c._id} value={c._id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Admin selection */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              {t("store.admin") || "Admin"}
+            </label>
+            <select
+              multiple
+              className="w-full border rounded px-3 py-2"
+              value={form.admin.map((a) => a._id)}
+              onChange={(e) => {
+                const selected = Array.from(e.target.selectedOptions).map(
+                  (o) => o.value
+                );
+                const newAdmins = usersList
+                  .filter((u) => u.role === "ADMIN")
+                  .filter((u) => selected.includes(u._id));
+                setForm({ ...form, admin: newAdmins });
+              }}
+            >
+              {usersList
+                .filter((u) => u.role === "ADMIN")
+                .map((u) => (
+                  <option key={u._id} value={u._id}>
+                    {u.first_name} {u.last_name}
+                  </option>
+                ))}
+            </select>
+          </div>
+        </div>
+      </FormModal>
 
       <ConfirmModal
         isOpen={isDeleteModalOpen}

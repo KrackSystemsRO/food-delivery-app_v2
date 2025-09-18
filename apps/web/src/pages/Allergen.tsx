@@ -13,10 +13,12 @@ import {
   AllergenFilters,
   type FiltersType,
 } from "@/components/allergen/filters.allergen";
-import AllergenModal from "@/components/allergen/allergen.modal";
 import usePersistedState from "@/hooks/use-persisted-state";
 import { Types, Services } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
+import { FormModal } from "@/components/common/form-modal";
+import { LabeledInput } from "@/components/common/label-input";
+import { CustomSelect } from "@/components/common/custom-select";
 
 const defaultFilters: FiltersType = {
   search: "",
@@ -264,15 +266,47 @@ export default function AllergenManagementPage() {
         onPageChange={setPage}
       />
 
-      <AllergenModal
+      <FormModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         onSubmit={handleSubmit}
-        form={form}
-        setForm={setForm}
-        isEditing={!!selectedAllergen}
+        title={
+          selectedAllergen
+            ? t("allergen.editAllergen")
+            : t("allergen.createAllergen")
+        }
+        description={t("allergen.dialogDescription")}
+        submitLabel={
+          selectedAllergen
+            ? t("common.button.update")
+            : t("common.button.create")
+        }
         loading={submitLoading}
-      />
+      >
+        <LabeledInput
+          label={t("common.form.label.name")}
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+        />
+
+        <LabeledInput
+          label={t("common.form.label.description")}
+          value={form.description || ""}
+          onChange={(e) => setForm({ ...form, description: e.target.value })}
+        />
+
+        <CustomSelect<"active" | "inactive">
+          label={t("common.form.label.status")}
+          value={form.is_active ? "active" : "inactive"}
+          onValueChange={(val) =>
+            setForm({ ...form, is_active: val === "active" })
+          }
+          options={[
+            { value: "active", label: t("common.table.active") },
+            { value: "inactive", label: t("common.table.inactive") },
+          ]}
+        />
+      </FormModal>
 
       <ConfirmModal
         isOpen={isDeleteModalOpen}

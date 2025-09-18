@@ -9,6 +9,7 @@ interface ConfirmModalProps {
   description?: string;
   confirmText?: string;
   cancelText?: string;
+  loading?: boolean;
 }
 
 const ConfirmModalComponent = ({
@@ -19,6 +20,7 @@ const ConfirmModalComponent = ({
   description = "This action cannot be undone.",
   confirmText = "Delete",
   cancelText = "Cancel",
+  loading,
 }: ConfirmModalProps) => {
   if (!isOpen) return null;
 
@@ -43,6 +45,7 @@ const ConfirmModalComponent = ({
               onConfirm();
               onClose();
             }}
+            disabled={loading}
           >
             {confirmText}
           </Button>

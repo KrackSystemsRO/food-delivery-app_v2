@@ -3,7 +3,6 @@ import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { showToast } from "@/utils/toast";
-import UserModal from "@/components/user/user.modal";
 import { ConfirmModal } from "@/components/common/confirm.modal";
 import { UserFilters } from "@/components/user/filters.user";
 import { DataTable, type ColumnDef } from "@/components/common/data-table";
@@ -11,6 +10,7 @@ import { PaginationControls } from "@/components/common/pagination.common";
 import useUserStore from "@/stores/user.store";
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
+import { FormModal } from "@/components/common/form-modal";
 
 const defaultFilters: Types.User.UserFiltersType = {
   search: "",
@@ -248,17 +248,91 @@ export default function UserManagementPage() {
         onPageChange={setPage}
       />
 
-      <UserModal
+      <FormModal
         isOpen={isModalOpen}
         onClose={() => {
           setModalOpen(false);
           clearSelectedUser();
         }}
         onSubmit={handleSubmit}
-        form={form}
-        setForm={setForm}
-        isEditing={!!selectedUser}
-      />
+        title={
+          selectedUser
+            ? t("user.editTitle") || "Edit User"
+            : t("user.createTitle") || "Create User"
+        }
+        description={
+          selectedUser
+            ? t("user.editDesc") || "Update user details."
+            : t("user.createDesc") ||
+              "Fill in the details to create a new user."
+        }
+        submitLabel={
+          selectedUser
+            ? t("common.button.update") || "Update"
+            : t("common.button.save") || "Save"
+        }
+        cancelLabel={t("common.button.cancel") || "Cancel"}
+      >
+        <div className="space-y-4">
+          {/* First Name */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              {t("user.firstName") || "First Name"}
+            </label>
+            <input
+              type="text"
+              className="w-full border rounded px-3 py-2"
+              value={form.first_name}
+              onChange={(e) => setForm({ ...form, first_name: e.target.value })}
+            />
+          </div>
+
+          {/* Last Name */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              {t("user.lastName") || "Last Name"}
+            </label>
+            <input
+              type="text"
+              className="w-full border rounded px-3 py-2"
+              value={form.last_name}
+              onChange={(e) => setForm({ ...form, last_name: e.target.value })}
+            />
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              {t("user.email") || "Email"}
+            </label>
+            <input
+              type="email"
+              className="w-full border rounded px-3 py-2"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
+          </div>
+
+          {/* Role */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              {t("user.role") || "Role"}
+            </label>
+            <select
+              className="w-full border rounded px-3 py-2"
+              value={form.role}
+              onChange={(e) => setForm({ ...form, role: e.target.value })}
+            >
+              <option value="">
+                {t("user.selectRole") || "Select a role"}
+              </option>
+              <option value="ADMIN">Admin</option>
+              <option value="MANAGER">Manager</option>
+              <option value="STAFF">Staff</option>
+            </select>
+          </div>
+        </div>
+      </FormModal>
 
       <ConfirmModal
         isOpen={isDeleteModalOpen}

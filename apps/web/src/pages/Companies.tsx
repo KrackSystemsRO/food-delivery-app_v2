@@ -5,12 +5,16 @@ import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
 
 import { ConfirmModal } from "@/components/common/confirm.modal";
+import { FormModal } from "@/components/common/form-modal";
 import { PaginationControls } from "@/components/common/pagination.common";
+import { LabeledInput } from "@/components/common/label-input";
+import { CustomSelect } from "@/components/common/custom-select";
+
 import useCompanyStore from "@/stores/company.store";
+import useUserStore from "@/stores/user.store";
 import { DataTable, type ColumnDef } from "@/components/common/data-table";
 import { CompanyFilters } from "@/components/company/filters.company";
-import CompanyModal from "@/components/company/company.modal";
-import useUserStore from "@/stores/user.store";
+
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
 
@@ -31,16 +35,28 @@ export default function CompanyManagementPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen, setModalOpen] = useState(false);
+
   const { usersList, setUsersList } = useUserStore();
+  const {
+    companiesList: companies,
+    setCompaniesList,
+    clearCompaniesList,
+    selectedCompany,
+    setSelectedCompany,
+    clearSelectedCompany,
+    updateCompanyInList,
+  } = useCompanyStore();
+
   const [form, setForm] = useState<Types.Company.CompanyForm>({
     name: "",
-    address: undefined,
+    address: "",
     type: undefined,
     email: "",
     phone_number: "",
     is_active: true,
     admin: [],
   });
+
   const [filters, setFilters] = useState(() => {
     const saved = localStorage.getItem("companyFilters");
     if (saved) {
@@ -59,6 +75,7 @@ export default function CompanyManagementPage() {
     }
     return defaultFilters;
   });
+
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Types.Company.CompanyType;
     direction: "asc" | "desc";
@@ -66,16 +83,6 @@ export default function CompanyManagementPage() {
     key: "createdAt",
     direction: "desc",
   });
-
-  const {
-    companiesList: companies,
-    setCompaniesList,
-    clearCompaniesList,
-    selectedCompany,
-    setSelectedCompany,
-    clearSelectedCompany,
-    updateCompanyInList,
-  } = useCompanyStore();
 
   const fetchCompanies = useCallback(async () => {
     setLoading(true);
@@ -128,7 +135,7 @@ export default function CompanyManagementPage() {
     clearSelectedCompany();
     setForm({
       name: "",
-      address: undefined,
+      address: "",
       type: undefined,
       email: "",
       phone_number: "",
@@ -143,12 +150,12 @@ export default function CompanyManagementPage() {
       setSelectedCompany(company);
       setForm({
         name: company.name,
-        admin: company.admin || [],
-        email: company.email,
-        type: company.type,
+        address: company.address || "",
+        type: company.type || undefined,
+        email: company.email || "",
+        phone_number: company.phone_number || "",
         is_active: company.is_active,
-        phone_number: company.phone_number,
-        address: company.address,
+        admin: company.admin || [],
       });
       setModalOpen(true);
     },
@@ -201,7 +208,6 @@ export default function CompanyManagementPage() {
           fetchCompanies();
         } else throw new Error();
       }
-
       setModalOpen(false);
       clearSelectedCompany();
     } catch {
@@ -294,19 +300,67 @@ export default function CompanyManagementPage() {
         onPageChange={setPage}
       />
 
-      <CompanyModal
+      <FormModal
         isOpen={isModalOpen}
-        onClose={() => {
-          setModalOpen(false);
-          clearCompaniesList();
-          fetchCompanies();
-        }}
+        onClose={() => setModalOpen(false)}
         onSubmit={handleSubmit}
-        form={form}
-        setForm={setForm}
-        isEditing={!!selectedCompany}
-        users={usersList}
-      />
+        title={
+          selectedCompany
+            ? t("company.editCompany") || "Edit Company"
+            : t("company.createCompany") || "Create Company"
+        }
+        submitLabel={
+          selectedCompany
+            ? t("common.button.update") || "Update"
+            : t("common.button.create") || "Create"
+        }
+        cancelLabel={t("common.button.cancel") || "Cancel"}
+        loading={loading}
+      >
+        <LabeledInput
+          label={t("common.form.label.name") || "Name"}
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+        />
+        <LabeledInput
+          label={t("common.form.label.email") || "Email"}
+          value={form.email || ""}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
+        />
+        <LabeledInput
+          label={t("common.form.label.phone") || "Phone"}
+          value={form.phone_number || ""}
+          onChange={(e) => setForm({ ...form, phone_number: e.target.value })}
+        />
+        <LabeledInput
+          label={t("common.form.label.address") || "Address"}
+          value={form.address || ""}
+          onChange={(e) => setForm({ ...form, address: e.target.value })}
+        />
+        <CustomSelect
+          label={t("common.form.label.type") || "Type"}
+          value={form.type || ""}
+          onValueChange={(val) => setForm({ ...form, type: val })}
+          options={[
+            {
+              value: "PROVIDER",
+              label: t("company.type.provider") || "Provider",
+            },
+            { value: "CLIENT", label: t("company.type.client") || "Client" },
+          ]}
+        />
+        <CustomSelect<"active" | "inactive">
+          label={t("common.form.label.status") || "Status"}
+          value={form.is_active ? "active" : "inactive"}
+          onValueChange={(val) =>
+            setForm({ ...form, is_active: val === "active" })
+          }
+          options={[
+            { value: "active", label: t("common.active") || "Active" },
+            { value: "inactive", label: t("common.inactive") || "Inactive" },
+          ]}
+        />
+      </FormModal>
 
       <ConfirmModal
         isOpen={isDeleteModalOpen}

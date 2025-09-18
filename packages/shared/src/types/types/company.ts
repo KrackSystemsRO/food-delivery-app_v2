@@ -6,7 +6,7 @@ export interface CompanyType {
   email: string;
   phone_number: string;
   address: string;
-  type: "PROVIDER" | "CLIENT" | undefined;
+  type: "PROVIDER" | "CLIENT" | "" | undefined;
   is_active: boolean;
   createdAt: string;
   updatedAt: string;

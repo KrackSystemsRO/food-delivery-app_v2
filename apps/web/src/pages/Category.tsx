@@ -3,15 +3,14 @@ import { Button } from "@/components/ui";
 import { Plus, Check, X } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
-
 import { ConfirmModal } from "@/components/common/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
 import { DataTable, type ColumnDef } from "@/components/common/data-table";
-
 import useCategoryStore from "@/stores/category.store";
 import { CategoryFilters } from "@/components/category/filters.category";
-import CategoryModal from "@/components/category/category.modal";
-
+import { FormModal } from "@/components/common/form-modal";
+import { LabeledInput } from "@/components/common/label-input";
+import { CustomSelect } from "@/components/common/custom-select";
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
 
@@ -244,7 +243,6 @@ export default function CategoryManagementPage() {
         resetFilters={resetFilters}
       />
 
-      {/* ✅ Replaced CategoryTable with common DataTable */}
       <DataTable
         columns={columns}
         data={categories}
@@ -263,18 +261,50 @@ export default function CategoryManagementPage() {
         onPageChange={setPage}
       />
 
-      <CategoryModal
+      <FormModal
         isOpen={isModalOpen}
-        onClose={() => {
-          setModalOpen(false);
-          clearCategoriesList();
-          fetchCategories();
-        }}
+        onClose={() => setModalOpen(false)}
         onSubmit={handleSubmit}
-        form={form}
-        setForm={setForm}
-        isEditing={!!selectedCategory}
-      />
+        title={
+          selectedCategory
+            ? t("category.editCategory") || "Edit Category"
+            : t("category.createCategory") || "Create Category"
+        }
+        description={t("category.dialogDescription")}
+        submitLabel={
+          selectedCategory
+            ? t("common.button.update") || "Update"
+            : t("common.button.create") || "Create"
+        }
+        loading={loading}
+      >
+        <LabeledInput
+          label={t("common.form.label.name") || "Name"}
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+        />
+
+        <LabeledInput
+          label={t("common.form.label.description") || "Description"}
+          value={form.description || ""}
+          onChange={(e) => setForm({ ...form, description: e.target.value })}
+        />
+
+        <CustomSelect<"active" | "inactive">
+          label={t("common.form.label.status") || "Status"}
+          value={form.is_active ? "active" : "inactive"}
+          onValueChange={(val) =>
+            setForm({ ...form, is_active: val === "active" })
+          }
+          options={[
+            { value: "active", label: t("common.table.active") || "Active" },
+            {
+              value: "inactive",
+              label: t("common.table.inactive") || "Inactive",
+            },
+          ]}
+        />
+      </FormModal>
 
       <ConfirmModal
         isOpen={isDeleteModalOpen}
