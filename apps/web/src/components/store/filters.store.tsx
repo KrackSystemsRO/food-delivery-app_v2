@@ -27,7 +27,7 @@ interface StoreFiltersProps {
   resetFilters: () => void;
   companies: Types.Company.CompanyType[];
   admins: Types.User.UserType[];
-  storeTypes: string[];
+  storeTypes: readonly string[];
 }
 
 export const StoreFilters = memo(function StoreFilters({

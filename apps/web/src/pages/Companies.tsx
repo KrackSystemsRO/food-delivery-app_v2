@@ -339,8 +339,13 @@ export default function CompanyManagementPage() {
         />
         <CustomSelect
           label={t("common.form.label.type") || "Type"}
-          value={form.type || ""}
-          onValueChange={(val) => setForm({ ...form, type: val })}
+          value={form.type ?? ""}
+          onValueChange={(val) =>
+            setForm({
+              ...form,
+              type: val ? (val as "PROVIDER" | "CLIENT") : undefined,
+            })
+          }
           options={[
             {
               value: "PROVIDER",

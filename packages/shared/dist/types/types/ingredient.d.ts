@@ -19,6 +19,7 @@ export type IngredientType = {
     nutritionalInfo?: NutritionalInfo;
     unit?: "piece" | "gram" | "liter";
     is_active?: boolean;
+    createdAt?: string;
 };
 export interface IngredientForm {
     name: string;

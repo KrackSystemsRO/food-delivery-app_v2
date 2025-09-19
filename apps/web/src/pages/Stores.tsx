@@ -25,7 +25,14 @@ const defaultFilters = {
   limit: 10,
 };
 
-const storeTypes = ["RESTAURANT", "GROCERY", "BAKERY", "CAFE", "OTHER"];
+const storeTypes = [
+  "RESTAURANT",
+  "GROCERY",
+  "BAKERY",
+  "CAFE",
+  "OTHER",
+] as const;
+type StoreType = (typeof storeTypes)[number];
 
 export default function StoreManagementPage() {
   const { t } = useTranslation();
@@ -363,7 +370,9 @@ export default function StoreManagementPage() {
             <select
               className="w-full border rounded px-3 py-2"
               value={form.type}
-              onChange={(e) => setForm({ ...form, type: e.target.value })}
+              onChange={(e) =>
+                setForm({ ...form, type: e.target.value as StoreType })
+              }
             >
               {storeTypes.map((type) => (
                 <option key={type} value={type}>
