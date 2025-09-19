@@ -16541,6 +16541,8 @@ __metadata:
 "test2@workspace:.":
   version: 0.0.0-use.local
   resolution: "test2@workspace:."
+  dependencies:
+    typescript: "npm:^5.9.2"
   languageName: unknown
   linkType: soft
 

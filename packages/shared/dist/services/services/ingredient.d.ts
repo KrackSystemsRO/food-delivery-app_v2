@@ -17,7 +17,7 @@ export interface GetIngredientsResponse {
     currentPage: number;
 }
 export declare const getIngredients: (axios: AxiosInstance, params: GetIngredientParams) => Promise<GetIngredientsResponse>;
-export declare const addIngredient: (axios: AxiosInstance, data: Types.Ingredient.IngredientForm) => Promise<any>;
-export declare const updateIngredient: (axios: AxiosInstance, id: string, data: Types.Ingredient.IngredientForm) => Promise<any>;
-export declare const deleteIngredient: (axios: AxiosInstance, id: string) => Promise<any>;
-export declare const checkIngredient: (axios: AxiosInstance, name: string) => Promise<unknown>;
+export declare const addIngredient: (axios: AxiosInstance, data: Types.Ingredient.IngredientForm) => unknown;
+export declare const updateIngredient: (axios: AxiosInstance, id: string, data: Types.Ingredient.IngredientForm) => unknown;
+export declare const deleteIngredient: (axios: AxiosInstance, id: string) => unknown;
+export declare const checkIngredient: (axios: AxiosInstance, name: string) => unknown;

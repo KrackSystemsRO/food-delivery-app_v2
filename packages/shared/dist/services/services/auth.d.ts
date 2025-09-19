@@ -3,8 +3,8 @@ export interface LoginData {
     email: string;
     password: string;
 }
-export declare const login: (axios: AxiosInstance, data: LoginData) => Promise<any>;
-export declare const logout: (logoutFn?: () => Promise<void>) => Promise<void>;
+export declare const login: (axios: AxiosInstance, data: LoginData) => unknown;
+export declare const logout: (logoutFn?: () => Promise<void>) => any;
 export declare function register(axios: AxiosInstance, { email, firstName, lastName, password, }: {
     email: string;
     firstName: string;
@@ -18,4 +18,4 @@ export declare function forgotPassword(axios: AxiosInstance, email: string): Pro
 export declare function resetPassword(axios: AxiosInstance, { token, new_password, }: {
     token: string;
     new_password: string;
-}): Promise<any>;
+}): unknown;

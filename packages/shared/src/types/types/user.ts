@@ -1,12 +1,19 @@
 import { CompanyType } from "./company";
 import { DepartmentType } from "./department";
 
-export interface UserType {
-  _id: string;
+// --- Base Interface ---
+// Common fields for UserType and UserForm
+interface BaseUser {
   first_name: string;
   last_name: string;
   email: string;
   role: string;
+}
+
+// --- Main Interfaces ---
+
+export interface UserType extends BaseUser {
+  _id: string;
   phone_number: string;
   company: CompanyType[];
   department: DepartmentType[];
@@ -20,17 +27,22 @@ export interface UserType {
   __v: number;
 }
 
+export interface UserForm extends BaseUser {
+  // Include optional fields used during creation/update if needed
+  phone_number?: string;
+  company?: CompanyType[];
+  department?: DepartmentType[];
+  deliveryLocations?: string[];
+}
+
+// --- Response Types ---
+
 export interface UserResponseType {
   status: number;
   result: UserType;
 }
 
-export interface UserForm {
-  first_name: string;
-  last_name: string;
-  email: string;
-  role: string;
-}
+// --- Filters for API queries ---
 
 export interface UserFiltersType {
   search: string;

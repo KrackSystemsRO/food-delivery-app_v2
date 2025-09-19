@@ -9,6 +9,6 @@ export interface GetStoresResponse {
     currentPage: number;
 }
 export declare const getStores: (axios: AxiosInstance, params: Types.Store.StoreListQuery) => Promise<GetStoresResponse>;
-export declare const addStore: (axios: AxiosInstance, data: Types.Store.StoreForm) => Promise<any>;
-export declare const updateStore: (axios: AxiosInstance, id: string, data: Types.Store.StoreForm) => Promise<any>;
-export declare const deleteStore: (axios: AxiosInstance, id: string) => Promise<any>;
+export declare const addStore: (axios: AxiosInstance, data: Types.Store.StoreForm) => unknown;
+export declare const updateStore: (axios: AxiosInstance, id: string, data: Types.Store.StoreForm) => unknown;
+export declare const deleteStore: (axios: AxiosInstance, id: string) => unknown;

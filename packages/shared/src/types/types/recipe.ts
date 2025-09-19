@@ -1,19 +1,21 @@
 import type { IngredientType } from "./ingredient";
 
-export interface RecipeType {
-  _id: string;
+// --- Base Interface ---
+// Shared fields between RecipeType and RecipeForm
+interface BaseRecipe {
   name: string;
   description?: string;
   ingredients?: IngredientType[];
   is_active?: boolean;
+}
+
+// --- Main Interfaces ---
+
+export interface RecipeType extends BaseRecipe {
+  _id: string;
   createdAt?: string;
   updatedAt?: string;
   __v?: number;
 }
 
-export interface RecipeForm {
-  name: string;
-  description?: string;
-  ingredients?: IngredientType[];
-  is_active?: boolean;
-}
+export interface RecipeForm extends BaseRecipe {}

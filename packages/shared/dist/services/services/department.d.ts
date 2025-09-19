@@ -18,6 +18,6 @@ export interface GetDepartmentsResponse {
     currentPage: number;
 }
 export declare const getDepartments: (axios: AxiosInstance, params: GetDepartmentParams) => Promise<GetDepartmentsResponse>;
-export declare const addDepartment: (axios: AxiosInstance, data: Types.Department.DepartmentForm) => Promise<any>;
-export declare const updateDepartment: (axios: AxiosInstance, id: string, data: Types.Department.DepartmentForm) => Promise<any>;
-export declare const deleteDepartment: (axios: AxiosInstance, id: string) => Promise<any>;
+export declare const addDepartment: (axios: AxiosInstance, data: Types.Department.DepartmentForm) => unknown;
+export declare const updateDepartment: (axios: AxiosInstance, id: string, data: Types.Department.DepartmentForm) => unknown;
+export declare const deleteDepartment: (axios: AxiosInstance, id: string) => unknown;

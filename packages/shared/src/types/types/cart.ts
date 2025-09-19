@@ -1,15 +1,15 @@
 import { StoreType } from "./store";
 
-export type CartItemType = {
+export interface CartItemType {
   product: string;
   name?: string;
   price: number;
   quantity: number;
   observations?: string;
   image?: string;
-};
+}
 
-export type CartStateType = {
+export interface CartStateType {
   store: StoreType | null;
   items: CartItemType[];
-};
+}
