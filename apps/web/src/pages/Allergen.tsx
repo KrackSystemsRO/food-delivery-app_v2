@@ -5,9 +5,9 @@ import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
-import { ConfirmModal } from "@/components/common/confirm.modal";
-import { PaginationControls } from "@/components/common/pagination.common";
-import useAllergenStore from "@/stores/allergen.store";
+import { ConfirmModal } from "@/components/common/ConfirmModal";
+import { PaginationControls } from "@/components/common/PaginationControls";
+import useAllergenStore from "@/stores/allergenStore";
 import {
   AllergenFilters,
   type FiltersType,
@@ -15,7 +15,7 @@ import {
 import usePersistedState from "@/hooks/use-persisted-state";
 import { Types, Services } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
-import { FormModal } from "@/components/common/form-modal";
+import { FormModal } from "@/components/common/FormModal";
 
 const defaultFilters: FiltersType = {
   search: "",

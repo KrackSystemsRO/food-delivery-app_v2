@@ -1,5 +1,5 @@
 import { memo, useMemo } from "react";
-import { DataTable, type ColumnDef } from "@/components/common/data-table";
+import { DataTable, type ColumnDef } from "@/components/common/DataTable";
 import { Types } from "@my-monorepo/shared";
 import { useTranslation } from "react-i18next";
 

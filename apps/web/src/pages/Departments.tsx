@@ -3,11 +3,11 @@ import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
-import { ConfirmModal } from "@/components/common/confirm.modal";
-import { PaginationControls } from "@/components/common/pagination.common";
-import useDepartmentStore from "@/stores/department.store";
-import useUserStore from "@/stores/user.store";
-import useCompanyStore from "@/stores/company.store";
+import { ConfirmModal } from "@/components/common/ConfirmModal";
+import { PaginationControls } from "@/components/common/PaginationControls";
+import useDepartmentStore from "@/stores/departmentStore";
+import useUserStore from "@/stores/userStore";
+import useCompanyStore from "@/stores/companyStore";
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
 import {

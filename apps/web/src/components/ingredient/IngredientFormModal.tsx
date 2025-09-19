@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { FormModal } from "@/components/common/form-modal";
+import { FormModal } from "@/components/common/FormModal";
 import { Types } from "@my-monorepo/shared";
 
 interface IngredientFormModalProps {

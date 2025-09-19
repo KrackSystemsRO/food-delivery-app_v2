@@ -1,5 +1,5 @@
-import { LabeledInput } from "@/components/common/label-input";
-import { CustomSelect } from "@/components/common/custom-select";
+import { LabeledInput } from "@/components/common/LabelInput";
+import { CustomSelect } from "@/components/common/CustomSelect";
 import { Types } from "@my-monorepo/shared";
 
 interface Props {

@@ -1,5 +1,5 @@
 import { memo, useMemo } from "react";
-import { DataTable, type ColumnDef } from "@/components/common/data-table";
+import { DataTable, type ColumnDef } from "@/components/common/DataTable";
 import { Check, X } from "lucide-react";
 import { Types } from "@my-monorepo/shared";
 

@@ -3,14 +3,14 @@ import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
-import useIngredientStore from "@/stores/ingredient.store";
+import useIngredientStore from "@/stores/ingredientStore";
 import {
   IngredientFilters,
   type FiltersType,
 } from "@/components/ingredient/IngredientFilters";
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
-import { ConfirmModal } from "@/components/common/confirm.modal";
+import { ConfirmModal } from "@/components/common/ConfirmModal";
 import { IngredientFormModal } from "@/components/ingredient/IngredientFormModal";
 import IngredientTable from "@/components/ingredient/IngredientTable";
 

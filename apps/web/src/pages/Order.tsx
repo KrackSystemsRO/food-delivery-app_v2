@@ -3,8 +3,8 @@ import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
-import { PaginationControls } from "@/components/common/pagination.common";
-import useOrderStore from "@/stores/order.store";
+import { PaginationControls } from "@/components/common/PaginationControls";
+import useOrderStore from "@/stores/orderStore";
 import {
   OrderFilters,
   type FiltersType,
@@ -14,7 +14,7 @@ import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
 import OrderFormModal from "@/components/order/OrderFormModal";
 import OrderTable from "@/components/order/OrderTable";
-import { ConfirmModal } from "@/components/common/confirm.modal";
+import { ConfirmModal } from "@/components/common/ConfirmModal";
 
 const defaultFilters: FiltersType = {
   search: "",

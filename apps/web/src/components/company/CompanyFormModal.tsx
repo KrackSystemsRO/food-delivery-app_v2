@@ -1,6 +1,6 @@
-import { FormModal } from "@/components/common/form-modal";
-import { LabeledInput } from "@/components/common/label-input";
-import { CustomSelect } from "@/components/common/custom-select";
+import { FormModal } from "@/components/common/FormModal";
+import { LabeledInput } from "@/components/common/LabelInput";
+import { CustomSelect } from "@/components/common/CustomSelect";
 import { Types } from "@my-monorepo/shared";
 import { useTranslation } from "react-i18next";
 

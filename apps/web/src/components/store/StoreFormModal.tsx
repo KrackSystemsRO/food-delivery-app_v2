@@ -1,4 +1,4 @@
-import { FormModal } from "@/components/common/form-modal";
+import { FormModal } from "@/components/common/FormModal";
 import { useState, useEffect, useCallback } from "react";
 import { Types } from "@my-monorepo/shared";
 import { showToast } from "@/utils/toast";

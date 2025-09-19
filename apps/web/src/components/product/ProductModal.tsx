@@ -1,12 +1,12 @@
 import { memo, useMemo, useCallback, useEffect } from "react";
-import { FormModal } from "@/components/common/form-modal";
+import { FormModal } from "@/components/common/FormModal";
 import { Label } from "@/components/ui";
 import MultiSelectWithChips from "./MultiSelectWithChips";
 import { IngredientsSelector } from "./IngredientsSelector";
 import StoreSelector from "./StoreSelector";
 import { Services, Types } from "@my-monorepo/shared";
-import useCategoryStore from "@/stores/category.store";
-import useIngredientStore from "@/stores/ingredient.store";
+import useCategoryStore from "@/stores/categoryStore";
+import useIngredientStore from "@/stores/ingredientStore";
 import axiosInstance from "@/utils/request/authorizedRequest";
 
 interface ProductModalProps {

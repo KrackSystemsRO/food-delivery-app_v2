@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { FormModal } from "@/components/common/form-modal";
+import { FormModal } from "@/components/common/FormModal";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
 import { Types, Services } from "@my-monorepo/shared";

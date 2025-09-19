@@ -3,10 +3,10 @@ import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
-import { ConfirmModal } from "@/components/common/confirm.modal";
-import { PaginationControls } from "@/components/common/pagination.common";
-import useCompanyStore from "@/stores/company.store";
-import useUserStore from "@/stores/user.store";
+import { ConfirmModal } from "@/components/common/ConfirmModal";
+import { PaginationControls } from "@/components/common/PaginationControls";
+import useCompanyStore from "@/stores/companyStore";
+import useUserStore from "@/stores/userStore";
 import {
   CompanyFilters,
   type FiltersType,
@@ -25,7 +25,7 @@ const defaultFilters: FiltersType = {
 
 export default function CompanyManagementPage() {
   const { t } = useTranslation();
-  const { usersList, setUsersList } = useUserStore();
+  const { setUsersList } = useUserStore();
   const {
     companiesList: companies,
     setCompaniesList,

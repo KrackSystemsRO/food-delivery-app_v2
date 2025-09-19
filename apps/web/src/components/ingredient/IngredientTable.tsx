@@ -1,6 +1,6 @@
 import { memo, useMemo } from "react";
-import { DataTable, type ColumnDef } from "@/components/common/data-table";
-import { PaginationControls } from "@/components/common/pagination.common";
+import { DataTable, type ColumnDef } from "@/components/common/DataTable";
+import { PaginationControls } from "@/components/common/PaginationControls";
 import { Types } from "@my-monorepo/shared";
 import { useTranslation } from "react-i18next";
 
