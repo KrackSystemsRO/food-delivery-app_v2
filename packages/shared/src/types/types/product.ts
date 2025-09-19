@@ -38,6 +38,7 @@ export interface ProductForm {
   available?: boolean;
   is_active?: boolean;
   ingredients?: IngredientWithQuantity[];
+  quantity?: string;
   category?: CategoryType[];
   recipe?: RecipeType | null;
   energetic_values?: EnergeticValues;

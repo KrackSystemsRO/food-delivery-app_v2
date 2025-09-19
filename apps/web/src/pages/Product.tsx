@@ -6,14 +6,14 @@ import { useTranslation } from "react-i18next";
 import { ConfirmModal } from "@/components/common/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
 import useProductStore from "@/stores/product.store";
-import { DataTable, type ColumnDef } from "@/components/common/data-table";
-import { ProductFilters } from "@/components/product/filters.product";
+import { ProductFilters } from "@/components/product/ProductFilters";
 import useCategoryStore from "@/stores/category.store";
 import useStore from "@/stores/store.store";
 import type { Types } from "@my-monorepo/shared";
 import { Services } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
-import { FormModal } from "@/components/common/form-modal";
+import { ProductModal } from "@/components/product/ProductModal";
+import { ProductTable } from "@/components/product/ProductTable";
 
 const defaultFilters = {
   search: "",
@@ -296,25 +296,6 @@ export default function ProductManagementPage() {
     localStorage.removeItem("productFilters");
   }, []);
 
-  const columns: ColumnDef<Types.Product.ProductType>[] = [
-    { key: "name", label: t("product.name") || "Name" },
-    {
-      key: "price",
-      label: t("product.price") || "Price",
-      render: (p) => `$${p.price.toFixed(2)}`,
-    },
-    {
-      key: "is_active",
-      label: t("product.active") || "Active",
-      render: (p) => (p.is_active ? "Yes" : "No"),
-    },
-    {
-      key: "category",
-      label: t("product.category") || "Category",
-      render: (p) => p.category?.map((c) => c.name).join(", ") || "-",
-    },
-  ];
-
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
@@ -336,16 +317,15 @@ export default function ProductManagementPage() {
         resetFilters={resetFilters}
       />
 
-      <DataTable
-        columns={columns}
-        data={products}
+      <ProductTable
+        products={products}
+        loading={loading}
         sortKey={sortConfig.key}
         sortDirection={sortConfig.direction}
-        loading={loading}
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={confirmDelete}
-        noDataText={t("product.noProducts") || "No products found."}
+        t={t}
       />
 
       <PaginationControls
@@ -354,110 +334,16 @@ export default function ProductManagementPage() {
         onPageChange={setPage}
       />
 
-      <FormModal
+      <ProductModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         onSubmit={handleSubmit}
-        title={
-          selectedProduct
-            ? t("product.editTitle") || "Edit Product"
-            : t("product.createTitle") || "Create Product"
-        }
-        description={
-          selectedProduct
-            ? t("product.editDesc") || "Update product details."
-            : t("product.createDesc") ||
-              "Fill in the details to create a new product."
-        }
-        submitLabel={
-          selectedProduct
-            ? t("common.button.update") || "Update"
-            : t("common.button.save") || "Save"
-        }
-        cancelLabel={t("common.button.cancel") || "Cancel"}
-      >
-        {/* ---------------- Product Form Fields ---------------- */}
-        <div className="space-y-4">
-          {/* Name */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              {t("product.name") || "Name"}
-            </label>
-            <input
-              type="text"
-              className="w-full border rounded px-3 py-2"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-            />
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              {t("product.description") || "Description"}
-            </label>
-            <textarea
-              className="w-full border rounded px-3 py-2"
-              value={form.description}
-              onChange={(e) =>
-                setForm({ ...form, description: e.target.value })
-              }
-            />
-          </div>
-
-          {/* Price */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              {t("product.price") || "Price"}
-            </label>
-            <input
-              type="number"
-              className="w-full border rounded px-3 py-2"
-              value={form.price}
-              onChange={(e) =>
-                setForm({ ...form, price: parseFloat(e.target.value) || 0 })
-              }
-            />
-          </div>
-
-          {/* Active */}
-          <div className="flex items-center space-x-2">
-            <input
-              id="active"
-              type="checkbox"
-              checked={form.is_active}
-              onChange={(e) =>
-                setForm({ ...form, is_active: e.target.checked })
-              }
-            />
-            <label htmlFor="active">{t("product.active") || "Active"}</label>
-          </div>
-
-          {/* Store Selection */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              {t("product.store") || "Store"}
-            </label>
-            <select
-              className="w-full border rounded px-3 py-2"
-              value={form.store?._id || ""}
-              onChange={(e) => {
-                const selected =
-                  storesList.find((s) => s._id === e.target.value) || null;
-                setForm({ ...form, store: selected });
-              }}
-            >
-              <option value="">{t("common.select") || "Select"}</option>
-              {storesList.map((store) => (
-                <option key={store._id} value={store._id}>
-                  {store.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          {/* Add more product fields (variants, categories, etc.) as needed */}
-        </div>
-      </FormModal>
+        form={form}
+        setForm={setForm}
+        selectedProduct={selectedProduct}
+        t={t}
+        storesList={storesList}
+      />
 
       <ConfirmModal
         isOpen={isDeleteModalOpen}
