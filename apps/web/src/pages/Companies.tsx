@@ -1,24 +1,22 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
-
 import { ConfirmModal } from "@/components/common/confirm.modal";
-import { FormModal } from "@/components/common/form-modal";
 import { PaginationControls } from "@/components/common/pagination.common";
-import { LabeledInput } from "@/components/common/label-input";
-import { CustomSelect } from "@/components/common/custom-select";
-
 import useCompanyStore from "@/stores/company.store";
 import useUserStore from "@/stores/user.store";
-import { DataTable, type ColumnDef } from "@/components/common/data-table";
-import { CompanyFilters } from "@/components/company/filters.company";
-
+import {
+  CompanyFilters,
+  type FiltersType,
+} from "@/components/company/CompanyFilters";
+import CompanyTable from "@/components/company/CompanyTable";
+import { CompanyFormModal } from "@/components/company/CompanyFormModal";
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
 
-const defaultFilters = {
+const defaultFilters: FiltersType = {
   search: "",
   type: "",
   is_active: undefined,
@@ -27,15 +25,6 @@ const defaultFilters = {
 
 export default function CompanyManagementPage() {
   const { t } = useTranslation();
-
-  const [companyToDelete, setCompanyToDelete] =
-    useState<Types.Company.CompanyType | null>(null);
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [isModalOpen, setModalOpen] = useState(false);
-
   const { usersList, setUsersList } = useUserStore();
   const {
     companiesList: companies,
@@ -56,26 +45,9 @@ export default function CompanyManagementPage() {
     is_active: true,
     admin: [],
   });
-
-  const [filters, setFilters] = useState(() => {
-    const saved = localStorage.getItem("companyFilters");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        return {
-          search: parsed.search || "",
-          type: parsed.type || "",
-          is_active:
-            parsed.is_active === undefined ? undefined : parsed.is_active,
-          limit: parsed.limit ? Number(parsed.limit) : 10,
-        };
-      } catch {
-        return defaultFilters;
-      }
-    }
-    return defaultFilters;
-  });
-
+  const [filters, setFilters] = useState(defaultFilters);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Types.Company.CompanyType;
     direction: "asc" | "desc";
@@ -83,13 +55,22 @@ export default function CompanyManagementPage() {
     key: "createdAt",
     direction: "desc",
   });
+  const [loading, setLoading] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [companyToDelete, setCompanyToDelete] =
+    useState<Types.Company.CompanyType | null>(null);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
 
+  // Fetch companies
   const fetchCompanies = useCallback(async () => {
     setLoading(true);
     try {
       const res = await Services.Company.getCompanies(axiosInstance, {
         search: filters.search,
-        type: filters.type,
+        type: (filters.type === "" ? undefined : filters.type) as
+          | "PROVIDER"
+          | "CLIENT"
+          | undefined,
         is_active: filters.is_active,
         page,
         limit: filters.limit,
@@ -148,15 +129,7 @@ export default function CompanyManagementPage() {
   const openEditModal = useCallback(
     (company: Types.Company.CompanyType) => {
       setSelectedCompany(company);
-      setForm({
-        name: company.name,
-        address: company.address || "",
-        type: company.type || undefined,
-        email: company.email || "",
-        phone_number: company.phone_number || "",
-        is_active: company.is_active,
-        admin: company.admin || [],
-      });
+      setForm({ ...company });
       setModalOpen(true);
     },
     [setSelectedCompany]
@@ -221,7 +194,6 @@ export default function CompanyManagementPage() {
     clearSelectedCompany,
     t,
   ]);
-
   const resetFilters = useCallback(() => {
     setFilters(defaultFilters);
     setPage(1);
@@ -229,43 +201,11 @@ export default function CompanyManagementPage() {
     localStorage.removeItem("companyFilters");
   }, []);
 
-  const columns: ColumnDef<Types.Company.CompanyType>[] = [
-    { key: "name", label: t("common.table.name") },
-    { key: "email", label: t("common.table.email") },
-    { key: "phone_number", label: t("common.table.phone") },
-    {
-      key: "type",
-      label: t("common.table.type"),
-      render: (row) => t(`company.type.${row.type}`) || row.type,
-    },
-    {
-      key: "is_active",
-      label: t("common.table.is_active"),
-      render: (row) =>
-        row.is_active ? (
-          <span className="text-green-600 font-medium">
-            {t("common.active")}
-          </span>
-        ) : (
-          <span className="text-red-600 font-medium">
-            {t("common.inactive")}
-          </span>
-        ),
-    },
-    {
-      key: "admin",
-      label: t("common.table.admins"),
-      render: (row) =>
-        row.admin?.map((u: Types.User.UserType) => u.first_name).join(", ") ||
-        "-",
-    },
-  ];
-
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-base font-bold">
-          {t("company.title") || "Manage Company"}
+          {t("company.title") || "Manage Companies"}
         </h2>
         <Button onClick={openCreateModal}>
           <Plus className="mr-2 h-4 w-4" />
@@ -275,98 +215,47 @@ export default function CompanyManagementPage() {
 
       <CompanyFilters
         filters={filters}
-        setFilters={(updated: Partial<typeof filters>) => {
-          setFilters((prev) => ({ ...prev, ...updated }));
+        setFilters={(updated: Partial<FiltersType>) => {
+          setFilters((prev) => ({
+            ...prev,
+            ...updated,
+            type: updated.type ? (updated.type as "PROVIDER" | "CLIENT") : "",
+          }));
           setPage(1);
         }}
         resetFilters={resetFilters}
       />
 
-      <DataTable
-        columns={columns}
+      {/* Table */}
+      <CompanyTable
         data={companies}
+        loading={loading}
         sortKey={sortConfig.key}
         sortDirection={sortConfig.direction}
-        loading={loading}
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={confirmDelete}
-        noDataText={t("common.table.noData") || "No companies found."}
       />
 
+      {/* Pagination */}
       <PaginationControls
         page={page}
         totalPages={totalPages}
         onPageChange={setPage}
       />
 
-      <FormModal
+      {/* Form Modal */}
+      <CompanyFormModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         onSubmit={handleSubmit}
-        title={
-          selectedCompany
-            ? t("company.editCompany") || "Edit Company"
-            : t("company.createCompany") || "Create Company"
-        }
-        submitLabel={
-          selectedCompany
-            ? t("common.button.update") || "Update"
-            : t("common.button.create") || "Create"
-        }
-        cancelLabel={t("common.button.cancel") || "Cancel"}
         loading={loading}
-      >
-        <LabeledInput
-          label={t("common.form.label.name") || "Name"}
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-        />
-        <LabeledInput
-          label={t("common.form.label.email") || "Email"}
-          value={form.email || ""}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-        />
-        <LabeledInput
-          label={t("common.form.label.phone") || "Phone"}
-          value={form.phone_number || ""}
-          onChange={(e) => setForm({ ...form, phone_number: e.target.value })}
-        />
-        <LabeledInput
-          label={t("common.form.label.address") || "Address"}
-          value={form.address || ""}
-          onChange={(e) => setForm({ ...form, address: e.target.value })}
-        />
-        <CustomSelect
-          label={t("common.form.label.type") || "Type"}
-          value={form.type ?? ""}
-          onValueChange={(val) =>
-            setForm({
-              ...form,
-              type: val ? (val as "PROVIDER" | "CLIENT") : undefined,
-            })
-          }
-          options={[
-            {
-              value: "PROVIDER",
-              label: t("company.type.provider") || "Provider",
-            },
-            { value: "CLIENT", label: t("company.type.client") || "Client" },
-          ]}
-        />
-        <CustomSelect<"active" | "inactive">
-          label={t("common.form.label.status") || "Status"}
-          value={form.is_active ? "active" : "inactive"}
-          onValueChange={(val) =>
-            setForm({ ...form, is_active: val === "active" })
-          }
-          options={[
-            { value: "active", label: t("common.active") || "Active" },
-            { value: "inactive", label: t("common.inactive") || "Inactive" },
-          ]}
-        />
-      </FormModal>
+        form={form}
+        setForm={setForm}
+        selectedCompany={selectedCompany}
+      />
 
+      {/* Confirm Delete Modal */}
       <ConfirmModal
         isOpen={isDeleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}

@@ -10,10 +10,10 @@ import {
 import { RotateCcw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-interface FiltersType {
+export interface FiltersType {
   search: string;
-  type: string;
-  is_active: boolean | undefined;
+  type: "" | "PROVIDER" | "CLIENT";
+  is_active?: boolean;
   limit: number;
 }
 
@@ -81,7 +81,10 @@ export function CompanyFilters({
 
       {renderSelect(
         filters.type || "all",
-        (val) => setFilters({ type: val === "all" ? "" : val }),
+        (val) =>
+          setFilters({
+            type: val === "all" ? "" : (val as "PROVIDER" | "CLIENT"),
+          }),
         t("company.filter.type", "Type"),
         typeOptions,
         "w-[200px]"

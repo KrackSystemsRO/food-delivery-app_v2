@@ -11,7 +11,7 @@ import { RotateCcw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useMemo, useCallback } from "react";
 
-interface FiltersType {
+export interface FiltersType {
   search: string;
   is_active: boolean | undefined;
   limit: number;

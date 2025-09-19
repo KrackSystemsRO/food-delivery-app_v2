@@ -1,3 +1,4 @@
+import { StoreType } from "./store";
 import { UserType } from "./user";
 
 export type OrderItemType = {
@@ -16,12 +17,8 @@ export type OrderType = {
   _id: string;
   id: string;
   user: UserType;
-  store: {
-    _id: string;
-    name: string;
-    is_open: boolean;
-  };
-  items: OrderItemType[];
+  store: StoreType;
+  items: Partial<OrderItemType[]>;
   total: number;
   status:
     | "pending"
@@ -52,17 +49,21 @@ export type OrdersResponse = {
 
 export interface OrderForm {
   user: string;
-  store: string;
-  items: {
-    product: string;
-    quantity: number;
-    observations?: string;
-  }[];
+  store: Partial<OrderType>;
+  items: OrderItemType[];
   total: number;
-  status?: "pending" | "preparing" | "on_the_way" | "delivered" | "cancelled";
+  status?: OrderStatus;
   deliveryLocation: {
     lat: number;
     lng: number;
     address: string;
   };
 }
+
+export type OrderStatus =
+  | "pending"
+  | "confirmed"
+  | "preparing"
+  | "delivering"
+  | "delivered"
+  | "cancelled";

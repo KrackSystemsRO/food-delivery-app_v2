@@ -11,7 +11,7 @@ import {
 import { RotateCcw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-interface FiltersType {
+export interface FiltersType {
   search: string;
   role: string;
   is_active: boolean | undefined;

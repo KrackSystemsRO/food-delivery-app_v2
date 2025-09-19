@@ -3,23 +3,21 @@ import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
-
 import { ConfirmModal } from "@/components/common/confirm.modal";
-import { FormModal } from "@/components/common/form-modal";
 import { PaginationControls } from "@/components/common/pagination.common";
-import { LabeledInput } from "@/components/common/label-input";
-import { CustomSelect } from "@/components/common/custom-select";
-
 import useDepartmentStore from "@/stores/department.store";
 import useUserStore from "@/stores/user.store";
 import useCompanyStore from "@/stores/company.store";
-import { DataTable, type ColumnDef } from "@/components/common/data-table";
-import { DepartmentFilters } from "@/components/department/filters.department";
-
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
+import {
+  DepartmentFilters,
+  type FiltersType,
+} from "@/components/department/DepartmentFilters";
+import { DepartmentFormModal } from "@/components/department/DepartmentFormModal";
+import DepartmentTable from "@/components/department/DepartmentTable";
 
-const defaultFilters = {
+const defaultFilters: FiltersType = {
   search: "",
   is_active: undefined,
   limit: 10,
@@ -39,7 +37,6 @@ export default function DepartmentManagementPage() {
 
   const { usersList, setUsersList } = useUserStore();
   const { companiesList, setCompaniesList } = useCompanyStore();
-
   const {
     departmentsList,
     setDepartmentsList,
@@ -58,23 +55,7 @@ export default function DepartmentManagementPage() {
     admin: [],
   });
 
-  const [filters, setFilters] = useState(() => {
-    const saved = localStorage.getItem("departmentFilters");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        return {
-          search: parsed.search || "",
-          is_active: parsed.is_active ?? undefined,
-          limit: parsed.limit ? Number(parsed.limit) : 10,
-          company: parsed.company || "",
-        };
-      } catch {
-        return defaultFilters;
-      }
-    }
-    return defaultFilters;
-  });
+  const [filters, setFilters] = useState(defaultFilters);
 
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Types.Department.DepartmentType;
@@ -90,7 +71,7 @@ export default function DepartmentManagementPage() {
       const res = await Services.Department.getDepartments(axiosInstance, {
         search: filters.search,
         is_active: filters.is_active,
-        company: filters.company,
+        company: filters.company || "",
         page,
         limit: filters.limit,
         sort_by: sortConfig.key,
@@ -123,10 +104,6 @@ export default function DepartmentManagementPage() {
     fetchDepartments();
     return () => clearDepartmentsList();
   }, [fetchDepartments, clearDepartmentsList]);
-
-  useEffect(() => {
-    localStorage.setItem("departmentFilters", JSON.stringify(filters));
-  }, [filters]);
 
   const handleSort = useCallback(
     (key: keyof Types.Department.DepartmentType) => {
@@ -222,7 +199,6 @@ export default function DepartmentManagementPage() {
           fetchDepartments();
         } else throw new Error();
       }
-
       setModalOpen(false);
       clearSelectedDepartment();
     } catch {
@@ -241,34 +217,7 @@ export default function DepartmentManagementPage() {
     setFilters(defaultFilters);
     setPage(1);
     setSortConfig({ key: "createdAt", direction: "desc" });
-    localStorage.removeItem("departmentFilters");
   }, []);
-
-  const columns: ColumnDef<Types.Department.DepartmentType>[] = [
-    { key: "name", label: t("common.table.name") },
-    {
-      key: "company",
-      label: t("common.table.company"),
-      render: (row) => row.company?.map((c) => c.name).join(", ") || "-",
-    },
-    {
-      key: "admin",
-      label: t("common.table.admins"),
-      render: (row) =>
-        row.admin?.map((u: Types.User.UserType) => u.first_name).join(", ") ||
-        "-",
-    },
-    {
-      key: "is_active",
-      label: t("common.table.is_active"),
-      render: (row) =>
-        row.is_active ? (
-          <span className="text-green-600">{t("common.active")}</span>
-        ) : (
-          <span className="text-red-600">{t("common.inactive")}</span>
-        ),
-    },
-  ];
 
   return (
     <div className="p-6 space-y-4">
@@ -284,24 +233,21 @@ export default function DepartmentManagementPage() {
 
       <DepartmentFilters
         filters={filters}
-        setFilters={(updated) => {
-          setFilters((prev) => ({ ...prev, ...updated }));
-          setPage(1);
-        }}
+        setFilters={(updated) =>
+          setFilters((prev) => ({ ...prev, ...updated }))
+        }
         resetFilters={resetFilters}
         companies={companiesList}
       />
 
-      <DataTable
-        columns={columns}
+      <DepartmentTable
         data={departmentsList}
+        loading={loading}
         sortKey={sortConfig.key}
         sortDirection={sortConfig.direction}
-        loading={loading}
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={confirmDelete}
-        noDataText={t("common.table.noData") || "No departments found."}
       />
 
       <PaginationControls
@@ -310,70 +256,17 @@ export default function DepartmentManagementPage() {
         onPageChange={setPage}
       />
 
-      <FormModal
+      <DepartmentFormModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         onSubmit={handleSubmit}
-        title={
-          selectedDepartment
-            ? t("department.editDepartment") || "Edit Department"
-            : t("department.createDepartment") || "Create Department"
-        }
-        submitLabel={
-          selectedDepartment
-            ? t("common.button.update") || "Update"
-            : t("common.button.create") || "Create"
-        }
-        cancelLabel={t("common.button.cancel") || "Cancel"}
         loading={loading}
-      >
-        <LabeledInput
-          label={t("common.form.label.name") || "Name"}
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-        />
-        <LabeledInput
-          label={t("common.form.label.description") || "Description"}
-          value={form.description || ""}
-          onChange={(e) => setForm({ ...form, description: e.target.value })}
-        />
-        <CustomSelect
-          label={t("common.form.label.companies") || "Companies"}
-          multiple
-          value={form.company.map((c) => c._id).filter(Boolean) as string[]}
-          onValueChange={(vals: string[]) => {
-            const selected = companiesList.filter((c) => vals.includes(c._id));
-            setForm({ ...form, company: selected });
-          }}
-          options={companiesList.map((c) => ({ value: c._id, label: c.name }))}
-        />
-
-        <CustomSelect
-          label={t("common.form.label.admins") || "Admins"}
-          multiple
-          value={form.admin.map((u) => u._id).filter(Boolean) as string[]}
-          onValueChange={(vals: string[]) => {
-            const selected = usersList.filter((u) => vals.includes(u._id));
-            setForm({ ...form, admin: selected });
-          }}
-          options={usersList.map((u) => ({
-            value: u._id,
-            label: u.first_name,
-          }))}
-        />
-
-        <CustomSelect<"active" | "inactive">
-          label={t("common.form.label.status") || "Status"}
-          value={form.is_active ? "active" : "inactive"}
-          onValueChange={(val) =>
-            setForm({ ...form, is_active: val === "active" })
-          }
-          options={[
-            { value: "active", label: t("common.active") || "Active" },
-            { value: "inactive", label: t("common.inactive") || "Inactive" },
-          ]}
-        />
-      </FormModal>
+        form={form}
+        setForm={setForm}
+        usersList={usersList}
+        companiesList={companiesList}
+        selectedDepartment={selectedDepartment}
+      />
 
       <ConfirmModal
         isOpen={isDeleteModalOpen}

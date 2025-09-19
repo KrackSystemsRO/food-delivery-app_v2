@@ -3,19 +3,18 @@ import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
-
-import { PaginationControls } from "@/components/common/pagination.common";
-import { DataTable, type ColumnDef } from "@/components/common/data-table";
-
 import useIngredientStore from "@/stores/ingredient.store";
-import { IngredientFilters } from "@/components/ingredient/filters.ingredient";
-
+import {
+  IngredientFilters,
+  type FiltersType,
+} from "@/components/ingredient/IngredientFilters";
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
-import { FormModal } from "@/components/common/form-modal"; // import FormModal
 import { ConfirmModal } from "@/components/common/confirm.modal";
+import { IngredientFormModal } from "@/components/ingredient/IngredientFormModal";
+import IngredientTable from "@/components/ingredient/IngredientTable";
 
-const defaultFilters = {
+const defaultFilters: FiltersType = {
   search: "",
   is_active: undefined,
   limit: 10,
@@ -38,30 +37,12 @@ export default function IngredientManagementPage() {
     is_active: true,
   });
 
-  const [filters, setFilters] = useState(() => {
-    const saved = localStorage.getItem("ingredientFilters");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        return {
-          search: parsed.search || "",
-          is_active: parsed.is_active ?? undefined,
-          limit: parsed.limit ? Number(parsed.limit) : 10,
-        };
-      } catch {
-        return defaultFilters;
-      }
-    }
-    return defaultFilters;
-  });
+  const [filters, setFilters] = useState(defaultFilters);
 
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Types.Ingredient.IngredientType;
     direction: "asc" | "desc";
-  }>({
-    key: "createdAt",
-    direction: "desc",
-  });
+  }>({ key: "createdAt", direction: "desc" });
 
   const {
     ingredientsList: ingredients,
@@ -106,23 +87,18 @@ export default function IngredientManagementPage() {
   }, [filters]);
 
   const handleSort = useCallback(
-    (key: keyof Types.Ingredient.IngredientType) => {
+    (key: keyof Types.Ingredient.IngredientType) =>
       setSortConfig((current) => ({
         key,
         direction:
           current.key === key && current.direction === "asc" ? "desc" : "asc",
-      }));
-    },
+      })),
     []
   );
 
   const openCreateModal = useCallback(() => {
     clearSelectedIngredient();
-    setForm({
-      name: "",
-      description: "",
-      is_active: true,
-    });
+    setForm({ name: "", description: "", is_active: true });
     setModalOpen(true);
   }, [clearSelectedIngredient]);
 
@@ -197,7 +173,6 @@ export default function IngredientManagementPage() {
           fetchIngredients();
         } else throw new Error();
       }
-
       setModalOpen(false);
       clearSelectedIngredient();
     } catch {
@@ -219,25 +194,6 @@ export default function IngredientManagementPage() {
     localStorage.removeItem("ingredientFilters");
   }, []);
 
-  const columns: ColumnDef<Types.Ingredient.IngredientType>[] = [
-    { key: "name", label: t("common.table.name") },
-    {
-      key: "description",
-      label: t("common.table.description"),
-      render: (row) => row.description || "-",
-    },
-    {
-      key: "is_active",
-      label: t("common.table.is_active"),
-      render: (row) =>
-        row.is_active ? (
-          <span className="text-green-600">{t("common.active")}</span>
-        ) : (
-          <span className="text-red-600">{t("common.inactive")}</span>
-        ),
-    },
-  ];
-
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
@@ -252,62 +208,35 @@ export default function IngredientManagementPage() {
 
       <IngredientFilters
         filters={filters}
-        setFilters={(updated: Partial<typeof filters>) => {
+        setFilters={(updated) => {
           setFilters((prev) => ({ ...prev, ...updated }));
           setPage(1);
         }}
         resetFilters={resetFilters}
       />
 
-      <DataTable
-        columns={columns}
-        data={ingredients}
+      <IngredientTable
+        ingredients={ingredients}
+        loading={loading}
+        page={page}
+        totalPages={totalPages}
         sortKey={sortConfig.key}
         sortDirection={sortConfig.direction}
-        loading={loading}
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={confirmDelete}
-        noDataText={t("common.table.noData") || "No ingredients found."}
-      />
-
-      <PaginationControls
-        page={page}
-        totalPages={totalPages}
         onPageChange={setPage}
       />
 
-      <FormModal
+      <IngredientFormModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         onSubmit={handleSubmit}
-        title={
-          selectedIngredient
-            ? t("ingredient.title.edit") || "Edit Ingredient"
-            : t("ingredient.title.create") || "Create Ingredient"
-        }
-        submitLabel={
-          selectedIngredient
-            ? t("common.button.update")
-            : t("common.button.create")
-        }
-      >
-        <div className="space-y-4">
-          <input
-            type="text"
-            placeholder={t("common.form.label.name")}
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="w-full border p-2 rounded"
-          />
-          <textarea
-            placeholder={t("common.form.label.description")}
-            value={form.description || ""}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-            className="w-full border p-2 rounded"
-          />
-        </div>
-      </FormModal>
+        form={form}
+        setForm={setForm}
+        selectedIngredient={selectedIngredient}
+        loading={loading}
+      />
 
       <ConfirmModal
         isOpen={isDeleteModalOpen}
@@ -320,7 +249,7 @@ export default function IngredientManagementPage() {
         }
         confirmText={t("common.button.delete") || "Delete"}
         cancelText={t("common.button.cancel") || "Cancel"}
-        loading={loading} // optional: disable button while deleting
+        loading={loading}
       />
     </div>
   );

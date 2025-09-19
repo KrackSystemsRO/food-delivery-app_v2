@@ -16,7 +16,7 @@ export interface CompanyType {
 export interface CompanyForm {
     name: string;
     address?: string;
-    type?: "PROVIDER" | "CLIENT";
+    type?: "PROVIDER" | "CLIENT" | "";
     email?: string;
     phone_number?: string;
     is_active: boolean;

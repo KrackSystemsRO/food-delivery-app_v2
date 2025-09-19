@@ -11,9 +11,9 @@ import { RotateCcw } from "lucide-react";
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
-interface FiltersType {
+export interface FiltersType {
   search: string;
-  is_active: boolean | undefined;
+  is_active?: boolean;
   limit: number;
 }
 
@@ -23,7 +23,7 @@ interface CategoryFiltersProps {
   resetFilters: () => void;
 }
 
-export function CategoryFilters({
+export default function CategoryFilters({
   filters,
   setFilters,
   resetFilters,

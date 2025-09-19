@@ -1,24 +1,21 @@
+import AllergenTable from "@/components/allergen/AllergenTable";
+import AllergenForm from "@/components/allergen/AllergenForm";
 import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui";
-import { Plus, Check, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
-
 import { ConfirmModal } from "@/components/common/confirm.modal";
 import { PaginationControls } from "@/components/common/pagination.common";
-import { DataTable, type ColumnDef } from "@/components/common/data-table";
-
 import useAllergenStore from "@/stores/allergen.store";
 import {
   AllergenFilters,
   type FiltersType,
-} from "@/components/allergen/filters.allergen";
+} from "@/components/allergen/AllergenFilters";
 import usePersistedState from "@/hooks/use-persisted-state";
 import { Types, Services } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
 import { FormModal } from "@/components/common/form-modal";
-import { LabeledInput } from "@/components/common/label-input";
-import { CustomSelect } from "@/components/common/custom-select";
 
 const defaultFilters: FiltersType = {
   search: "",
@@ -212,52 +209,31 @@ export default function AllergenManagementPage() {
     localStorage.removeItem("allergenFilters");
   }, [setFilters]);
 
-  const columns: ColumnDef<Types.Allergen.AllergenType>[] = [
-    { key: "name", label: t("common.table.name") },
-    { key: "description", label: t("common.table.description") },
-    {
-      key: "is_active",
-      label: t("common.table.is_active"),
-      render: (row) =>
-        row.is_active ? (
-          <Check className="text-green-500 inline-block" />
-        ) : (
-          <X className="text-red-500 inline-block" />
-        ),
-    },
-  ];
-
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-base font-bold">
-          {t("allergen.title") || "Manage Allergens"}
-        </h2>
+        <h2 className="text-base font-bold">{t("allergen.title")}</h2>
         <Button onClick={openCreateModal}>
           <Plus className="mr-2 h-4 w-4" />
-          {t("allergen.createAllergen") || "Create Allergen"}
+          {t("allergen.createAllergen")}
         </Button>
       </div>
 
       <AllergenFilters
         filters={filters}
-        setFilters={(updated: Partial<FiltersType>) =>
-          setFilters((prev) => ({ ...prev, ...updated }))
-        }
+        setFilters={(u) => setFilters((p) => ({ ...p, ...u }))}
         resetFilters={resetFilters}
       />
 
-      {/* ✅ Generic DataTable usage */}
-      <DataTable
-        columns={columns}
+      <AllergenTable
         data={allergens}
+        loading={loading}
         sortKey={sortConfig.key}
         sortDirection={sortConfig.direction}
-        loading={loading}
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={confirmDelete}
-        noDataText={t("common.table.noData") || "No allergens found."}
+        t={t}
       />
 
       <PaginationControls
@@ -275,7 +251,6 @@ export default function AllergenManagementPage() {
             ? t("allergen.editAllergen")
             : t("allergen.createAllergen")
         }
-        description={t("allergen.dialogDescription")}
         submitLabel={
           selectedAllergen
             ? t("common.button.update")
@@ -283,29 +258,7 @@ export default function AllergenManagementPage() {
         }
         loading={submitLoading}
       >
-        <LabeledInput
-          label={t("common.form.label.name")}
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-        />
-
-        <LabeledInput
-          label={t("common.form.label.description")}
-          value={form.description || ""}
-          onChange={(e) => setForm({ ...form, description: e.target.value })}
-        />
-
-        <CustomSelect<"active" | "inactive">
-          label={t("common.form.label.status")}
-          value={form.is_active ? "active" : "inactive"}
-          onValueChange={(val) =>
-            setForm({ ...form, is_active: val === "active" })
-          }
-          options={[
-            { value: "active", label: t("common.table.active") },
-            { value: "inactive", label: t("common.table.inactive") },
-          ]}
-        />
+        <AllergenForm form={form} setForm={setForm} t={t} />
       </FormModal>
 
       <ConfirmModal
