@@ -7,19 +7,24 @@ import {
   StyleSheet,
 } from "react-native";
 import { Button, Text, Card } from "react-native-paper";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { OrdersStackParamList } from "@/navigation/manager/OrdersStack";
+import {
+  NativeStackNavigationProp,
+  NativeStackScreenProps,
+} from "@react-navigation/native-stack";
+import { ClientTabsParamList, OrdersStackParamList } from "@/navigation/types";
 import { getSocket } from "@/services/soket.connection/socket";
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
+import { useCart } from "@/context/CartContext";
+import { useNavigation } from "@react-navigation/native";
 
 /* ---------- Types ---------- */
-export type OrderDetailProps = NativeStackScreenProps<
+export type ClientOrderDetailProps = NativeStackScreenProps<
   OrdersStackParamList,
   "OrderDetail"
 >;
 
-/* ---------- Memoized Item Card ---------- */
+/* ---------- Item Card ---------- */
 const OrderItemCard = React.memo<{ item: Types.Order.OrderItemType }>(
   ({ item }) => (
     <Card style={styles.itemCard}>
@@ -36,7 +41,7 @@ const OrderItemCard = React.memo<{ item: Types.Order.OrderItemType }>(
   )
 );
 
-/* ---------- Memoized Header ---------- */
+/* ---------- Header ---------- */
 const OrderListHeader = React.memo<{
   order: Types.Order.OrderType | null;
   statusColor: string;
@@ -53,9 +58,8 @@ const OrderListHeader = React.memo<{
               {order.status.toUpperCase()}
             </Text>
           </Text>
-          <Text>
-            Customer: {order.user.first_name} {order.user.last_name}
-          </Text>
+          <Text>Store: {order.store.name}</Text>
+          <Text>Delivery Address: {order.deliveryLocation.address}</Text>
           <Text>Total: ${order.total.toFixed(2)}</Text>
         </Card.Content>
       </Card>
@@ -66,31 +70,39 @@ const OrderListHeader = React.memo<{
   );
 });
 
-/* ---------- Memoized Footer ---------- */
+/* ---------- Footer (Repeat Order for completed/cancelled) ---------- */
 const OrderListFooter = React.memo<{
   order: Types.Order.OrderType | null;
-  onAccept: () => void;
-  onDeny: () => void;
-}>(({ order, onAccept, onDeny }) => {
-  if (!order || order.status !== "pending") return null;
+  onRepeat: () => void;
+}>(({ order, onRepeat }) => {
+  if (!order) return null;
+
+  const isCompleted =
+    order.status === "delivered" || order.status === "cancelled";
+
+  if (!isCompleted) return null;
+
   return (
     <View style={styles.footer}>
-      <Button mode="contained" onPress={onAccept} style={styles.flex1}>
-        Accept
-      </Button>
-      <Button mode="outlined" onPress={onDeny} style={styles.flex1}>
-        Deny
+      <Button mode="contained" onPress={onRepeat} style={styles.flex1}>
+        Repeat Order
       </Button>
     </View>
   );
 });
 
 /* ---------- Screen ---------- */
-const OrderDetailScreen: React.FC<OrderDetailProps> = ({ route }) => {
+const ClientOrderDetailScreen: React.FC<ClientOrderDetailProps> = ({
+  route,
+}) => {
   const { _id } = route.params;
   const [order, setOrder] = useState<Types.Order.OrderType | null>(null);
   const [loading, setLoading] = useState(true);
+  const { syncAddToCart, dispatch } = useCart();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<ClientTabsParamList>>();
 
+  /** Fetch detail */
   const fetchOrderDetail = useCallback(async () => {
     setLoading(true);
     try {
@@ -108,45 +120,59 @@ const OrderDetailScreen: React.FC<OrderDetailProps> = ({ route }) => {
     fetchOrderDetail();
   }, [fetchOrderDetail]);
 
+  /** Live updates via socket */
   useEffect(() => {
     const socket = getSocket();
     if (!socket) return;
-
-    const handleUpdate = (updatedOrder: Types.Order.OrderType) => {
-      if (updatedOrder._id === _id) setOrder(updatedOrder);
+    const handleUpdate = (updated: Types.Order.OrderType) => {
+      if (updated._id === _id) setOrder(updated);
     };
-
     socket.on("order:update", handleUpdate);
     return () => {
       socket.off("order:update", handleUpdate);
     };
   }, [_id]);
 
-  const handleAccept = useCallback(async () => {
+  /** Repeat order action */
+  const handleRepeatOrder = useCallback(async () => {
+    if (!order) return;
     try {
-      await Services.Order.acceptOrder(axiosInstance, _id);
-      Alert.alert("Success", "Order accepted");
-    } catch {
-      Alert.alert("Error", "Failed to accept order");
-    }
-  }, [_id]);
+      // clear any existing cart content first
+      dispatch({ type: "CLEAR_CART" });
 
-  const handleDeny = useCallback(async () => {
-    try {
-      await Services.Order.denyOrder(axiosInstance, _id);
-      Alert.alert("Success", "Order denied");
-      fetchOrderDetail();
-    } catch {
-      Alert.alert("Error", "Failed to deny order");
-    }
-  }, [_id, fetchOrderDetail]);
+      // add each item from this order back into the cart
+      await Promise.all(
+        order.items.map((i) =>
+          syncAddToCart(
+            {
+              product: i.product._id,
+              name: i.product.name,
+              price: i.product.price,
+              quantity: i.quantity,
+              observations: i.observations,
+            },
+            order.store._id
+          )
+        )
+      );
 
+      // navigate to the Cart screen
+      navigation.navigate("CartTab");
+    } catch (err) {
+      console.error(err);
+      Alert.alert("Error", "Failed to repeat order");
+    }
+  }, [order, syncAddToCart, dispatch, navigation]);
+
+  /** Status color */
   const statusColor = useMemo(() => {
     switch (order?.status) {
       case "pending":
         return "orange";
       case "confirmed":
         return "green";
+      case "delivered":
+        return "blue";
       case "cancelled":
         return "red";
       default:
@@ -159,22 +185,6 @@ const OrderDetailScreen: React.FC<OrderDetailProps> = ({ route }) => {
       <OrderItemCard item={item} />
     ),
     []
-  );
-
-  const headerComponent = useMemo(
-    () => <OrderListHeader order={order} statusColor={statusColor} />,
-    [order, statusColor]
-  );
-
-  const footerComponent = useMemo(
-    () => (
-      <OrderListFooter
-        order={order}
-        onAccept={handleAccept}
-        onDeny={handleDeny}
-      />
-    ),
-    [order, handleAccept, handleDeny]
   );
 
   if (loading) {
@@ -199,8 +209,12 @@ const OrderDetailScreen: React.FC<OrderDetailProps> = ({ route }) => {
       data={order.items}
       keyExtractor={(item) => item._id}
       renderItem={renderItem}
-      ListHeaderComponent={headerComponent}
-      ListFooterComponent={footerComponent}
+      ListHeaderComponent={
+        <OrderListHeader order={order} statusColor={statusColor} />
+      }
+      ListFooterComponent={
+        <OrderListFooter order={order} onRepeat={handleRepeatOrder} />
+      }
       contentContainerStyle={styles.listContent}
       refreshing={loading}
       onRefresh={fetchOrderDetail}
@@ -208,7 +222,7 @@ const OrderDetailScreen: React.FC<OrderDetailProps> = ({ route }) => {
   );
 };
 
-export default React.memo(OrderDetailScreen);
+export default React.memo(ClientOrderDetailScreen);
 
 /* ---------- Styles ---------- */
 const styles = StyleSheet.create({

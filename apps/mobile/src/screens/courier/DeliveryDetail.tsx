@@ -1,7 +1,7 @@
 import { ScrollView, StyleSheet } from "react-native";
 import { Text, Card, Button } from "react-native-paper";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { CourierOrdersStackParamList } from "./CourierOrders.stack";
+import { CourierOrdersStackParamList } from "@/navigation/types";
 
 type DeliveryDetailProps = NativeStackScreenProps<
   CourierOrdersStackParamList,

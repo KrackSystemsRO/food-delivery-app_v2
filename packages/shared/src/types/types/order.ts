@@ -20,6 +20,7 @@ export interface OrderItemType extends BaseOrderItem {
     name: string;
     image: string;
     available: boolean;
+    price: number;
   };
 }
 
