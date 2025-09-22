@@ -2,8 +2,8 @@ import {
   createNativeStackNavigator,
   NativeStackScreenProps,
 } from "@react-navigation/native-stack";
-import OrdersListScreen from "@/screens/manager/OrdersList.screen";
-import OrderDetailScreen from "@/screens/manager/OrderDetails.screen";
+import OrdersListScreen from "@/screens/manager/OrdersList";
+import OrderDetailScreen from "@/screens/manager/OrderDetails";
 import { CustomHeader } from "@/navigation/common/CommonHeader";
 
 /* ------------------ Types ------------------ */

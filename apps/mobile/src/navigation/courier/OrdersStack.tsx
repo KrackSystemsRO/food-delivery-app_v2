@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import CourierOrdersPage from "@/screens/courier/CourierList.screen";
-import DeliveryDetailPage from "@/screens/courier/DeliveryDetail.screen";
+import CourierOrdersPage from "@/screens/courier/CourierList";
+import DeliveryDetailPage from "@/screens/courier/DeliveryDetail";
 import { CustomHeader } from "@/navigation/common/CommonHeader";
 import { Types } from "@my-monorepo/shared";
 
