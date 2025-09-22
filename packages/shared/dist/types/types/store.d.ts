@@ -19,6 +19,8 @@ interface BaseStore {
 export interface StoreType extends BaseStore {
     _id: string;
     storeId: number;
+    cityId: string;
+    zoneId: string;
     createdAt: string;
     updatedAt: string;
 }

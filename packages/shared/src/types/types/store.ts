@@ -25,8 +25,8 @@ interface BaseStore {
 export interface StoreType extends BaseStore {
   _id: string;
   storeId: number;
-  // For normalized references you may only have IDs;
-  // when populated you'll receive full objects as declared above
+  cityId: string;
+  zoneId: string;
   createdAt: string;
   updatedAt: string;
 }
