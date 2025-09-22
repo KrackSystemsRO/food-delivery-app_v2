@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { View, ActivityIndicator, Alert, FlatList } from "react-native";
 import { Button, Text, Card } from "react-native-paper";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { OrdersStackParamList } from "@/components/layouts/ManagerLayout";
+import { OrdersStackParamList } from "@/navigation/types";
 import { getSocket } from "@/services/soket.connection/socket";
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";

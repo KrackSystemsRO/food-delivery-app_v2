@@ -1,4 +1,3 @@
-import React from "react";
 import { ScrollView, StyleSheet } from "react-native";
 import { Text, Card, Button } from "react-native-paper";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -34,7 +33,6 @@ export default function DeliveryDetailPage({ route }: DeliveryDetailProps) {
         </Card.Content>
       </Card>
 
-      {/* Optionally add action buttons */}
       {order.status === "confirmed" && (
         <Button
           mode="contained"

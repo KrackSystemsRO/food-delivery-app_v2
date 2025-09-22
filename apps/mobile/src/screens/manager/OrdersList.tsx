@@ -12,6 +12,9 @@ import MultiSelectWithChips from "@/components/select/MultiSelectWithChips";
 import { useAuth } from "@/context/authContext";
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useNavigation } from "@react-navigation/native";
+import { OrdersStackParamList } from "@/navigation/types";
 
 const OrderCard: React.FC<{
   order: Types.Order.OrderType;
@@ -64,6 +67,11 @@ const OrderCard: React.FC<{
   </Card>
 ));
 
+type OrdersListNavProp = NativeStackNavigationProp<
+  OrdersStackParamList,
+  "OrderDetail"
+>;
+
 const ManagerOrdersScreen: React.FC = () => {
   const { socket, user, updateSelectedStores } = useAuth();
   const [stores, setStores] = useState<Types.Store.StoreType[]>([]);
@@ -73,6 +81,7 @@ const ManagerOrdersScreen: React.FC = () => {
   const [orders, setOrders] = useState<Types.Order.OrderType[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const navigation = useNavigation<OrdersListNavProp>();
 
   const selectedStoresRef = useRef<Types.Store.StoreType[]>([]);
   selectedStoresRef.current = selectedStores;
@@ -188,7 +197,7 @@ const ManagerOrdersScreen: React.FC = () => {
         order={item}
         onAccept={handleAcceptOrder}
         onDeny={handleDenyOrder}
-        onPress={() => console.log("Open order", item._id)}
+        onPress={() => navigation.navigate("OrderDetail", { _id: item._id })}
       />
     ),
     [handleAcceptOrder, handleDenyOrder]

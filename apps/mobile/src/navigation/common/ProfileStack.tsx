@@ -1,7 +1,8 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import ProfileScreen from "../screens/client/Profile";
+import ProfileScreen from "../../screens/client/Profile";
 import { useTranslation } from "react-i18next";
+import { CustomHeader } from "@/navigation/common/CommonHeader";
 
 export type ProfileStackParamList = {
   Profile: undefined;
@@ -14,6 +15,7 @@ export default function ProfileStackNavigator() {
   return (
     <ProfileStack.Navigator
       screenOptions={{
+        header: (props) => <CustomHeader {...props} />,
         headerShown: true,
       }}
     >
