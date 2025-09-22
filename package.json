@@ -2,8 +2,14 @@
   "name": "test2",
   "packageManager": "yarn@4.9.4",
   "private": true,
+  "scripts": {
+    "type-check": "tsc --build --noEmit"
+  },
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
 }

@@ -1,39 +1,46 @@
-export interface AllergenType {
-  _id: string;
+// --- Base Interfaces ---
+export interface BaseAllergen {
   name: string;
   description?: string;
   is_active?: boolean;
 }
 
-export type NutritionalInfo = {
+export interface BaseNutritionalInfo {
   calories?: number;
   protein?: number;
   fat?: number;
   fiber?: number;
   sugar?: number;
-};
+}
 
-export type IngredientType = {
-  _id: string;
+export interface BaseIngredient {
   name: string;
   description?: string;
-  allergens?: AllergenType[];
-  nutritionalInfo?: NutritionalInfo;
   unit?: "piece" | "gram" | "liter";
-  is_active?: boolean;
-};
-
-export interface IngredientForm {
-  name: string;
-  description?: string;
-  allergens?: string[];
-  nutritionalInfo?: Partial<NutritionalInfo>;
-  unit?: string;
   is_active?: boolean;
 }
 
+// --- Main Types ---
+export interface AllergenType extends BaseAllergen {
+  _id: string;
+}
+
+export interface NutritionalInfo extends BaseNutritionalInfo {}
+
+export interface IngredientType extends BaseIngredient {
+  _id: string;
+  allergens?: AllergenType[];
+  nutritionalInfo?: NutritionalInfo;
+}
+
+export interface IngredientForm extends BaseIngredient {
+  allergens?: string[]; // just IDs for the form
+  nutritionalInfo?: Partial<NutritionalInfo>; // allow partial edits
+}
+
+// Ingredient with a specific quantity and unit
 export interface IngredientWithQuantity {
   ingredient: IngredientType;
-  quantity?: string;
+  quantity?: string; // kept as string for easier form binding
   unit: string;
 }

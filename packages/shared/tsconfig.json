@@ -9,7 +9,8 @@
     "esModuleInterop": true,
     "composite": true,
     "skipLibCheck": true,
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "lib": ["esnext", "dom"]
   },
   "include": ["src"]
 }

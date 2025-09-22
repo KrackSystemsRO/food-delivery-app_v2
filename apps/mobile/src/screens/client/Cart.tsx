@@ -8,11 +8,6 @@ import {
   Image,
 } from "react-native";
 import { useCart } from "../../context/CartContext";
-import {
-  removeItemFromCart,
-  clearCart as clearCartApi,
-  fetchCart,
-} from "../../services/cart.service";
 import { showToast } from "../../utils/toast";
 import { useTranslation } from "react-i18next";
 import {
@@ -39,7 +34,7 @@ export default function CartScreen() {
   const handleRemoveItem = async (product: string) => {
     try {
       setLoading(true);
-      await removeItemFromCart(product);
+      await Services.Cart.removeItemFromCart(axiosInstance, product);
       dispatch({
         type: "SET_CART",
         cart: {
@@ -57,7 +52,7 @@ export default function CartScreen() {
   const handleClearCart = async () => {
     try {
       setLoading(true);
-      await clearCartApi();
+      await Services.Cart.clearCart(axiosInstance);
       dispatch({ type: "CLEAR_CART" });
     } catch (err) {
       showToast("error", "Oops!", "Failed to clear cart");
@@ -104,7 +99,7 @@ export default function CartScreen() {
       };
 
       await Services.Order.placeOrder(axiosInstance, orderData);
-      await clearCartApi();
+      await Services.Cart.clearCart(axiosInstance);
       dispatch({ type: "CLEAR_CART" });
 
       showToast("success", "Yeey!", "Your order has been placed!");
