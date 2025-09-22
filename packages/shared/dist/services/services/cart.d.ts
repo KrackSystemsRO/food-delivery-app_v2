@@ -5,8 +5,18 @@ export declare const addToCart: (axios: AxiosInstance, { product, quantity, stor
     quantity: number;
     store: string;
     observations?: string;
-}) => unknown;
-export declare const fetchCart: (axios: AxiosInstance) => unknown;
-export declare const updateCartItemQuantity: (axios: AxiosInstance, product: string, quantity: number, store: Types.Store.StoreType) => unknown;
-export declare const removeItemFromCart: (axios: AxiosInstance, product: string) => unknown;
-export declare const clearCart: (axios: AxiosInstance) => unknown;
+}) => Promise<{
+    success: boolean;
+    data: any;
+    message?: undefined;
+    status?: undefined;
+} | {
+    success: boolean;
+    message: any;
+    status: any;
+    data?: undefined;
+}>;
+export declare const fetchCart: (axios: AxiosInstance) => Promise<any>;
+export declare const updateCartItemQuantity: (axios: AxiosInstance, product: string, quantity: number, store: Types.Store.StoreType) => Promise<any>;
+export declare const removeItemFromCart: (axios: AxiosInstance, product: string) => Promise<any>;
+export declare const clearCart: (axios: AxiosInstance) => Promise<any>;

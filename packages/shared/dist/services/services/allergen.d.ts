@@ -17,6 +17,6 @@ export interface GetAllergensResponse {
     currentPage: number;
 }
 export declare const getAllergens: (axios: AxiosInstance, params: GetAllergenParams) => Promise<GetAllergensResponse>;
-export declare const addAllergen: (axios: AxiosInstance, data: Types.Allergen.AllergenForm) => unknown;
-export declare const updateAllergen: (axios: AxiosInstance, id: string, data: Types.Allergen.AllergenForm) => unknown;
-export declare const deleteAllergen: (axios: AxiosInstance, id: string) => unknown;
+export declare const addAllergen: (axios: AxiosInstance, data: Types.Allergen.AllergenForm) => Promise<any>;
+export declare const updateAllergen: (axios: AxiosInstance, id: string, data: Types.Allergen.AllergenForm) => Promise<any>;
+export declare const deleteAllergen: (axios: AxiosInstance, id: string) => Promise<any>;

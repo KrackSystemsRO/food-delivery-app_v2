@@ -32,9 +32,9 @@ export interface CreateProductPayload {
     }[];
 }
 export declare const getProducts: (axios: AxiosInstance, params: GetProductParams) => Promise<GetProductsResponse>;
-export declare const addProduct: (axios: AxiosInstance, data: Types.Product.ProductForm | CreateProductPayload) => unknown;
-export declare const updateProduct: (axios: AxiosInstance, id: string, data: Types.Product.ProductForm) => unknown;
-export declare const deleteProduct: (axios: AxiosInstance, id: string) => unknown;
-export declare const getListProductsStore: (axios: AxiosInstance, idStore: string) => unknown;
-export declare const getUserProductsStore: (axios: AxiosInstance, storeId: string | string[]) => unknown;
-export declare const getUserProductsStores: (axios: AxiosInstance, stores: Types.Store.StoreType[]) => unknown;
+export declare const addProduct: (axios: AxiosInstance, data: Types.Product.ProductForm | CreateProductPayload) => Promise<any>;
+export declare const updateProduct: (axios: AxiosInstance, id: string, data: Types.Product.ProductForm) => Promise<any>;
+export declare const deleteProduct: (axios: AxiosInstance, id: string) => Promise<any>;
+export declare const getListProductsStore: (axios: AxiosInstance, idStore: string) => Promise<any>;
+export declare const getUserProductsStore: (axios: AxiosInstance, storeId: string | string[]) => Promise<any>;
+export declare const getUserProductsStores: (axios: AxiosInstance, stores: Types.Store.StoreType[]) => Promise<any[]>;

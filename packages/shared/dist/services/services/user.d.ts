@@ -17,9 +17,9 @@ interface GetUsersResponse {
     totalPages?: number;
     currentPage?: number;
 }
-export declare const getUserDetails: (axios: AxiosInstance) => unknown;
+export declare const getUserDetails: (axios: AxiosInstance) => Promise<any>;
 export declare const getUsers: (axios: AxiosInstance, params: GetUsersParams) => Promise<GetUsersResponse>;
-export declare const addUser: (axios: AxiosInstance, data: UserForm) => unknown;
-export declare const updateUser: (axios: AxiosInstance, id: string, data: UserForm) => unknown;
-export declare const deleteUser: (axios: AxiosInstance, id: string) => unknown;
+export declare const addUser: (axios: AxiosInstance, data: UserForm) => Promise<any>;
+export declare const updateUser: (axios: AxiosInstance, id: string, data: UserForm) => Promise<any>;
+export declare const deleteUser: (axios: AxiosInstance, id: string) => Promise<any>;
 export {};

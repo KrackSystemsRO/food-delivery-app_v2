@@ -18,6 +18,6 @@ export interface GetCompaniesResponse {
     currentPage: number;
 }
 export declare const getCompanies: (axios: AxiosInstance, params: GetCompanyParams) => Promise<GetCompaniesResponse>;
-export declare const addCompany: (axios: AxiosInstance, data: Types.Company.CompanyForm) => unknown;
-export declare const updateCompany: (axios: AxiosInstance, id: string, data: Types.Company.CompanyForm) => unknown;
-export declare const deleteCompany: (axios: AxiosInstance, id: string) => unknown;
+export declare const addCompany: (axios: AxiosInstance, data: Types.Company.CompanyForm) => Promise<any>;
+export declare const updateCompany: (axios: AxiosInstance, id: string, data: Types.Company.CompanyForm) => Promise<any>;
+export declare const deleteCompany: (axios: AxiosInstance, id: string) => Promise<any>;

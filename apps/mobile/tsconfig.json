@@ -2,25 +2,12 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "strict": true,
-    "baseUrl": "src",
+    "baseUrl": ".",
     "jsx": "react-jsx",
     "paths": {
-      "@/*": ["*"],
+      "@/*": ["src/*"],
       "@my-monorepo/shared": ["../../packages/shared/src"]
     }
   },
-  "include": [
-    "src",
-    "../../deleted/types",
-    "../../deleted/mobile/services/authentication.service.ts",
-    "../../deleted/mobile/services/cart.service.ts",
-    "../../deleted/mobile/services/category.service.ts",
-    "../../deleted/mobile/services/courier.service.ts",
-    "../../deleted/mobile/services/ingredient.service.ts",
-    "../../deleted/mobile/services/notifications.service.ts",
-    "../../deleted/mobile/services/order.service.ts",
-    "../../deleted/mobile/services/product.service.ts",
-    "../../deleted/mobile/services/store.service.ts",
-    "../../deleted/mobile/services/user.service.ts"
-  ]
+  "include": ["src"]
 }

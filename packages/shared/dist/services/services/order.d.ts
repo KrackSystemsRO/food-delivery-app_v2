@@ -25,9 +25,9 @@ export interface AcceptDenyOrderResponse {
     message: string;
 }
 export declare const getOrders: (axios: AxiosInstance, params: GetOrderParams) => Promise<GetOrdersResponse>;
-export declare const addOrder: (axios: AxiosInstance, data: Types.Order.OrderForm) => unknown;
-export declare const updateOrder: (axios: AxiosInstance, id: string, data: Types.Order.OrderForm) => unknown;
-export declare const deleteOrder: (axios: AxiosInstance, id: string) => unknown;
+export declare const addOrder: (axios: AxiosInstance, data: Types.Order.OrderForm) => Promise<any>;
+export declare const updateOrder: (axios: AxiosInstance, id: string, data: Types.Order.OrderForm) => Promise<any>;
+export declare const deleteOrder: (axios: AxiosInstance, id: string) => Promise<any>;
 export declare const placeOrder: (axios: AxiosInstance, orderData: {
     store: Types.Store.StoreType;
     items: Types.Cart.CartItemType[];
@@ -36,9 +36,9 @@ export declare const placeOrder: (axios: AxiosInstance, orderData: {
         lng: number;
         address: string;
     };
-}) => unknown;
-export declare const getUserOrder: (axios: AxiosInstance) => unknown;
-export declare const getOrderById: (axios: AxiosInstance, id: string) => unknown;
-export declare const acceptOrder: (axios: AxiosInstance, orderId: string) => unknown;
-export declare const denyOrder: (axios: AxiosInstance, orderId: string) => unknown;
-export declare const getUserOrdersByStores: (axios: AxiosInstance, storesId: string[]) => unknown;
+}) => Promise<any>;
+export declare const getUserOrder: (axios: AxiosInstance) => Promise<any>;
+export declare const getOrderById: (axios: AxiosInstance, id: string) => Promise<any>;
+export declare const acceptOrder: (axios: AxiosInstance, orderId: string) => Promise<any>;
+export declare const denyOrder: (axios: AxiosInstance, orderId: string) => Promise<any>;
+export declare const getUserOrdersByStores: (axios: AxiosInstance, storesId: string[]) => Promise<any>;

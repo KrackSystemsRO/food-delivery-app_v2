@@ -17,6 +17,6 @@ export interface GetCategoriesResponse {
     currentPage: number;
 }
 export declare const getCategories: (axios: AxiosInstance, params: GetCategoryParams) => Promise<GetCategoriesResponse>;
-export declare const addCategory: (axios: AxiosInstance, data: Types.Category.CategoryForm) => unknown;
-export declare const updateCategory: (axios: AxiosInstance, id: string, data: Types.Category.CategoryForm) => unknown;
-export declare const deleteCategory: (axios: AxiosInstance, id: string) => unknown;
+export declare const addCategory: (axios: AxiosInstance, data: Types.Category.CategoryForm) => Promise<any>;
+export declare const updateCategory: (axios: AxiosInstance, id: string, data: Types.Category.CategoryForm) => Promise<any>;
+export declare const deleteCategory: (axios: AxiosInstance, id: string) => Promise<any>;

@@ -17,6 +17,6 @@ export interface GetRecipesResponse {
     currentPage: number;
 }
 export declare const getRecipes: (axios: AxiosInstance, params: GetRecipeParams) => Promise<GetRecipesResponse>;
-export declare const addRecipe: (axios: AxiosInstance, data: Types.Recipe.RecipeForm) => unknown;
-export declare const updateRecipe: (axios: AxiosInstance, id: string, data: Types.Recipe.RecipeForm) => unknown;
-export declare const deleteRecipe: (axios: AxiosInstance, id: string) => unknown;
+export declare const addRecipe: (axios: AxiosInstance, data: Types.Recipe.RecipeForm) => Promise<any>;
+export declare const updateRecipe: (axios: AxiosInstance, id: string, data: Types.Recipe.RecipeForm) => Promise<any>;
+export declare const deleteRecipe: (axios: AxiosInstance, id: string) => Promise<any>;
