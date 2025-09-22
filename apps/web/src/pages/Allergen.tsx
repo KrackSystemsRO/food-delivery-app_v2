@@ -1,22 +1,21 @@
+import AllergenTable from "@/components/allergen/AllergenTable";
+import AllergenForm from "@/components/allergen/AllergenForm";
 import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
-
-import { ConfirmModal } from "@/components/user/confirm.modal";
-import { PaginationControls } from "@/components/common/pagination.common";
-
-import useAllergenStore from "@/stores/allergen.store";
-import { AllergenTable } from "@/components/allergen/data-table.allergen";
+import { ConfirmModal } from "@/components/common/ConfirmModal";
+import { PaginationControls } from "@/components/common/PaginationControls";
+import useAllergenStore from "@/stores/allergenStore";
 import {
   AllergenFilters,
   type FiltersType,
-} from "@/components/allergen/filters.allergen";
-import AllergenModal from "@/components/allergen/allergen.modal";
+} from "@/components/allergen/AllergenFilters";
 import usePersistedState from "@/hooks/use-persisted-state";
 import { Types, Services } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
+import { FormModal } from "@/components/common/FormModal";
 
 const defaultFilters: FiltersType = {
   search: "",
@@ -103,8 +102,7 @@ export default function AllergenManagementPage() {
   }, [fetchAllergens, clearAllergensList, page]);
 
   const handleSort = useCallback((key: keyof Types.Allergen.AllergenType) => {
-    if (!sortableKeys.includes(key as SortKey)) return; // skip unsupported keys
-
+    if (!sortableKeys.includes(key as SortKey)) return;
     setSortConfig((current) => ({
       key: key as SortKey,
       direction:
@@ -146,7 +144,6 @@ export default function AllergenManagementPage() {
       );
       showToast("success", t("allergen.message.deleted") || "Allergen deleted");
 
-      // Handle page adjustment if last item deleted
       if (allergens.length === 1 && page > 1) {
         setPage((prev) => prev - 1);
       } else {
@@ -215,31 +212,28 @@ export default function AllergenManagementPage() {
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-base font-bold">
-          {t("allergen.title") || "Manage Allergens"}
-        </h2>
+        <h2 className="text-base font-bold">{t("allergen.title")}</h2>
         <Button onClick={openCreateModal}>
           <Plus className="mr-2 h-4 w-4" />
-          {t("allergen.createAllergen") || "Create Allergen"}
+          {t("allergen.createAllergen")}
         </Button>
       </div>
 
       <AllergenFilters
         filters={filters}
-        setFilters={(updated: Partial<FiltersType>) => {
-          setFilters((prev) => ({ ...prev, ...updated }));
-        }}
+        setFilters={(u) => setFilters((p) => ({ ...p, ...u }))}
         resetFilters={resetFilters}
       />
 
       <AllergenTable
-        allergens={allergens}
+        data={allergens}
+        loading={loading}
         sortKey={sortConfig.key}
         sortDirection={sortConfig.direction}
-        loading={loading}
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={confirmDelete}
+        t={t}
       />
 
       <PaginationControls
@@ -248,15 +242,24 @@ export default function AllergenManagementPage() {
         onPageChange={setPage}
       />
 
-      <AllergenModal
+      <FormModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         onSubmit={handleSubmit}
-        form={form}
-        setForm={setForm}
-        isEditing={!!selectedAllergen}
+        title={
+          selectedAllergen
+            ? t("allergen.editAllergen")
+            : t("allergen.createAllergen")
+        }
+        submitLabel={
+          selectedAllergen
+            ? t("common.button.update")
+            : t("common.button.create")
+        }
         loading={submitLoading}
-      />
+      >
+        <AllergenForm form={form} setForm={setForm} t={t} />
+      </FormModal>
 
       <ConfirmModal
         isOpen={isDeleteModalOpen}

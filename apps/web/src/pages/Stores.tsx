@@ -3,26 +3,17 @@ import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
-
-import { ConfirmModal } from "@/components/user/confirm.modal";
-import { PaginationControls } from "@/components/common/pagination.common";
-
-// import {
-//   addStore,
-//   deleteStore,
-//   getStores,
-//   updateStore,
-// } from "@/services/store.service";
-
-import { StoreTable } from "@/components/store/data-table.store";
-import useUserStore from "@/stores/user.store";
-import useCompanyStore from "@/stores/company.store";
-import useStore from "@/stores/store.store";
-import { StoreFilters } from "@/components/store/filters.store";
-import StoreModal from "@/components/store/store.modal";
-import { useDebounce } from "use-debounce";
+import { ConfirmModal } from "@/components/common/ConfirmModal";
+import { PaginationControls } from "@/components/common/PaginationControls";
+import useStore from "@/stores/storeStore";
+import useUserStore from "@/stores/userStore";
+import useCompanyStore from "@/stores/companyStore";
+import { StoreFilters } from "@/components/store/StoreFilters";
+import StoreTable from "@/components/store/StoreTable";
+import StoreFormModal from "@/components/store/StoreFormModal";
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
+import { useDebounce } from "use-debounce";
 
 const defaultFilters = {
   search: "",
@@ -34,94 +25,62 @@ const defaultFilters = {
   limit: 10,
 };
 
-const storeTypes = ["RESTAURANT", "GROCERY", "BAKERY", "CAFE", "OTHER"];
+const storeTypes = [
+  "RESTAURANT",
+  "GROCERY",
+  "BAKERY",
+  "CAFE",
+  "OTHER",
+] as const;
 
 export default function StoreManagementPage() {
   const { t } = useTranslation();
-
   const {
-    storesList: stores,
+    storesList,
     setStoresList,
-    clearSelectedStore,
     selectedStore,
     setSelectedStore,
-    updateStoreInList,
+    clearSelectedStore,
   } = useStore();
   const { usersList, setUsersList } = useUserStore();
   const { companiesList, setCompaniesList } = useCompanyStore();
 
-  const [itemToDelete, setItemToDelete] =
-    useState<Types.Store.StoreType | null>(null);
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [filters, setFilters] = useState(defaultFilters);
+  const [debouncedFilters] = useDebounce(filters, 300);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen, setModalOpen] = useState(false);
-
-  const [form, setForm] = useState<Types.Store.StoreForm>({
-    name: "",
-    type: "RESTAURANT",
-    address: "",
-    phone_number: "",
-    description: "",
-    is_active: false,
-    is_open: false,
-    admin: [],
-    company: [],
-    location: { lat: undefined, lng: undefined },
-  });
-  const [filters, setFilters] = useState(() => {
-    const saved = localStorage.getItem("storeFilters");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        return {
-          search: parsed.search || "",
-          company: parsed.company || "",
-          admin: parsed.admin || "",
-          type: parsed.type || "",
-          is_active: parsed.is_active ?? undefined,
-          is_open: parsed.is_open ?? undefined,
-          limit: parsed.limit ? Number(parsed.limit) : 10,
-        };
-      } catch {
-        return defaultFilters;
-      }
-    }
-    return defaultFilters;
-  });
-  const [debouncedFilters] = useDebounce(filters, 10);
-
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] =
+    useState<Types.Store.StoreType | null>(null);
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Types.Store.StoreType;
     direction: "asc" | "desc";
-  }>({
-    key: "createdAt",
-    direction: "desc",
-  });
+  }>({ key: "createdAt", direction: "desc" });
+
+  // Fetch stores
   const fetchStores = useCallback(async () => {
     setLoading(true);
     try {
       const res = await Services.Store.getStores(axiosInstance, {
-        search: filters.search,
-        company: filters.company,
-        admin: filters.admin,
-        type: filters.type,
-        is_active: filters.is_active,
-        is_open: filters.is_open,
+        ...filters,
         page,
-        limit: filters.limit,
         sort_by: sortConfig.key,
         order: sortConfig.direction,
       });
       setStoresList(res.result);
       setTotalPages(res.totalPages || 1);
     } catch {
-      showToast("error", t("store.loadFailed") || "Failed to load restaurants");
+      showToast("error", t("store.loadFailed") || "Failed to load stores");
     } finally {
       setLoading(false);
     }
   }, [filters, page, sortConfig, setStoresList, t]);
+
+  useEffect(() => {
+    fetchStores();
+  }, [debouncedFilters, page, sortConfig]);
 
   useEffect(() => {
     (async () => {
@@ -129,20 +88,12 @@ export default function StoreManagementPage() {
         is_active: true,
       });
       setUsersList(usersRes.result);
-      const companyRes = await Services.Company.getCompanies(axiosInstance, {
+      const companiesRes = await Services.Company.getCompanies(axiosInstance, {
         is_active: true,
       });
-      setCompaniesList(companyRes.result);
+      setCompaniesList(companiesRes.result);
     })();
   }, [setUsersList, setCompaniesList]);
-
-  useEffect(() => {
-    fetchStores();
-  }, [debouncedFilters, page, sortConfig]);
-
-  useEffect(() => {
-    localStorage.setItem("storeFilters", JSON.stringify(filters));
-  }, [filters]);
 
   const handleSort = useCallback((key: keyof Types.Store.StoreType) => {
     setSortConfig((current) => ({
@@ -157,76 +108,13 @@ export default function StoreManagementPage() {
     setPage(1);
   }, []);
 
-  const handleSubmit = useCallback(async () => {
-    if (!form.name) {
-      showToast("error", t("store.message.allFieldsRequired"));
-      return;
-    }
-
-    try {
-      if (selectedStore) {
-        const res = await Services.Store.updateStore(
-          axiosInstance,
-          selectedStore._id,
-          form
-        );
-        if (res.status === 200) {
-          showToast("success", t("store.message.updated"));
-          updateStoreInList(res.result);
-        } else throw new Error();
-      } else {
-        const res = await Services.Store.addStore(axiosInstance, form);
-        if (res.status === 201) {
-          showToast("success", t("store.message.created"));
-          fetchStores();
-        } else throw new Error();
-      }
-      setModalOpen(false);
-      clearSelectedStore();
-    } catch {
-      showToast("error", t("store.message.submitFailed"));
-    }
-  }, [
-    form,
-    selectedStore,
-    fetchStores,
-    updateStoreInList,
-    t,
-    clearSelectedStore,
-  ]);
-
   const openCreateModal = useCallback(() => {
     clearSelectedStore();
-    setForm({
-      name: "",
-      type: "RESTAURANT",
-      address: "",
-      phone_number: "",
-      description: "",
-      is_active: false,
-      is_open: false,
-      admin: [],
-      company: [],
-      location: { lat: undefined, lng: undefined },
-    });
     setModalOpen(true);
   }, [clearSelectedStore]);
-
   const openEditModal = useCallback(
     (store: Types.Store.StoreType) => {
       setSelectedStore(store);
-      setForm({
-        name: store.name,
-        type: store.type,
-        address: store.address,
-        phone_number: store.phone_number ?? "",
-        description: store.description ?? "",
-        is_active: store.is_active,
-        is_open: store.is_open,
-        admin: store.admin || [],
-        company: store.company || [],
-        location: store.location || { lat: undefined, lng: undefined },
-      });
       setModalOpen(true);
     },
     [setSelectedStore]
@@ -236,29 +124,30 @@ export default function StoreManagementPage() {
     setItemToDelete(store);
     setDeleteModalOpen(true);
   }, []);
-
   const performDelete = useCallback(async () => {
     if (!itemToDelete) return;
     try {
       await Services.Store.deleteStore(axiosInstance, itemToDelete._id);
+      showToast("success", t("store.message.deleted"));
       fetchStores();
-      showToast("success", t("store.message.deleted") || "Restaurant deleted");
     } catch {
-      showToast(
-        "error",
-        t("store.message.deleteFailed") || "Failed to delete restaurant"
-      );
+      showToast("error", t("store.message.deleteFailed"));
     } finally {
       setDeleteModalOpen(false);
       setItemToDelete(null);
     }
   }, [itemToDelete, fetchStores, t]);
 
+  const handleSave = useCallback(() => {
+    fetchStores();
+    setModalOpen(false);
+    clearSelectedStore();
+  }, [fetchStores, clearSelectedStore]);
+
   const resetFilters = useCallback(() => {
     setFilters(defaultFilters);
     setPage(1);
     setSortConfig({ key: "createdAt", direction: "desc" });
-    localStorage.removeItem("storeFilters");
   }, []);
 
   return (
@@ -269,7 +158,7 @@ export default function StoreManagementPage() {
         </h2>
         <Button onClick={openCreateModal}>
           <Plus className="mr-2 h-4 w-4" />
-          {t("store.createStore") || "Create Store"}
+          {t("store.createStore")}
         </Button>
       </div>
 
@@ -278,18 +167,19 @@ export default function StoreManagementPage() {
         setFilters={handleFilterChange}
         resetFilters={resetFilters}
         companies={companiesList}
-        admins={usersList.filter((user) => user.role === "ADMIN")}
+        admins={usersList.filter((u) => u.role === "ADMIN")}
         storeTypes={storeTypes}
       />
 
       <StoreTable
-        stores={stores}
+        stores={storesList}
+        loading={loading}
         sortKey={sortConfig.key}
         sortDirection={sortConfig.direction}
-        loading={loading}
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={confirmDelete}
+        t={t}
       />
 
       <PaginationControls
@@ -298,26 +188,21 @@ export default function StoreManagementPage() {
         onPageChange={setPage}
       />
 
-      <StoreModal
+      <StoreFormModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
-        onSubmit={handleSubmit}
-        form={form}
-        setForm={setForm}
-        isEditing={!!selectedStore}
-        companies={companiesList || []}
-        users={usersList || []}
+        selectedStore={selectedStore}
+        companies={companiesList}
+        admins={usersList.filter((u) => u.role === "ADMIN")}
+        onSave={handleSave}
       />
 
       <ConfirmModal
         isOpen={isDeleteModalOpen}
-        onConfirm={performDelete}
         onClose={() => setDeleteModalOpen(false)}
-        title={t("store.message.confirmDeleteTitle") || "Confirm Delete"}
-        description={
-          t("store.message.confirmDeleteDesc") ||
-          "Are you sure you want to delete this store?"
-        }
+        onConfirm={performDelete}
+        title={t("store.message.confirmDeleteTitle")}
+        description={t("store.message.confirmDeleteDesc")}
       />
     </div>
   );

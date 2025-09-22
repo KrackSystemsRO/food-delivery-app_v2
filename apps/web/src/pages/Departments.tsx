@@ -3,21 +3,21 @@ import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
-
-import { ConfirmModal } from "@/components/user/confirm.modal";
-import { PaginationControls } from "@/components/common/pagination.common";
-
-import useDepartmentStore from "@/stores/department.store";
-import { DepartmentTable } from "@/components/department/data-table.department";
-import { DepartmentFilters } from "@/components/department/filters.department";
-import DepartmentModal from "@/components/department/department.modal";
-
-import useUserStore from "@/stores/user.store";
-import useCompanyStore from "@/stores/company.store";
+import { ConfirmModal } from "@/components/common/ConfirmModal";
+import { PaginationControls } from "@/components/common/PaginationControls";
+import useDepartmentStore from "@/stores/departmentStore";
+import useUserStore from "@/stores/userStore";
+import useCompanyStore from "@/stores/companyStore";
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
+import {
+  DepartmentFilters,
+  type FiltersType,
+} from "@/components/department/DepartmentFilters";
+import { DepartmentFormModal } from "@/components/department/DepartmentFormModal";
+import DepartmentTable from "@/components/department/DepartmentTable";
 
-const defaultFilters = {
+const defaultFilters: FiltersType = {
   search: "",
   is_active: undefined,
   limit: 10,
@@ -37,41 +37,6 @@ export default function DepartmentManagementPage() {
 
   const { usersList, setUsersList } = useUserStore();
   const { companiesList, setCompaniesList } = useCompanyStore();
-
-  const [form, setForm] = useState<Types.Department.DepartmentForm>({
-    name: "",
-    description: undefined,
-    is_active: true,
-    company: [],
-    admin: [],
-  });
-
-  const [filters, setFilters] = useState(() => {
-    const saved = localStorage.getItem("departmentFilters");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        return {
-          search: parsed.search || "",
-          is_active: parsed.is_active ?? undefined,
-          limit: parsed.limit ? Number(parsed.limit) : 10,
-          company: parsed.company || "",
-        };
-      } catch {
-        return defaultFilters;
-      }
-    }
-    return defaultFilters;
-  });
-
-  const [sortConfig, setSortConfig] = useState<{
-    key: keyof Types.Department.DepartmentType;
-    direction: "asc" | "desc";
-  }>({
-    key: "createdAt",
-    direction: "desc",
-  });
-
   const {
     departmentsList,
     setDepartmentsList,
@@ -82,13 +47,31 @@ export default function DepartmentManagementPage() {
     updateDepartmentInList,
   } = useDepartmentStore();
 
+  const [form, setForm] = useState<Types.Department.DepartmentForm>({
+    name: "",
+    description: "",
+    is_active: true,
+    company: [],
+    admin: [],
+  });
+
+  const [filters, setFilters] = useState(defaultFilters);
+
+  const [sortConfig, setSortConfig] = useState<{
+    key: keyof Types.Department.DepartmentType;
+    direction: "asc" | "desc";
+  }>({
+    key: "createdAt",
+    direction: "desc",
+  });
+
   const fetchDepartments = useCallback(async () => {
     setLoading(true);
     try {
       const res = await Services.Department.getDepartments(axiosInstance, {
         search: filters.search,
         is_active: filters.is_active,
-        company: filters.company,
+        company: filters.company || "",
         page,
         limit: filters.limit,
         sort_by: sortConfig.key,
@@ -122,10 +105,6 @@ export default function DepartmentManagementPage() {
     return () => clearDepartmentsList();
   }, [fetchDepartments, clearDepartmentsList]);
 
-  useEffect(() => {
-    localStorage.setItem("departmentFilters", JSON.stringify(filters));
-  }, [filters]);
-
   const handleSort = useCallback(
     (key: keyof Types.Department.DepartmentType) => {
       setSortConfig((current) => ({
@@ -145,7 +124,7 @@ export default function DepartmentManagementPage() {
     clearSelectedDepartment();
     setForm({
       name: "",
-      description: undefined,
+      description: "",
       is_active: true,
       company: [],
       admin: [],
@@ -158,7 +137,7 @@ export default function DepartmentManagementPage() {
       setSelectedDepartment(department);
       setForm({
         name: department.name,
-        description: department.description,
+        description: department.description || "",
         is_active: department.is_active,
         company: department.company || [],
         admin: department.admin || [],
@@ -220,7 +199,6 @@ export default function DepartmentManagementPage() {
           fetchDepartments();
         } else throw new Error();
       }
-
       setModalOpen(false);
       clearSelectedDepartment();
     } catch {
@@ -239,7 +217,6 @@ export default function DepartmentManagementPage() {
     setFilters(defaultFilters);
     setPage(1);
     setSortConfig({ key: "createdAt", direction: "desc" });
-    localStorage.removeItem("departmentFilters");
   }, []);
 
   return (
@@ -256,19 +233,18 @@ export default function DepartmentManagementPage() {
 
       <DepartmentFilters
         filters={filters}
-        setFilters={(updated) => {
-          setFilters((prev) => ({ ...prev, ...updated }));
-          setPage(1);
-        }}
+        setFilters={(updated) =>
+          setFilters((prev) => ({ ...prev, ...updated }))
+        }
         resetFilters={resetFilters}
         companies={companiesList}
       />
 
       <DepartmentTable
-        departments={departmentsList}
+        data={departmentsList}
+        loading={loading}
         sortKey={sortConfig.key}
         sortDirection={sortConfig.direction}
-        loading={loading}
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={confirmDelete}
@@ -280,19 +256,16 @@ export default function DepartmentManagementPage() {
         onPageChange={setPage}
       />
 
-      <DepartmentModal
+      <DepartmentFormModal
         isOpen={isModalOpen}
-        onClose={() => {
-          setModalOpen(false);
-          clearDepartmentsList();
-          fetchDepartments();
-        }}
+        onClose={() => setModalOpen(false)}
         onSubmit={handleSubmit}
+        loading={loading}
         form={form}
         setForm={setForm}
-        isEditing={!!selectedDepartment}
-        users={usersList}
-        companies={companiesList}
+        usersList={usersList}
+        companiesList={companiesList}
+        selectedDepartment={selectedDepartment}
       />
 
       <ConfirmModal

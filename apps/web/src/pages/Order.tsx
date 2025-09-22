@@ -1,30 +1,30 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
-import { PaginationControls } from "@/components/common/pagination.common";
-import useOrderStore from "@/stores/order.store";
-import { OrderTable } from "@/components/order/data-table";
-import { OrderFilters, type FiltersType } from "@/components/order/filters";
-import OrderModal from "@/components/order/order.modal";
-import { ConfirmModal } from "@/components/order/confirm.modal";
+import { PaginationControls } from "@/components/common/PaginationControls";
+import useOrderStore from "@/stores/orderStore";
+import {
+  OrderFilters,
+  type FiltersType,
+} from "@/components/order/OrderFilters";
 import usePersistedState from "@/hooks/use-persisted-state";
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
+import OrderFormModal from "@/components/order/OrderFormModal";
+import OrderTable from "@/components/order/OrderTable";
+import { ConfirmModal } from "@/components/common/ConfirmModal";
 
 const defaultFilters: FiltersType = {
   search: "",
   status: undefined,
   limit: 10,
 };
-
 type SortKey = "user" | "createdAt" | "status";
 
 export default function OrderManagementPage() {
   const { t } = useTranslation();
-
-  // --- State ---
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -39,14 +39,10 @@ export default function OrderManagementPage() {
     "orderFilters",
     defaultFilters
   );
-
   const [sortConfig, setSortConfig] = useState<{
     key: SortKey;
     direction: "asc" | "desc";
-  }>({
-    key: "createdAt",
-    direction: "desc",
-  });
+  }>({ key: "createdAt", direction: "desc" });
 
   const {
     ordersList: orders,
@@ -56,13 +52,11 @@ export default function OrderManagementPage() {
     setSelectedOrder,
     clearSelectedOrder,
   } = useOrderStore();
-
   const sortableKeys = useMemo<SortKey[]>(
     () => ["user", "createdAt", "status"],
     []
   );
 
-  // --- API ---
   const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
@@ -87,13 +81,8 @@ export default function OrderManagementPage() {
     try {
       await Services.Order.deleteOrder(axiosInstance, orderToDelete._id);
       showToast("success", t("order.message.deleted") || "Order deleted");
-
-      // Refresh or go back a page if last item
-      if (orders.length === 1 && page > 1) {
-        setPage((prev) => prev - 1);
-      } else {
-        fetchOrders();
-      }
+      if (orders.length === 1 && page > 1) setPage((prev) => prev - 1);
+      else fetchOrders();
     } catch {
       showToast(
         "error",
@@ -106,28 +95,39 @@ export default function OrderManagementPage() {
     }
   }, [orderToDelete, fetchOrders, t, orders.length, page]);
 
-  // --- Effects ---
   useEffect(() => setPage(1), [filters, sortConfig]);
   useEffect(() => {
     fetchOrders();
     return clearOrdersList;
   }, [fetchOrders, clearOrdersList, page]);
 
-  // --- Handlers ---
-  const handleSort = useCallback((key: keyof Types.Order.OrderType) => {
-    if (!sortableKeys.includes(key as SortKey)) return;
-    setSortConfig((current) => ({
-      key: key as SortKey,
-      direction:
-        current.key === key && current.direction === "asc" ? "desc" : "asc",
-    }));
-  }, []);
+  const handleSort = useCallback(
+    (key: keyof Types.Order.OrderType) => {
+      if (!sortableKeys.includes(key as SortKey)) return;
+      setSortConfig((current) => ({
+        key: key as SortKey,
+        direction:
+          current.key === key && current.direction === "asc" ? "desc" : "asc",
+      }));
+    },
+    [sortableKeys]
+  );
 
+  const updateFilters = useCallback(
+    (updated: Partial<FiltersType>) =>
+      setFilters((prev) => ({ ...prev, ...updated })),
+    [setFilters]
+  );
+  const resetFilters = useCallback(() => {
+    setFilters(defaultFilters);
+    setPage(1);
+    setSortConfig({ key: "createdAt", direction: "desc" });
+    localStorage.removeItem("orderFilters");
+  }, [setFilters]);
   const openCreateModal = useCallback(() => {
     clearSelectedOrder();
     setModalOpen(true);
   }, [clearSelectedOrder]);
-
   const openEditModal = useCallback(
     (order: Types.Order.OrderType) => {
       setSelectedOrder(order);
@@ -135,24 +135,11 @@ export default function OrderManagementPage() {
     },
     [setSelectedOrder]
   );
-  const updateFilters = useCallback(
-    (updated: Partial<FiltersType>) =>
-      setFilters((prev) => ({ ...prev, ...updated })),
-    [setFilters]
-  );
   const confirmDelete = useCallback((order: Types.Order.OrderType) => {
     setOrderToDelete(order);
     setDeleteModalOpen(true);
   }, []);
 
-  const resetFilters = useCallback(() => {
-    setFilters(defaultFilters);
-    setPage(1);
-    setSortConfig({ key: "createdAt", direction: "desc" });
-    localStorage.removeItem("orderFilters");
-  }, [setFilters]);
-
-  // --- Render ---
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
@@ -170,33 +157,28 @@ export default function OrderManagementPage() {
         setFilters={updateFilters}
         resetFilters={resetFilters}
       />
-
       <OrderTable
         orders={orders}
+        loading={loading}
         sortKey={sortConfig.key}
         sortDirection={sortConfig.direction}
-        loading={loading}
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={confirmDelete}
+        t={t}
       />
-
       <PaginationControls
         page={page}
         totalPages={totalPages}
         onPageChange={setPage}
       />
 
-      {/* Order modal */}
-      {isModalOpen && (
-        <OrderModal
-          order={selectedOrder}
-          isOpen={isModalOpen}
-          onClose={() => setModalOpen(false)}
-        />
-      )}
-
-      {/* Confirm delete */}
+      <OrderFormModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        selectedOrder={selectedOrder}
+        refreshList={fetchOrders}
+      />
       <ConfirmModal
         isOpen={isDeleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}

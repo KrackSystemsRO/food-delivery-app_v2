@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { isEqual } from "@/utils/utils";
-import useUserStore from "@/stores/user.store";
+import useUserStore from "stores/userStore";
 import type { Types } from "@my-monorepo/shared";
 import { Services } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";

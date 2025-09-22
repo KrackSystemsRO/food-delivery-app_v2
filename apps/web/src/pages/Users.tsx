@@ -1,18 +1,18 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { showToast } from "@/utils/toast";
-import UserModal from "@/components/user/user.modal";
-import { ConfirmModal } from "@/components/user/confirm.modal";
-import { UserFilters } from "@/components/user/filters.user";
-import { UserTable } from "@/components/user/data-table.user";
-import { PaginationControls } from "@/components/common/pagination.common";
-import useUserStore from "@/stores/user.store";
+import { ConfirmModal } from "@/components/common/ConfirmModal";
+import { PaginationControls } from "@/components/common/PaginationControls";
+import useUserStore from "@/stores/userStore";
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
+import { UserFilters, type FiltersType } from "@/components/user/UserFilters";
+import UserTable from "@/components/user/UserTable";
+import UserFormModal from "@/components/user/UserFormModal";
 
-const defaultFilters: Types.User.UserFiltersType = {
+const defaultFilters: FiltersType = {
   search: "",
   role: "",
   is_active: undefined,
@@ -21,58 +21,29 @@ const defaultFilters: Types.User.UserFiltersType = {
 
 export default function UserManagementPage() {
   const { t } = useTranslation();
-
-  const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-
-  const [form, setForm] = useState<Types.User.UserForm>({
-    first_name: "",
-    last_name: "",
-    email: "",
-    role: "",
-  });
-  const [userToDelete, setUserToDelete] = useState<Types.User.UserType | null>(
-    null
-  );
-  const [filters, setFilters] = useState(() => {
-    const saved = localStorage.getItem("userFilters");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        return {
-          ...defaultFilters,
-          ...parsed,
-          limit: Number(parsed.limit || 10),
-        };
-      } catch {
-        return defaultFilters;
-      }
-    }
-    return defaultFilters;
-  });
-
-  const [sortConfig, setSortConfig] = useState<{
-    key: keyof Types.User.UserType;
-    direction: "asc" | "desc";
-  }>({
-    key: "createdAt",
-    direction: "desc",
-  });
-
   const {
-    usersList: users,
+    usersList,
     setUsersList,
-    clearUsersList,
     selectedUser,
     setSelectedUser,
     clearSelectedUser,
-    updateUserInList,
+    clearUsersList,
   } = useUserStore();
 
-  // Fetch users
+  const [filters, setFilters] = useState(defaultFilters);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [sortConfig, setSortConfig] = useState<{
+    key: keyof Types.User.UserType;
+    direction: "asc" | "desc";
+  }>({ key: "createdAt", direction: "desc" });
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<Types.User.UserType | null>(
+    null
+  );
+
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
@@ -96,33 +67,29 @@ export default function UserManagementPage() {
     return () => clearUsersList();
   }, [fetchUsers, clearUsersList]);
 
-  useEffect(() => {
-    localStorage.setItem("userFilters", JSON.stringify(filters));
-  }, [filters]);
-
-  // Sorting handler
-  const handleSort = (key: keyof Types.User.UserType) =>
+  const handleSort = useCallback((key: keyof Types.User.UserType) => {
     setSortConfig((current) => ({
       key,
       direction:
         current.key === key && current.direction === "asc" ? "desc" : "asc",
     }));
+  }, []);
+
+  const handleFilterChange = useCallback(
+    (updated: Partial<Types.User.UserFiltersType>) => {
+      setFilters((prev) => ({ ...prev, ...updated }));
+      setPage(1);
+    },
+    []
+  );
 
   const openCreateModal = useCallback(() => {
     clearSelectedUser();
-    setForm({ first_name: "", last_name: "", email: "", role: "" });
     setModalOpen(true);
   }, [clearSelectedUser]);
-
   const openEditModal = useCallback(
     (user: Types.User.UserType) => {
       setSelectedUser(user);
-      setForm({
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-        role: user.role,
-      });
       setModalOpen(true);
     },
     [setSelectedUser]
@@ -132,100 +99,55 @@ export default function UserManagementPage() {
     setUserToDelete(user);
     setDeleteModalOpen(true);
   }, []);
-
-  const performDelete = async () => {
+  const performDelete = useCallback(async () => {
     if (!userToDelete) return;
     try {
       await Services.User.deleteUser(axiosInstance, userToDelete._id);
-      showToast("success", t("user.message.deleted") || "User deleted");
+      showToast("success", t("user.message.deleted"));
       fetchUsers();
     } catch {
-      showToast(
-        "error",
-        t("user.message.deleteFailed") || "Failed to delete user"
-      );
+      showToast("error", t("user.message.deleteFailed"));
     } finally {
       setDeleteModalOpen(false);
       setUserToDelete(null);
     }
-  };
+  }, [userToDelete, fetchUsers, t]);
 
-  const handleSubmit = useCallback(async () => {
-    const { first_name, last_name, email, role } = form;
-
-    if (!first_name || !last_name || !email || !role) {
-      return showToast(
-        "error",
-        t("user.message.allFieldsRequired") || "All fields are required"
-      );
-    }
-
-    try {
-      if (selectedUser) {
-        const res = await Services.User.updateUser(
-          axiosInstance,
-          selectedUser._id,
-          form
-        );
-        if (res.status === 200) {
-          showToast("success", t("user.message.updated") || "User updated");
-          updateUserInList(res.result);
-        } else throw new Error();
-      } else {
-        const res = await Services.User.addUser(axiosInstance, form);
-        if (res.status === 201) {
-          showToast("success", t("user.message.created") || "User created");
-          fetchUsers();
-        } else throw new Error();
-      }
-      setModalOpen(false);
-      clearSelectedUser();
-    } catch {
-      showToast(
-        "error",
-        t("user.message.submitFailed") || "Failed to submit user"
-      );
-    }
-  }, [form, selectedUser, updateUserInList, fetchUsers, clearSelectedUser, t]);
-
-  const resetFilters = () => {
+  const handleSave = useCallback(() => {
+    fetchUsers();
+    setModalOpen(false);
+    clearSelectedUser();
+  }, [fetchUsers, clearSelectedUser]);
+  const resetFilters = useCallback(() => {
     setFilters(defaultFilters);
     setPage(1);
-    localStorage.removeItem("userFilters");
-  };
+  }, []);
 
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-base font-bold">
-          {t("user.title") || "Manage Users"}
-        </h2>
+        <h2 className="text-base font-bold">{t("user.title")}</h2>
         <Button onClick={openCreateModal}>
           <Plus className="mr-2 h-4 w-4" />
-          {t("user.createUser") || "Create User"}
+          {t("user.createUser")}
         </Button>
       </div>
 
       <UserFilters
         filters={filters}
-        setFilters={(updated: Partial<typeof filters>) => {
-          setFilters((prev: Types.User.UserFiltersType) => ({
-            ...prev,
-            ...updated,
-          }));
-          setPage(1);
-        }}
+        setFilters={handleFilterChange}
         resetFilters={resetFilters}
       />
 
       <UserTable
-        users={users}
+        users={usersList}
+        loading={loading}
         sortKey={sortConfig.key}
         sortDirection={sortConfig.direction}
-        loading={loading}
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={confirmDelete}
+        t={t}
       />
 
       <PaginationControls
@@ -234,29 +156,21 @@ export default function UserManagementPage() {
         onPageChange={setPage}
       />
 
-      <UserModal
+      <UserFormModal
         isOpen={isModalOpen}
-        onClose={() => {
-          setModalOpen(false);
-          clearSelectedUser();
-        }}
-        onSubmit={handleSubmit}
-        form={form}
-        setForm={setForm}
-        isEditing={!!selectedUser}
+        onClose={() => setModalOpen(false)}
+        selectedUser={selectedUser}
+        onSave={handleSave}
       />
 
       <ConfirmModal
         isOpen={isDeleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={performDelete}
-        title={t("user.message.confirmDeleteTitle") || "Confirm Delete"}
-        description={
-          t("user.message.confirmDeleteDesc") ||
-          "Are you sure you want to delete this user? This action cannot be undone."
-        }
-        confirmText={t("common.button.delete") || "Delete"}
-        cancelText={t("common.button.cancel") || "Cancel"}
+        title={t("user.message.confirmDeleteTitle")}
+        description={t("user.message.confirmDeleteDesc")}
+        confirmText={t("common.button.delete")}
+        cancelText={t("common.button.cancel")}
       />
     </div>
   );

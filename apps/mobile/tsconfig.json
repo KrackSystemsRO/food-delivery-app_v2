@@ -1,13 +1,15 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "lib": ["esnext"],
     "strict": true,
-    "baseUrl": "src",
+    "baseUrl": ".",
     "jsx": "react-jsx",
+    "types": ["react", "react-native"],
     "paths": {
-      "@/*": ["*"],
+      "@/*": ["src/*"],
       "@my-monorepo/shared": ["../../packages/shared/src"]
     }
   },
-  "include": ["src", "../../deleted/types"]
+  "include": ["src"]
 }

@@ -3,17 +3,17 @@ import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
-import { ConfirmModal } from "@/components/user/confirm.modal";
-import { PaginationControls } from "@/components/common/pagination.common";
-import useProductStore from "@/stores/product.store";
-import { ProductTable } from "@/components/product/data-table.product";
-import { ProductFilters } from "@/components/product/filters.product";
-import { ProductModal } from "@/components/product/product.modal";
-import useCategoryStore from "@/stores/category.store";
-import useStore from "@/stores/store.store";
+import { ConfirmModal } from "@/components/common/ConfirmModal";
+import { PaginationControls } from "@/components/common/PaginationControls";
+import useProductStore from "@/stores/productStore";
+import { ProductFilters } from "@/components/product/ProductFilters";
+import useCategoryStore from "@/stores/categoryStore";
+import useStore from "@/stores/storeStore";
 import type { Types } from "@my-monorepo/shared";
 import { Services } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
+import { ProductModal } from "@/components/product/ProductModal";
+import { ProductTable } from "@/components/product/ProductTable";
 
 const defaultFilters = {
   search: "",
@@ -319,12 +319,13 @@ export default function ProductManagementPage() {
 
       <ProductTable
         products={products}
+        loading={loading}
         sortKey={sortConfig.key}
         sortDirection={sortConfig.direction}
-        loading={loading}
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={confirmDelete}
+        t={t}
       />
 
       <PaginationControls
@@ -335,15 +336,12 @@ export default function ProductManagementPage() {
 
       <ProductModal
         isOpen={isModalOpen}
-        onClose={() => {
-          setModalOpen(false);
-          clearProductsList();
-          fetchProducts();
-        }}
+        onClose={() => setModalOpen(false)}
         onSubmit={handleSubmit}
         form={form}
         setForm={setForm}
-        isEditing={!!selectedProduct}
+        selectedProduct={selectedProduct}
+        t={t}
         storesList={storesList}
       />
 

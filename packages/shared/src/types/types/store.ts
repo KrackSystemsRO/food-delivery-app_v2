@@ -2,50 +2,9 @@ import { Types } from "../../index";
 import { CompanyType } from "./company";
 import { UserType } from "./user";
 
-export interface StoreType {
-  _id: string;
-  storeId: number;
-
-  company?: CompanyType[]; // or a populated CompanyType[] if you return full objects
-  admin?: UserType[]; // or a populated UserType[] if you return full objects
-
-  name: string;
-  type: "RESTAURANT" | "GROCERY" | "BAKERY" | "CAFE" | "OTHER";
-  phone_number?: string;
-  description?: string;
-
-  address: string;
-
-  location?: {
-    lat?: number;
-    lng?: number;
-  };
-
-  cityId: string;
-  zoneId: string;
-
-  is_open: boolean;
-  is_active: boolean;
-
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface StoreListQuery {
-  search?: string;
-  company?: string;
-  admin?: string;
-  type?: string;
-  is_active?: boolean;
-  is_open?: boolean;
-  page?: number;
-  limit?: number;
-  sort_by?: keyof Types.Store.StoreType;
-  order?: "asc" | "desc";
-}
-
-export interface StoreForm {
-  _id?: string;
+// --- Base Interface ---
+// Common fields shared by StoreType and StoreForm
+interface BaseStore {
   name: string;
   type: "RESTAURANT" | "GROCERY" | "BAKERY" | "CAFE" | "OTHER";
   address: string;
@@ -59,4 +18,34 @@ export interface StoreForm {
     lat?: number;
     lng?: number;
   };
+}
+
+// --- Main Interfaces ---
+
+export interface StoreType extends BaseStore {
+  _id: string;
+  storeId: number;
+  cityId: string;
+  zoneId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface StoreForm extends BaseStore {
+  _id?: string; // optional when creating a new store
+}
+
+// --- Query Parameters ---
+
+export interface StoreListQuery {
+  search?: string;
+  company?: string;
+  admin?: string;
+  type?: string;
+  is_active?: boolean;
+  is_open?: boolean;
+  page?: number;
+  limit?: number;
+  sort_by?: keyof Types.Store.StoreType;
+  order?: "asc" | "desc";
 }

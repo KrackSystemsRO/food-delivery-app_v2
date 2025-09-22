@@ -3,22 +3,18 @@ import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
-
-import { ConfirmModal } from "@/components/user/confirm.modal";
-import { PaginationControls } from "@/components/common/pagination.common";
-// import {
-//   addIngredient,
-//   deleteIngredient,
-//   getIngredients,
-//   updateIngredient,
-// } from "@/services/ingredient.service";
-import useIngredientStore from "@/stores/ingredient.store";
-import { IngredientTable } from "@/components/ingredient/data-table.ingredient";
-import { IngredientFilters } from "@/components/ingredient/filters.ingredient";
-import IngredientModal from "@/components/ingredient/ingredient.modal";
+import useIngredientStore from "@/stores/ingredientStore";
+import {
+  IngredientFilters,
+  type FiltersType,
+} from "@/components/ingredient/IngredientFilters";
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
-const defaultFilters = {
+import { ConfirmModal } from "@/components/common/ConfirmModal";
+import { IngredientFormModal } from "@/components/ingredient/IngredientFormModal";
+import IngredientTable from "@/components/ingredient/IngredientTable";
+
+const defaultFilters: FiltersType = {
   search: "",
   is_active: undefined,
   limit: 10,
@@ -41,31 +37,12 @@ export default function IngredientManagementPage() {
     is_active: true,
   });
 
-  const [filters, setFilters] = useState(() => {
-    const saved = localStorage.getItem("ingredientFilters");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        return {
-          search: parsed.search || "",
-          is_active:
-            parsed.is_active === undefined ? undefined : parsed.is_active,
-          limit: parsed.limit ? Number(parsed.limit) : 10,
-        };
-      } catch {
-        return defaultFilters;
-      }
-    }
-    return defaultFilters;
-  });
+  const [filters, setFilters] = useState(defaultFilters);
 
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Types.Ingredient.IngredientType;
     direction: "asc" | "desc";
-  }>({
-    key: "createdAt",
-    direction: "desc",
-  });
+  }>({ key: "createdAt", direction: "desc" });
 
   const {
     ingredientsList: ingredients,
@@ -110,23 +87,18 @@ export default function IngredientManagementPage() {
   }, [filters]);
 
   const handleSort = useCallback(
-    (key: keyof Types.Ingredient.IngredientType) => {
+    (key: keyof Types.Ingredient.IngredientType) =>
       setSortConfig((current) => ({
         key,
         direction:
           current.key === key && current.direction === "asc" ? "desc" : "asc",
-      }));
-    },
+      })),
     []
   );
 
   const openCreateModal = useCallback(() => {
     clearSelectedIngredient();
-    setForm({
-      name: "",
-      description: "",
-      is_active: true,
-    });
+    setForm({ name: "", description: "", is_active: true });
     setModalOpen(true);
   }, [clearSelectedIngredient]);
 
@@ -201,7 +173,6 @@ export default function IngredientManagementPage() {
           fetchIngredients();
         } else throw new Error();
       }
-
       setModalOpen(false);
       clearSelectedIngredient();
     } catch {
@@ -237,7 +208,7 @@ export default function IngredientManagementPage() {
 
       <IngredientFilters
         filters={filters}
-        setFilters={(updated: Partial<typeof filters>) => {
+        setFilters={(updated) => {
           setFilters((prev) => ({ ...prev, ...updated }));
           setPage(1);
         }}
@@ -246,31 +217,25 @@ export default function IngredientManagementPage() {
 
       <IngredientTable
         ingredients={ingredients}
+        loading={loading}
+        page={page}
+        totalPages={totalPages}
         sortKey={sortConfig.key}
         sortDirection={sortConfig.direction}
-        loading={loading}
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={confirmDelete}
-      />
-
-      <PaginationControls
-        page={page}
-        totalPages={totalPages}
         onPageChange={setPage}
       />
 
-      <IngredientModal
+      <IngredientFormModal
         isOpen={isModalOpen}
-        onClose={() => {
-          setModalOpen(false);
-          clearIngredientsList();
-          fetchIngredients();
-        }}
+        onClose={() => setModalOpen(false)}
         onSubmit={handleSubmit}
         form={form}
         setForm={setForm}
-        isEditing={!!selectedIngredient}
+        selectedIngredient={selectedIngredient}
+        loading={loading}
       />
 
       <ConfirmModal
@@ -284,6 +249,7 @@ export default function IngredientManagementPage() {
         }
         confirmText={t("common.button.delete") || "Delete"}
         cancelText={t("common.button.cancel") || "Cancel"}
+        loading={loading}
       />
     </div>
   );

@@ -1,11 +1,10 @@
 import "./src/utils/translationLocales/i18n";
-import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { AuthProvider } from "./src/context/authContext";
 import RootNavigator from "./src/navigation/RootNavigator";
 import Toast from "react-native-toast-message";
 import { CartProvider } from "./src/context/CartContext";
-import { LanguageProvider } from "@/context/LanguageContext";
+import { LanguageProvider } from "./src/context/LanguageContext";
 import { Provider as PaperProvider } from "react-native-paper";
 
 function AppContent() {

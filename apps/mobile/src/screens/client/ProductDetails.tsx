@@ -11,9 +11,10 @@ import {
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { StoresStackParamList } from "@/types/navigation.type";
 import { useCart } from "../../context/CartContext";
-import { fetchCart } from "../../services/cart.service";
 import { showToast } from "../../utils/toast";
 import { useTranslation } from "react-i18next";
+import { Services } from "@my-monorepo/shared";
+import axiosInstance from "@/utils/request/authorizedRequest";
 
 type Props = NativeStackScreenProps<StoresStackParamList, "ProductDetails">;
 
@@ -32,7 +33,7 @@ export default function ProductDetailsScreen({ route, navigation }: Props) {
   useEffect(() => {
     const initCart = async () => {
       try {
-        const cart = await fetchCart();
+        const cart = await Services.Cart.fetchCart(axiosInstance);
         dispatch({
           type: "SET_CART",
           cart: {

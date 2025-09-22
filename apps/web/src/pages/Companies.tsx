@@ -1,20 +1,22 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
-
-import { ConfirmModal } from "@/components/user/confirm.modal";
-import { PaginationControls } from "@/components/common/pagination.common";
-import useCompanyStore from "@/stores/company.store";
-import { CompanyTable } from "@/components/company/data-table.company";
-import { CompanyFilters } from "@/components/company/filters.company";
-import CompanyModal from "@/components/company/company.modal";
-import useUserStore from "@/stores/user.store";
+import { ConfirmModal } from "@/components/common/ConfirmModal";
+import { PaginationControls } from "@/components/common/PaginationControls";
+import useCompanyStore from "@/stores/companyStore";
+import useUserStore from "@/stores/userStore";
+import {
+  CompanyFilters,
+  type FiltersType,
+} from "@/components/company/CompanyFilters";
+import CompanyTable from "@/components/company/CompanyTable";
+import { CompanyFormModal } from "@/components/company/CompanyFormModal";
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
 
-const defaultFilters = {
+const defaultFilters: FiltersType = {
   search: "",
   type: "",
   is_active: undefined,
@@ -23,50 +25,7 @@ const defaultFilters = {
 
 export default function CompanyManagementPage() {
   const { t } = useTranslation();
-
-  const [companyToDelete, setCompanyToDelete] =
-    useState<Types.Company.CompanyType | null>(null);
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [isModalOpen, setModalOpen] = useState(false);
-  const { usersList, setUsersList } = useUserStore();
-  const [form, setForm] = useState<Types.Company.CompanyForm>({
-    name: "",
-    address: undefined,
-    type: undefined,
-    email: "",
-    phone_number: "",
-    is_active: true,
-    admin: [],
-  });
-  const [filters, setFilters] = useState(() => {
-    const saved = localStorage.getItem("companyFilters");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        return {
-          search: parsed.search || "",
-          type: parsed.type || "",
-          is_active:
-            parsed.is_active === undefined ? undefined : parsed.is_active,
-          limit: parsed.limit ? Number(parsed.limit) : 10,
-        };
-      } catch {
-        return defaultFilters;
-      }
-    }
-    return defaultFilters;
-  });
-  const [sortConfig, setSortConfig] = useState<{
-    key: keyof Types.Company.CompanyType;
-    direction: "asc" | "desc";
-  }>({
-    key: "createdAt",
-    direction: "desc",
-  });
-
+  const { setUsersList } = useUserStore();
   const {
     companiesList: companies,
     setCompaniesList,
@@ -77,12 +36,41 @@ export default function CompanyManagementPage() {
     updateCompanyInList,
   } = useCompanyStore();
 
+  const [form, setForm] = useState<Types.Company.CompanyForm>({
+    name: "",
+    address: "",
+    type: undefined,
+    email: "",
+    phone_number: "",
+    is_active: true,
+    admin: [],
+  });
+  const [filters, setFilters] = useState(defaultFilters);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [sortConfig, setSortConfig] = useState<{
+    key: keyof Types.Company.CompanyType;
+    direction: "asc" | "desc";
+  }>({
+    key: "createdAt",
+    direction: "desc",
+  });
+  const [loading, setLoading] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [companyToDelete, setCompanyToDelete] =
+    useState<Types.Company.CompanyType | null>(null);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  // Fetch companies
   const fetchCompanies = useCallback(async () => {
     setLoading(true);
     try {
       const res = await Services.Company.getCompanies(axiosInstance, {
         search: filters.search,
-        type: filters.type,
+        type: (filters.type === "" ? undefined : filters.type) as
+          | "PROVIDER"
+          | "CLIENT"
+          | undefined,
         is_active: filters.is_active,
         page,
         limit: filters.limit,
@@ -128,7 +116,7 @@ export default function CompanyManagementPage() {
     clearSelectedCompany();
     setForm({
       name: "",
-      address: undefined,
+      address: "",
       type: undefined,
       email: "",
       phone_number: "",
@@ -141,15 +129,7 @@ export default function CompanyManagementPage() {
   const openEditModal = useCallback(
     (company: Types.Company.CompanyType) => {
       setSelectedCompany(company);
-      setForm({
-        name: company.name,
-        admin: company.admin || [],
-        email: company.email,
-        type: company.type,
-        is_active: company.is_active,
-        phone_number: company.phone_number,
-        address: company.address,
-      });
+      setForm({ ...company });
       setModalOpen(true);
     },
     [setSelectedCompany]
@@ -201,7 +181,6 @@ export default function CompanyManagementPage() {
           fetchCompanies();
         } else throw new Error();
       }
-
       setModalOpen(false);
       clearSelectedCompany();
     } catch {
@@ -215,7 +194,6 @@ export default function CompanyManagementPage() {
     clearSelectedCompany,
     t,
   ]);
-
   const resetFilters = useCallback(() => {
     setFilters(defaultFilters);
     setPage(1);
@@ -227,7 +205,7 @@ export default function CompanyManagementPage() {
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-base font-bold">
-          {t("company.title") || "Manage Company"}
+          {t("company.title") || "Manage Companies"}
         </h2>
         <Button onClick={openCreateModal}>
           <Plus className="mr-2 h-4 w-4" />
@@ -237,43 +215,47 @@ export default function CompanyManagementPage() {
 
       <CompanyFilters
         filters={filters}
-        setFilters={(updated: Partial<typeof filters>) => {
-          setFilters((prev) => ({ ...prev, ...updated }));
+        setFilters={(updated: Partial<FiltersType>) => {
+          setFilters((prev) => ({
+            ...prev,
+            ...updated,
+            type: updated.type ? (updated.type as "PROVIDER" | "CLIENT") : "",
+          }));
           setPage(1);
         }}
         resetFilters={resetFilters}
       />
 
+      {/* Table */}
       <CompanyTable
-        companies={companies}
+        data={companies}
+        loading={loading}
         sortKey={sortConfig.key}
         sortDirection={sortConfig.direction}
-        loading={loading}
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={confirmDelete}
       />
 
+      {/* Pagination */}
       <PaginationControls
         page={page}
         totalPages={totalPages}
         onPageChange={setPage}
       />
 
-      <CompanyModal
+      {/* Form Modal */}
+      <CompanyFormModal
         isOpen={isModalOpen}
-        onClose={() => {
-          setModalOpen(false);
-          clearCompaniesList();
-          fetchCompanies();
-        }}
+        onClose={() => setModalOpen(false)}
         onSubmit={handleSubmit}
+        loading={loading}
         form={form}
         setForm={setForm}
-        isEditing={!!selectedCompany}
-        users={usersList}
+        selectedCompany={selectedCompany}
       />
 
+      {/* Confirm Delete Modal */}
       <ConfirmModal
         isOpen={isDeleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}

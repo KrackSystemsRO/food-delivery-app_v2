@@ -1,5 +1,4 @@
-import { ProductType } from "../../../../deleted/mobile/types/product.type";
-import { StoreType } from "../../../../deleted/mobile/types/store.type";
+import { Types } from "@my-monorepo/shared";
 
 export type AppStackParamList = {
   Login: undefined;
@@ -11,6 +10,6 @@ export type AppStackParamList = {
 
 export type StoresStackParamList = {
   Stores: undefined;
-  StoreDetails: { store: StoreType };
-  ProductDetails: { product: ProductType };
+  StoreDetails: { store: Types.Store.StoreType };
+  ProductDetails: { product: Types.Product.ProductType };
 };
