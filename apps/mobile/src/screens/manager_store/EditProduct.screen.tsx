@@ -1,7 +1,7 @@
 import { Alert } from "react-native";
 import ProductForm from "@/components/ProductForm";
 import { RouteProp } from "@react-navigation/native";
-import { ProductsStackParamList } from "@/components/layouts/ManagerLayout";
+import { ProductsStackParamList } from "@/navigation/manager/types";
 import axiosInstance from "@/utils/request/authorizedRequest";
 import { Services } from "@my-monorepo/shared";
 

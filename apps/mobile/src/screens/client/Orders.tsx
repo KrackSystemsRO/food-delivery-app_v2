@@ -104,7 +104,6 @@ export default function OrdersScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>My Orders</Text>
       <TabView
         navigationState={{ index, routes }}
         renderScene={renderScene}
@@ -129,12 +128,6 @@ export default function OrdersScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, paddingTop: 16 },
-  heading: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginHorizontal: 16,
-    marginBottom: 12,
-  },
   orderCard: {
     padding: 16,
     marginBottom: 12,

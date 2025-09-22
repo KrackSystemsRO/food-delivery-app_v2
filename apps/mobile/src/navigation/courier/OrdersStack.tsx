@@ -1,8 +1,8 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import CourierOrdersPage from "@/screens/courier/CourierList.screen";
 import DeliveryDetailPage from "@/screens/courier/DeliveryDetail.screen";
+import { CustomHeader } from "@/navigation/common/CommonHeader";
 import { Types } from "@my-monorepo/shared";
-import { CustomHeader } from "@/components/HeaderLayout";
 
 export type CourierOrdersStackParamList = {
   Orders: undefined;
@@ -11,22 +11,23 @@ export type CourierOrdersStackParamList = {
 
 const Stack = createNativeStackNavigator<CourierOrdersStackParamList>();
 
-export default function CourierOrdersStack() {
+export default function OrdersStack() {
   return (
     <Stack.Navigator
       screenOptions={{
+        headerShown: true,
         header: (props) => <CustomHeader {...props} />,
       }}
     >
       <Stack.Screen
         name="Orders"
         component={CourierOrdersPage}
-        options={{ headerShown: false }}
+        options={{ title: "Available Orders" }}
       />
       <Stack.Screen
         name="DeliveryDetail"
         component={DeliveryDetailPage}
-        options={{ title: "Delivery Details" }}
+        options={{ title: "Delivery Detail" }}
       />
     </Stack.Navigator>
   );

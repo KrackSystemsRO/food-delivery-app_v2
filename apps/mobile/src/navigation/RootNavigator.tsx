@@ -3,12 +3,13 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useAuth } from "../context/authContext";
 import LoginScreen from "../screens/Login";
 import FadeOutLoading from "../components/animations/FadeOutLoading";
-import ClientLayout from "../components/layouts/ClientLayout";
+
 import { AppStackParamList } from "@/types/navigation.type";
 import RegisterScreen from "@/screens/Register";
 import RecoverPasswordScreen from "@/screens/RecoverPassword";
-import CourierLayout from "@/components/layouts/CourierLayout";
-import ManagerLayout from "@/components/layouts/ManagerLayout";
+import CourierLayout from "@/navigation/courier/CourierLayout";
+import ManagerLayout from "@/navigation/manager/ManagerLayout";
+import ClientLayout from "@/navigation/client/ClientLayout";
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
 

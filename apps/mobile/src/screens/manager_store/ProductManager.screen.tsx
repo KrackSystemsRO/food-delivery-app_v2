@@ -1,4 +1,4 @@
-import { ProductsStackParamList } from "@/components/layouts/ManagerLayout";
+import { ProductsStackParamList } from "@/navigation/manager/types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { View, FlatList, Alert } from "react-native";
