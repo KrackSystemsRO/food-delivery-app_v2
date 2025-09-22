@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import ProductsScreen from "@/screens/manager_store/ProductManager.screen";
-import AddProductScreen from "@/screens/manager_store/AddProduct.screen";
-import EditProductScreen from "@/screens/manager_store/EditProduct.screen";
+import ProductsScreen from "@/screens/manager/ProductManager.screen";
+import AddProductScreen from "@/screens/manager/AddProduct.screen";
+import EditProductScreen from "@/screens/manager/EditProduct.screen";
 import { CustomHeader } from "@/navigation/common/CommonHeader";
 import { Types } from "@my-monorepo/shared";
 

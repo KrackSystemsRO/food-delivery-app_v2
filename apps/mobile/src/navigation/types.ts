@@ -1,5 +1,6 @@
 import { StoresStackParamList } from "@/types/navigation.type";
 import { Types } from "@my-monorepo/shared";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 export type ClientTabsParamList = {
   Home: undefined;
@@ -29,6 +30,11 @@ export type OrdersStackParamList = {
   OrdersList: undefined;
   OrderDetail: { _id: string };
 };
+
+export type OrderDetailProps = NativeStackScreenProps<
+  OrdersStackParamList,
+  "OrderDetail"
+>;
 
 export type ProductsStackParamList = {
   ProductsMain: undefined;
