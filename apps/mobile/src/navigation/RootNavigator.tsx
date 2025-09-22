@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useAuth } from "../context/authContext";
 import LoginScreen from "../screens/Login";
 import FadeOutLoading from "../components/animations/FadeOutLoading";
-import AuthenticatedLayout from "../components/layouts/AuthenticatedLayout";
+import ClientLayout from "../components/layouts/ClientLayout";
 import { AppStackParamList } from "@/types/navigation.type";
 import RegisterScreen from "@/screens/Register";
 import RecoverPasswordScreen from "@/screens/RecoverPassword";
@@ -30,7 +30,7 @@ export default function RootNavigator() {
         ) : user.role === "MANAGER" ? (
           <Stack.Screen name="Foodie" component={ManagerLayout} />
         ) : (
-          <Stack.Screen name="Foodie" component={AuthenticatedLayout} />
+          <Stack.Screen name="Foodie" component={ClientLayout} />
         )
       ) : (
         <>

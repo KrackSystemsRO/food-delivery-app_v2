@@ -14,6 +14,7 @@ import { useCart } from "@/context/CartContext";
 import { AnimatedBadge } from "../animations/BadgeOnUpdate";
 import { StoresStackParamList } from "@/types/navigation.type";
 import OrdersScreen from "@/screens/client/Orders";
+import { CustomHeader } from "../HeaderLayout";
 
 export type BottomTabsParamList = {
   Home: undefined;
@@ -31,6 +32,7 @@ export function StoresStackNavigator() {
     <StoresStack.Navigator
       screenOptions={{
         headerShown: true,
+        header: (props) => <CustomHeader {...props} />,
       }}
     >
       <StoresStack.Screen
@@ -38,10 +40,15 @@ export function StoresStackNavigator() {
         component={StoresScreen}
         options={{ title: "Stores" }}
       />
-      <StoresStack.Screen name="StoreDetails" component={StoreDetailsScreen} />
+      <StoresStack.Screen
+        name="StoreDetails"
+        component={StoreDetailsScreen}
+        options={{ title: "Store Details" }}
+      />
       <StoresStack.Screen
         name="ProductDetails"
         component={ProductDetailsScreen}
+        options={{ title: "Product Details" }}
       />
     </StoresStack.Navigator>
   );
@@ -118,7 +125,7 @@ function BottomTabs() {
   );
 }
 
-export default function AuthenticatedLayout() {
+export default function ClientLayout() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>

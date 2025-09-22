@@ -15,6 +15,7 @@ import EditProductScreen from "@/screens/manager_store/EditProduct.screen";
 import OrderDetailScreen from "@/screens/manager_store/OrderDetails.sreen";
 import { useAuth } from "@/context/authContext";
 import { Types } from "@my-monorepo/shared";
+import ProfileScreen from "@/screens/client/Profile";
 
 /* ------------------ Types ------------------ */
 export type OrdersStackParamList = {
@@ -32,28 +33,6 @@ export type ManagerTabsParamList = {
   Orders: undefined;
   Products: undefined;
   Account: undefined;
-};
-
-/* ------------------ Account Screen ------------------ */
-const AccountScreen: React.FC = () => {
-  const { user, logout } = useAuth();
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: 8,
-      }}
-    >
-      <Text>
-        {user?.first_name} {user?.last_name}
-      </Text>
-      <Button mode="text" onPress={logout}>
-        Logout
-      </Button>
-    </View>
-  );
 };
 
 /* ------------------ Stack Navigators ------------------ */
@@ -101,8 +80,8 @@ const AccountStackScreen = () => (
   <AccountStack.Navigator screenOptions={{ headerShown: true }}>
     <AccountStack.Screen
       name="AccountMain"
-      component={AccountScreen}
-      options={{ title: "Account" }}
+      component={ProfileScreen}
+      options={{ title: "Your Profile" }}
     />
   </AccountStack.Navigator>
 );
