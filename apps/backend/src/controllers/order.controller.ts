@@ -151,12 +151,10 @@ const orderController = {
   deny: async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const user = await getUserFromRequest(request, reply);
-      console.log(user);
       const { orderId } = request.body as { orderId: string };
 
       const order = await orderService.denyOrder(orderId, user);
 
-      // emit to sockets asynchronously
       setTimeout(() => {
         orderService.emitOrderToRelevantSockets(request.server.io, order);
       }, 0);
