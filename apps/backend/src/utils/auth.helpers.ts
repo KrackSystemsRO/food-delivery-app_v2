@@ -1,6 +1,7 @@
 import jwt, { JwtPayload as JwtVerifyPayload } from "jsonwebtoken";
 import { FastifyReply, FastifyRequest } from "fastify";
 import userModel from "@/models/user.model";
+import { Types } from "@my-monorepo/shared";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
@@ -16,15 +17,20 @@ export interface JwtPayload extends JwtVerifyPayload {
  * Verifies a JWT token and returns the decoded payload.
  * Throws an Error if verification fails.
  */
-export function verifyToken(token: string): JwtPayload {
+export function verifyToken(token: string | undefined): JwtPayload {
+  if (!token) throw new Error("Token is required");
+  if (!process.env.JWT_SECRET) throw new Error("JWT secret is not set");
+
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET) as unknown;
+
     if (typeof decoded === "string") {
-      // jwt.verify can return a string or object, ensure object type
       throw new Error("Invalid token payload format");
     }
+
+    // cast safely after checking type
     return decoded as JwtPayload;
-  } catch (error) {
+  } catch (err) {
     throw new Error("Invalid or expired token");
   }
 }
@@ -56,10 +62,30 @@ export function forbidden(
   reply.status(403).send({ status: 403, message });
 }
 
+// export async function getUserFromRequest(
+//   request: FastifyRequest,
+//   reply: FastifyReply
+// ) {
+//   const token = request.cookies?.accessToken || request.cookies?.access_token;
+//   if (!token) return unauthorized();
+
+//   let payload;
+//   try {
+//     payload = verifyToken(token);
+//   } catch {
+//     return unauthorized();
+//   }
+
+//   const user = await userModel.findById(payload._id);
+//   if (!user) return unauthorized();
+
+//   return user;
+// }
+
 export async function getUserFromRequest(
   request: FastifyRequest,
   reply: FastifyReply
-) {
+): Promise<Types.User.UserType> {
   const token = request.cookies?.accessToken || request.cookies?.access_token;
   if (!token) return unauthorized();
 
@@ -70,8 +96,18 @@ export async function getUserFromRequest(
     return unauthorized();
   }
 
-  const user = await userModel.findById(payload._id);
-  if (!user) return unauthorized();
+  const doc = await userModel
+    .findById(payload._id)
+    .populate("company") // now company is CompanyType[]
+    .populate("department"); // now department is DepartmentType[]
 
-  return user;
+  if (!doc) return unauthorized();
+
+  const user = doc.toObject();
+
+  // Normalize _id and return
+  return {
+    ...user,
+    _id: user._id.toString(),
+  } as unknown as Types.User.UserType;
 }

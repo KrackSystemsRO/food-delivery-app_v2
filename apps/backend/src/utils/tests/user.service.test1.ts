@@ -23,7 +23,6 @@ jest.mock("@/permissions/user.permissions", () => ({
 }));
 
 import * as userService from "@/services/user.service";
-import { UserType } from "@/types/user.type";
 
 const JWT_SECRET = process.env.JWT_SECRET || "GnuGcc1281";
 

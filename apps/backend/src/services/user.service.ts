@@ -6,11 +6,11 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
-import { UserType } from "@/types/user.type";
 import { generateRandomPassword } from "@/utils/generateRndomPassword";
 import { getQueryById } from "@/utils/getQueryById";
 import { checkPermissionOrThrow } from "@/utils/permissions.helpers";
-import { Types } from "mongoose";
+import { Types as MongooseTypes } from "mongoose";
+import { Types } from "@my-monorepo/shared";
 
 export const JWT_SECRET = process.env.JWT_SECRET || "GnuGcc1281";
 export const JWT_EXPIRATION = process.env.JWT_EXPIRATION
@@ -102,15 +102,16 @@ export async function registerUser(data: {
     user._id.toString()
   );
   const userObj = user.toObject();
-  delete userObj.password;
-  return { user: userObj, ...tokens };
+  const { password, ...userWithoutPassword } = userObj;
+
+  return { user: userWithoutPassword, ...tokens };
 }
 
-export async function loginUser(email: string, password: string) {
+export async function loginUser(email: string, pswd: string) {
   const user = await userModel.findOne({ email });
   if (!user) throw new Error("User not found");
 
-  const isValid = await bcrypt.compare(password, user.password);
+  const isValid = await bcrypt.compare(pswd, user.password);
   if (!isValid) throw new Error("Invalid email or password");
 
   const tokens = await generateTokens(
@@ -119,32 +120,35 @@ export async function loginUser(email: string, password: string) {
   );
 
   const userObj = user.toObject();
-  delete userObj.password;
+  const { password, ...userWithoutPassword } = userObj;
 
-  return { user: userObj, ...tokens };
+  return { user: userWithoutPassword, ...tokens };
 }
 
 export async function logoutUser(refreshToken: string) {
   await tokenModel.deleteOne({ token: refreshToken });
 }
 
-export async function createUser(data: Partial<UserType>, role: string) {
+export async function createUser(
+  data: Partial<Types.User.UserType>,
+  role: string
+) {
   checkPermissionOrThrow(role, "create", "users");
 
-  const password = data.password || generateRandomPassword();
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const pswd = data.password || generateRandomPassword();
+  const hashedPassword = await bcrypt.hash(pswd, 10);
 
   const user = new userModel({ ...data, password: hashedPassword });
   await user.save();
 
   const userObj = user.toObject();
-  delete userObj.password;
+  const { password, ...userWithoutPassword } = userObj;
 
-  return userObj;
+  return userWithoutPassword;
 }
 
 export async function getUserById(
-  userId: string | Types.ObjectId,
+  userId: string | MongooseTypes.ObjectId,
   role: string
 ) {
   checkPermissionOrThrow(role, "read", "users");
@@ -157,8 +161,9 @@ export async function getUserById(
 
   if (!user) throw new Error("User not found");
 
-  delete user.password;
-  return user;
+  const { password, ...userWithoutPassword } = user;
+
+  return userWithoutPassword;
 }
 
 export async function listUsers(
@@ -182,8 +187,8 @@ export async function listUsers(
   // Remove passwords for security
   const sanitizedUsers = users.map((user) => {
     const u = { ...user };
-    delete u.password;
-    return u;
+    const { password, ...userWithoutPassword } = u;
+    return userWithoutPassword;
   });
 
   return {
@@ -196,7 +201,7 @@ export async function listUsers(
 
 export async function updateUser(
   userId: string,
-  data: Partial<UserType>,
+  data: Partial<Types.User.UserType>,
   role: string
 ) {
   checkPermissionOrThrow(role, "update", "users");
@@ -211,9 +216,9 @@ export async function updateUser(
   if (!updatedUser) throw new Error("User not found");
 
   const userObj = updatedUser.toObject();
-  delete userObj.password;
+  const { password, ...userWithoutPassword } = userObj;
 
-  return userObj;
+  return userWithoutPassword;
 }
 
 export async function deleteUser(userId: string, role: string) {

@@ -5,7 +5,7 @@ import {
   getUserFromRequest,
 } from "@/utils/auth.helpers";
 import * as userService from "@/services/user.service";
-import { Type } from "@my-monorepo/shared";
+import { Types } from "@my-monorepo/shared";
 
 const userController = {
   register: async (request: FastifyRequest, reply: FastifyReply) => {
@@ -169,7 +169,7 @@ const userController = {
     try {
       const user = await getUserFromRequest(request, reply);
 
-      const data = request.body as Partial<Type.User.UserType>;
+      const data = request.body as Partial<Types.User.UserType>;
       const newUser = await userService.createUser(data, user.role);
 
       return reply.status(201).send({
@@ -186,7 +186,7 @@ const userController = {
       const user = await getUserFromRequest(request, reply);
 
       const { id } = request.params as { id: string };
-      const data = request.body as Partial<Type.User.UserType>;
+      const data = request.body as Partial<Types.User.UserType>;
 
       const updatedUser = await userService.updateUser(id, data, user.role);
       return reply.status(200).send({

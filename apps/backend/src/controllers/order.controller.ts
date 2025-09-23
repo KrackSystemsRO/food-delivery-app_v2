@@ -17,8 +17,10 @@ const orderController = {
 
       setTimeout(() => {
         orderService.emitOrderToRelevantSockets(request.server.io, order);
+
+        // Assert non-null if it's guaranteed
         request.server.io
-          .to(`store:${order.store._id.toString()}`)
+          .to(`store:${order.store!._id.toString()}`)
           .emit("newOrder", order);
       }, 0);
 
@@ -149,10 +151,12 @@ const orderController = {
   deny: async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const user = await getUserFromRequest(request, reply);
+      console.log(user);
       const { orderId } = request.body as { orderId: string };
 
       const order = await orderService.denyOrder(orderId, user);
 
+      // emit to sockets asynchronously
       setTimeout(() => {
         orderService.emitOrderToRelevantSockets(request.server.io, order);
       }, 0);
@@ -161,7 +165,10 @@ const orderController = {
         .status(200)
         .send({ status: 200, message: "Order denied!", result: order });
     } catch (err: any) {
-      return reply.status(500).send({ status: 500, message: err.message });
+      return reply.status(500).send({
+        status: 500,
+        message: err?.message ?? "Internal server error",
+      });
     }
   },
 
