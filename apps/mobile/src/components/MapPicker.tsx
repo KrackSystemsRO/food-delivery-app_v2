@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,10 @@ import {
 import MapView, { Marker, MapPressEvent } from "react-native-maps";
 import * as Location from "expo-location";
 import Geocoder from "react-native-geocoding";
+
+import { GOOGLE_MAPS_API_KEY } from "@env";
+
+Geocoder.init(GOOGLE_MAPS_API_KEY);
 
 Geocoder.init("AIzaSyApEYIvmZAJgphA0WSj1LBBQwgrA3kMSbE"); // replace with your key
 
