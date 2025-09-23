@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 
 const DeliveryLocationSchema = new mongoose.Schema(
   {
+    locationId: { type: Number, required: false },
     label: { type: String, required: true },
     address: { type: String, required: true },
     city: { type: String },
@@ -12,7 +13,7 @@ const DeliveryLocationSchema = new mongoose.Schema(
     lng: { type: Number },
     is_default: { type: Boolean, default: false },
   },
-  { _id: false }
+  { _id: true }
 );
 
 const VehicleInfoSchema = new mongoose.Schema(
@@ -98,6 +99,7 @@ const userSchema = new mongoose.Schema(
     ],
 
     deliveryLocations: [DeliveryLocationSchema],
+    deliveryLocationCounter: { type: Number, default: 0 },
     vehicle_info: VehicleInfoSchema,
 
     cityId: { type: String, default: "1" },
