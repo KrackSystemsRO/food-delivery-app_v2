@@ -10,3 +10,4 @@ export * as Product from "./types/product";
 export * as Recipe from "./types/recipe";
 export * as Store from "./types/store";
 export * as User from "./types/user";
+export * as DeliveryLocation from "./types/deliveryLocation";

@@ -1,6 +1,7 @@
 import { Date, Types } from "mongoose";
 import { CompanyType } from "./company";
 import { DepartmentType } from "./department";
+import { DeliveryLocation } from "./deliveryLocation";
 interface BaseUser {
     first_name: string;
     last_name: string;
@@ -13,7 +14,7 @@ export interface UserType extends BaseUser {
     password?: string;
     company: CompanyType[];
     department: DepartmentType[];
-    deliveryLocations: string[];
+    deliveryLocations: DeliveryLocation[];
     createdAt: string | Date;
     updatedAt: string | Date;
     userId: number;

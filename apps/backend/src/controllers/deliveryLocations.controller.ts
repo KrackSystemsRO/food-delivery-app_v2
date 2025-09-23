@@ -16,7 +16,7 @@ const deliveryLocationController = {
       return reply.status(200).send({
         status: 200,
         message: "Delivery locations fetched successfully",
-        deliveryLocations: locations,
+        result: locations,
       });
     } catch (err: any) {
       return reply.status(404).send({ status: 404, message: err.message });
@@ -63,7 +63,7 @@ const deliveryLocationController = {
       return reply.status(201).send({
         status: 201,
         message: "Delivery location added successfully",
-        deliveryLocations: locations,
+        result: locations,
       });
     } catch (err: any) {
       return reply.status(400).send({ status: 400, message: err.message });
