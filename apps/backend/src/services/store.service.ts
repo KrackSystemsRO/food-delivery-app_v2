@@ -3,15 +3,15 @@ import mongoose from "mongoose";
 import storeModel from "@/models/store.model";
 import { getQueryById } from "@/utils/getQueryById";
 import { checkPermissionOrThrow } from "@/utils/permissions.helpers";
-import { Types } from "mongoose";
-import { UserType } from "@/types/user.type";
+import { Types as MongooseTypes } from "mongoose";
+import { Types } from "@my-monorepo/shared";
 import { StoreListQuery, StoreInput } from "@/interfaces/store.interface";
 
 const validStoreTypes = ["RESTAURANT", "GROCERY", "BAKERY", "CAFE", "OTHER"];
 
 export async function createStore(
   data: StoreInput,
-  adminId: string | Types.ObjectId,
+  adminId: string | MongooseTypes.ObjectId,
   role: string
 ) {
   checkPermissionOrThrow(role, "create", "stores");
@@ -56,7 +56,10 @@ export async function getStore(id: string, role: string) {
     .exec();
 }
 
-export async function listStores(params: StoreListQuery, user: UserType) {
+export async function listStores(
+  params: StoreListQuery,
+  user: Types.User.UserType
+) {
   checkPermissionOrThrow(user.role, "read", "stores");
 
   const {

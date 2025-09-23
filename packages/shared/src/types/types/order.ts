@@ -1,3 +1,5 @@
+import { ProductType } from "./product";
+import { StoreType } from "./store";
 import { UserType } from "./user";
 
 // ---- Base Interfaces ----
@@ -13,27 +15,7 @@ interface BaseDeliveryLocation {
 }
 
 // ---- Main Types ----
-export interface OrderItemType extends BaseOrderItem {
-  _id: string;
-  product: {
-    _id: string;
-    name: string;
-    image: string;
-    available: boolean;
-  };
-}
-
-export interface OrderType {
-  _id: string;
-  id: string;
-  user: UserType;
-  store: {
-    _id: string;
-    name: string;
-    is_open: boolean;
-  };
-  items: OrderItemType[];
-  total: number;
+export interface OrderStatus {
   status:
     | "pending"
     | "confirmed"
@@ -41,6 +23,26 @@ export interface OrderType {
     | "delivering"
     | "delivered"
     | "cancelled";
+}
+export interface OrderItemType extends BaseOrderItem {
+  _id: string;
+  product: {
+    _id: string;
+    name: string;
+    image: string;
+    available: boolean;
+    price: number;
+  };
+}
+
+export interface OrderType {
+  _id: string;
+  id: string;
+  user: UserType;
+  store: StoreType;
+  items: OrderItemType[];
+  total: number;
+  status: OrderStatus["status"];
   deliveryLocation: BaseDeliveryLocation;
   createdAt: string;
   updatedAt: string;
@@ -59,10 +61,11 @@ export interface OrdersResponse {
 
 // ---- Form ----
 export interface OrderForm {
-  user: string; // user ID
-  store: string; // store ID
-  items: (BaseOrderItem & { product: string })[]; // product IDs only
+  _id?: string;
+  user: UserType; // user ID
+  store: StoreType; // store ID
+  items: OrderItemType[]; // product IDs only
   total: number;
-  status?: "pending" | "preparing" | "on_the_way" | "delivered" | "cancelled";
+  status?: OrderStatus["status"];
   deliveryLocation: BaseDeliveryLocation;
 }

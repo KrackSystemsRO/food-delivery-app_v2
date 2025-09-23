@@ -17,8 +17,10 @@ const orderController = {
 
       setTimeout(() => {
         orderService.emitOrderToRelevantSockets(request.server.io, order);
+
+        // Assert non-null if it's guaranteed
         request.server.io
-          .to(`store:${order.store._id.toString()}`)
+          .to(`store:${order.store!._id.toString()}`)
           .emit("newOrder", order);
       }, 0);
 
@@ -94,7 +96,7 @@ const orderController = {
           .send({ status: 404, message: "Order not found" });
 
       setTimeout(() => {
-        orderService.emitOrderToRelevantSockets(request.server.io, order);
+        orderService.emitOrderToRelevantSockets(request.server.io, updated);
       }, 0);
       // orderService.emitOrderToCouriers(request.server.io, updated);
       // request.server.io
@@ -161,7 +163,10 @@ const orderController = {
         .status(200)
         .send({ status: 200, message: "Order denied!", result: order });
     } catch (err: any) {
-      return reply.status(500).send({ status: 500, message: err.message });
+      return reply.status(500).send({
+        status: 500,
+        message: err?.message ?? "Internal server error",
+      });
     }
   },
 

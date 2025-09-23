@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import departmentModel from "@/models/department.model";
 import { checkPermissionOrThrow } from "@/utils/permissions.helpers";
 import { getQueryById } from "@/utils/getQueryById";
+import { Types } from "@my-monorepo/shared";
 
 export interface ListDepartmentsParams {
   role: string;
@@ -119,12 +120,7 @@ export async function createDepartment(
 
 export async function updateDepartment(
   id: string,
-  updateData: Partial<{
-    company: string;
-    admin?: string;
-    name: string;
-    is_active: boolean;
-  }>,
+  updateData: Partial<Types.Department.DepartmentType>,
   role: string
 ) {
   checkPermissionOrThrow(role, "update", "departments");

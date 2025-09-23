@@ -1,3 +1,4 @@
+import { Date, Types } from "mongoose";
 import { CompanyType } from "./company";
 import { DepartmentType } from "./department";
 interface BaseUser {
@@ -7,13 +8,14 @@ interface BaseUser {
     role: string;
 }
 export interface UserType extends BaseUser {
-    _id: string;
-    phone_number: string;
+    _id: string | Types.ObjectId;
+    phone_number?: string | null;
+    password?: string;
     company: CompanyType[];
     department: DepartmentType[];
     deliveryLocations: string[];
-    createdAt: string;
-    updatedAt: string;
+    createdAt: string | Date;
+    updatedAt: string | Date;
     userId: number;
     cityId: string;
     zoneId: string;

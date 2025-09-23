@@ -3,8 +3,8 @@ import orderModel from "@/models/order.model";
 import productModel from "@/models/product.model";
 import { getQueryById } from "@/utils/getQueryById";
 import { checkPermissionOrThrow } from "@/utils/permissions.helpers";
-import { UserType } from "@/types/user.type";
 import { Server } from "socket.io";
+import { Types } from "@my-monorepo/shared";
 
 interface OrderItem {
   product: string;
@@ -87,7 +87,7 @@ export async function listOrders(
   params: {
     _id?: string;
     user?: string;
-    store?: string;
+    store?: string | { $in: string[] };
     status?: string;
     page?: number;
     limit?: number;
@@ -116,7 +116,23 @@ export async function listOrders(
     filter._id = new mongoose.Types.ObjectId(_id);
   if (user && mongoose.Types.ObjectId.isValid(user))
     filter.user = new mongoose.Types.ObjectId(user);
-  if (store && mongoose.Types.ObjectId.isValid(store)) filter.store = store;
+  if (store) {
+    if (typeof store === "string" && mongoose.Types.ObjectId.isValid(store)) {
+      // single store id
+      filter.store = new mongoose.Types.ObjectId(store);
+    } else if (
+      typeof store === "object" &&
+      "$in" in store &&
+      Array.isArray(store.$in)
+    ) {
+      // multiple store ids
+      filter.store = {
+        $in: store.$in
+          .filter((id): id is string => mongoose.Types.ObjectId.isValid(id))
+          .map((id) => new mongoose.Types.ObjectId(id)),
+      };
+    }
+  }
   if (status) {
     filter.status = status;
   }
@@ -168,10 +184,11 @@ export async function deleteOrder(id: string, role: string) {
   return deleted;
 }
 
-export async function acceptOrder(orderId: string, user: UserType) {
+export async function acceptOrder(orderId: string, user: Types.User.UserType) {
   checkPermissionOrThrow(user.role, "accept", "orders");
   const order = await orderModel.findById(orderId);
   if (!order) throw new Error("Order not found");
+  if (!user) throw new Error("User not found");
 
   if (user.role === "COURIER") {
     const alreadyAssigned = order.couriers.some(
@@ -202,7 +219,7 @@ export async function acceptOrder(orderId: string, user: UserType) {
     .then((o) => o.toObject());
 }
 
-export async function denyOrder(orderId: string, user: UserType) {
+export async function denyOrder(orderId: string, user: Types.User.UserType) {
   checkPermissionOrThrow(user.role, "accept", "orders");
   const order = await orderModel.findById(orderId);
   if (!order) throw new Error("Order not found");

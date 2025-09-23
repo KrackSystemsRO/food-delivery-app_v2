@@ -1,9 +1,19 @@
 import { useEffect, useState, useCallback } from "react";
-import { View, Text, StyleSheet, FlatList, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
 import { TabView, TabBar } from "react-native-tab-view";
 import { Services, Types } from "@my-monorepo/shared";
 import { useAuth } from "@/context/authContext";
 import axiosInstance from "@/utils/request/authorizedRequest";
+import { OrdersStackParamList } from "@/navigation/types";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useNavigation } from "@react-navigation/native";
 
 type OrdersRoute = { key: string; title: string };
 
@@ -12,6 +22,8 @@ export default function OrdersScreen() {
   const [orders, setOrders] = useState<Types.Order.OrderType[]>([]);
   const [index, setIndex] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
+  const navigation =
+    useNavigation<NativeStackNavigationProp<OrdersStackParamList>>();
 
   const [routes] = useState<OrdersRoute[]>([
     { key: "active", title: "Active Orders" },
@@ -72,13 +84,17 @@ export default function OrdersScreen() {
   );
 
   const renderOrder = ({ item }: { item: Types.Order.OrderType }) => (
-    <View style={styles.orderCard}>
+    <TouchableOpacity
+      onPress={() => navigation.navigate("OrderDetail", { _id: item._id })}
+      activeOpacity={0.7} // adjust opacity when pressed
+      style={styles.orderCard}
+    >
       <Text style={styles.storeName}>{item.store.name}</Text>
       <Text>Order ID: {item.orderId}</Text>
       <Text>Status: {item.status}</Text>
       <Text>Total: ${item.total.toFixed(2)}</Text>
       <Text>Delivery: {item.deliveryLocation.address}</Text>
-    </View>
+    </TouchableOpacity>
   );
 
   const renderScene = ({ route }: { route: OrdersRoute }) => {

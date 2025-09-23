@@ -9,7 +9,7 @@ import { CustomHeader } from "@/navigation/common/CommonHeader";
 /* ------------------ Types ------------------ */
 export type OrdersStackParamList = {
   OrdersList: undefined;
-  OrderDetail: { _id: string }; // singular, matches screen
+  OrderDetail: { _id: string };
 };
 
 /* Properly type the screen props for OrderDetailScreen */

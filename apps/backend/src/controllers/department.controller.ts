@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import * as departmentService from "@/services/department.service";
 import { getUserFromRequest } from "@/utils/auth.helpers";
+import { Types } from "@my-monorepo/shared";
 
 const departmentController = {
   list: async (request: FastifyRequest, reply: FastifyReply) => {
@@ -72,8 +73,8 @@ const departmentController = {
   update: async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const user = await getUserFromRequest(request, reply);
-      const { id } = request.params as any;
-      const updateData = request.body;
+      const { id } = request.params as { id: string };
+      const updateData = request.body as Types.Department.DepartmentType;
 
       const department = await departmentService.updateDepartment(
         id,
