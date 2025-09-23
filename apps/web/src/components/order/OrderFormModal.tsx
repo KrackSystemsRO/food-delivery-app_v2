@@ -21,16 +21,16 @@ export default function OrderFormModal({
   const { t } = useTranslation();
 
   const [form, setForm] = useState<{
-    user: string;
-    status: Types.Order.OrderStatus;
+    user: Types.User.UserType;
+    status: Types.Order.OrderStatus["status"];
   }>({
-    user: selectedOrder?.user?.first_name || "",
+    user: selectedOrder?.user || "",
     status: selectedOrder?.status || "pending",
   });
 
   useEffect(() => {
     setForm({
-      user: selectedOrder?.user?.first_name || "",
+      user: selectedOrder?.user || "",
       status: selectedOrder?.status || "pending",
     });
   }, [selectedOrder]);

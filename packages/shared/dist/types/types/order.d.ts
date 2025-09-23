@@ -1,3 +1,4 @@
+import { StoreType } from "./store";
 import { UserType } from "./user";
 interface BaseOrderItem {
     quantity: number;
@@ -7,6 +8,9 @@ interface BaseDeliveryLocation {
     lat: number;
     lng: number;
     address: string;
+}
+export interface OrderStatus {
+    status: "pending" | "confirmed" | "preparing" | "delivering" | "delivered" | "cancelled";
 }
 export interface OrderItemType extends BaseOrderItem {
     _id: string;
@@ -22,14 +26,10 @@ export interface OrderType {
     _id: string;
     id: string;
     user: UserType;
-    store: {
-        _id: string;
-        name: string;
-        is_open: boolean;
-    };
+    store: StoreType;
     items: OrderItemType[];
     total: number;
-    status: "pending" | "confirmed" | "preparing" | "delivering" | "delivered" | "cancelled";
+    status: OrderStatus["status"];
     deliveryLocation: BaseDeliveryLocation;
     createdAt: string;
     updatedAt: string;
@@ -45,13 +45,12 @@ export interface OrdersResponse {
     currentPage: number;
 }
 export interface OrderForm {
-    user: string;
-    store: string;
-    items: (BaseOrderItem & {
-        product: string;
-    })[];
+    _id?: string;
+    user: UserType;
+    store: StoreType;
+    items: OrderItemType[];
     total: number;
-    status?: "pending" | "preparing" | "on_the_way" | "delivered" | "cancelled";
+    status?: OrderStatus["status"];
     deliveryLocation: BaseDeliveryLocation;
 }
 export {};

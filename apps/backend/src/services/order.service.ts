@@ -172,6 +172,7 @@ export async function acceptOrder(orderId: string, user: UserType) {
   checkPermissionOrThrow(user.role, "accept", "orders");
   const order = await orderModel.findById(orderId);
   if (!order) throw new Error("Order not found");
+  if (!user) throw new Error("User not found");
 
   if (user.role === "COURIER") {
     const alreadyAssigned = order.couriers.some(

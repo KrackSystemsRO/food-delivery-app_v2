@@ -94,7 +94,7 @@ const orderController = {
           .send({ status: 404, message: "Order not found" });
 
       setTimeout(() => {
-        orderService.emitOrderToRelevantSockets(request.server.io, order);
+        orderService.emitOrderToRelevantSockets(request.server.io, updated);
       }, 0);
       // orderService.emitOrderToCouriers(request.server.io, updated);
       // request.server.io
