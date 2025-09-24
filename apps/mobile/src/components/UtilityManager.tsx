@@ -22,17 +22,19 @@ interface Tile {
 
 interface DraggableGridProps {
   snapToGrid?: boolean; // optional prop
+  navigation: any;
 }
 
 const initialTiles: Tile[] = [
-  { id: "1", label: "Settings", color: "#3498db" },
-  { id: "2", label: "Profile", color: "#e67e22" },
-  { id: "3", label: "Messages", color: "#9b59b6" },
-  { id: "4", label: "Tasks", color: "#2ecc71" },
+  { id: "1", label: "ManagerLandingStack", color: "#3498db" },
+  { id: "2", label: "OrdersStack", color: "#e67e22" },
+  { id: "3", label: "ProductsStack", color: "#9b59b6" },
+  { id: "4", label: "ProfileStack", color: "#2ecc71" },
 ];
 
 export default function DraggableGrid({
   snapToGrid = true,
+  navigation,
 }: DraggableGridProps) {
   const [tiles, setTiles] = useState<Tile[]>(initialTiles);
   const [draggingIndexState, setDraggingIndexState] = useState<number | null>(
@@ -89,12 +91,32 @@ export default function DraggableGrid({
         }
       },
 
-      onPanResponderRelease: () => {
+      onPanResponderRelease: (e, gesture) => {
         clearTimeout((positions[index] as any).longPressTimeout);
+
+        const isTap = Math.abs(gesture.dx) < 5 && Math.abs(gesture.dy) < 5;
+
+        if (isTap) {
+          // Navigate to the page for this tile
+          switch (tile.id) {
+            case "1":
+              navigation.navigate("ManagerLandingStack");
+              break;
+            case "2":
+              navigation.navigate("OrdersStack");
+              break;
+            case "3":
+              navigation.navigate("ProductsStack");
+              break;
+            case "4":
+              navigation.navigate("ProfileStack");
+              break;
+          }
+          return;
+        }
 
         if (draggingIndex.current === index) {
           if (snapToGrid) {
-            // Snap to nearest grid
             const tileX =
               positions[index].x._value + positions[index].x._offset;
             const tileY =
@@ -118,7 +140,6 @@ export default function DraggableGrid({
             }).start();
           }
 
-          // Always reset scale
           Animated.spring(scales[index], {
             toValue: 1,
             useNativeDriver: false,
