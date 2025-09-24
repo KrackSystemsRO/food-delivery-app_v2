@@ -11,7 +11,7 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import MapPicker from "../MapPicker";
+import MapPicker from "./MapPicker";
 import { Types } from "@my-monorepo/shared";
 import { Icon, IconButton } from "react-native-paper";
 

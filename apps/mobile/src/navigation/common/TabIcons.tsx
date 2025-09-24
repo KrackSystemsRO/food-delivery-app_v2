@@ -33,11 +33,13 @@ export function getCourierTabIcon(name: keyof CourierTabsParamList) {
 // Manager icons
 export function getManagerTabIcon(name: keyof ManagerTabsParamList) {
   switch (name) {
-    case "Orders":
+    case "ManagerLandingStack":
+      return "home";
+    case "OrdersStack":
       return "list";
-    case "Products":
+    case "ProductsStack":
       return "cube";
-    case "Profile":
+    case "ProfileStack":
       return "person";
   }
 }

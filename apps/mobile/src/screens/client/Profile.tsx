@@ -11,9 +11,6 @@ import { useAuth } from "../../context/authContext";
 import LoadingSpin from "../../components/LoadingSpin";
 import { useTranslation } from "react-i18next";
 import LanguageSwitch from "@/components/buttons/LanguageSwitch";
-import DeliveryLocationManager from "@/components/map/DeliveryLocationsManager";
-import { Services, Types } from "@my-monorepo/shared";
-import axiosInstance from "@/utils/request/authorizedRequest";
 import { ScrollView } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -72,6 +69,11 @@ export default function ProfileScreen() {
     </View>
   );
 
+  const handleLogout = () => {
+    setModalVisible(false);
+    logout();
+  };
+
   return (
     <>
       <ScrollView
@@ -80,7 +82,6 @@ export default function ProfileScreen() {
       >
         <ListHeader />
 
-        {/* Navigate to dedicated locations page */}
         <TouchableOpacity
           style={[styles.logoutButton, { backgroundColor: "#5cb85c" }]}
           onPress={() => navigation.navigate("DeliveryLocations")}
@@ -91,7 +92,6 @@ export default function ProfileScreen() {
           </Text>
         </TouchableOpacity>
 
-        {/* Logout button */}
         <TouchableOpacity
           style={styles.logoutButton}
           onPress={() => setModalVisible(true)}
@@ -101,6 +101,44 @@ export default function ProfileScreen() {
             {t("common.buttons.logout")}
           </Text>
         </TouchableOpacity>
+
+        <Modal
+          transparent
+          animationType="fade"
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>
+                {t("common.modal.logout.heading")}
+              </Text>
+              <Text style={styles.modalMessage}>
+                {t("common.modal.logout.question")}
+              </Text>
+
+              <View style={styles.modalButtons}>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.cancelButton]}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text style={styles.cancelButtonText}>
+                    {t("common.buttons.cancel")}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.confirmButton]}
+                  onPress={handleLogout}
+                >
+                  <Text style={styles.confirmButtonText}>
+                    {t("common.buttons.logout")}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </ScrollView>
     </>
   );
