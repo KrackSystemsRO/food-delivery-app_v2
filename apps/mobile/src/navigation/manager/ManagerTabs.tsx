@@ -25,27 +25,27 @@ export default function ManagerTabs() {
         tabBarInactiveTintColor: "gray",
       })}
     >
-      <Tab.Screen
+      {/* <Tab.Screen
         name="ManagerLandingStack"
         component={ManagerLandingScreen}
         options={{
           tabBarStyle: { display: "none" },
         }}
-      />
+      /> */}
       <Tab.Screen
         name="OrdersStack"
         component={OrdersStack}
-        options={{ title: "Orders", tabBarStyle: { display: "none" } }}
+        options={{ title: "Orders" /* tabBarStyle: { display: "none" }*/ }}
       />
       <Tab.Screen
         name="ProductsStack"
         component={ProductsStack}
-        options={{ title: "Products", tabBarStyle: { display: "none" } }}
+        options={{ title: "Products" /* tabBarStyle: { display: "none" }*/ }}
       />
       <Tab.Screen
         name="ProfileStack"
         component={ProfileStack}
-        options={{ title: "Profile", tabBarStyle: { display: "none" } }}
+        options={{ title: "Profile" /* tabBarStyle: { display: "none" }*/ }}
       />
     </Tab.Navigator>
   );

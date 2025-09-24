@@ -1,5 +1,5 @@
 import { StyleSheet, View } from "react-native";
-import MetroGrid from "@/components/MetroGrid";
+import MetroGrid from "@/components/gridLandingComponents/MetroGrid";
 
 export default function ManagerLandingScreen() {
   return (

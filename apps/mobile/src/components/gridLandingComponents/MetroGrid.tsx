@@ -1,5 +1,5 @@
 import { View, StyleSheet } from "react-native";
-import UtilityManager from "@/components/UtilityManager";
+import UtilityManager from "@/components/gridLandingComponents/UtilityManager";
 import { useNavigation } from "@react-navigation/native";
 import { ManagerTabsParamList } from "@/navigation/types";
 
