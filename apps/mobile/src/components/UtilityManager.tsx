@@ -6,8 +6,9 @@ import {
   Dimensions,
   Animated,
   PanResponder,
-  Vibration, // <-- add
+  Vibration,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width } = Dimensions.get("window");
 const TILE_MARGIN = 8;
@@ -20,8 +21,13 @@ interface Tile {
   color: string;
 }
 
+interface GridPos {
+  row: number;
+  col: number;
+}
+
 interface DraggableGridProps {
-  snapToGrid?: boolean; // optional prop
+  snapToGrid?: boolean;
   navigation: any;
 }
 
@@ -32,24 +38,17 @@ const initialTiles: Tile[] = [
   { id: "4", label: "ProfileStack", color: "#2ecc71" },
 ];
 
+const STORAGE_KEY = "@grid_positions";
+
 export default function DraggableGrid({
   snapToGrid = true,
   navigation,
 }: DraggableGridProps) {
-  const [tiles, setTiles] = useState<Tile[]>(initialTiles);
-  const [draggingIndexState, setDraggingIndexState] = useState<number | null>(
-    null
-  );
-  // position + scale arrays
+  const [tiles] = useState<Tile[]>(initialTiles);
+  const [gridPositions, setGridPositions] = useState<GridPos[]>([]);
+
   const positions = useRef<Animated.ValueXY[]>(
-    initialTiles.map((_, i) => {
-      const row = Math.floor(i / NUM_COLUMNS);
-      const col = i % NUM_COLUMNS;
-      return new Animated.ValueXY({
-        x: col * (TILE_SIZE + TILE_MARGIN),
-        y: row * (TILE_SIZE + TILE_MARGIN),
-      });
-    })
+    initialTiles.map(() => new Animated.ValueXY({ x: 0, y: 0 }))
   ).current;
 
   const scales = useRef<Animated.Value[]>(
@@ -58,6 +57,50 @@ export default function DraggableGrid({
 
   const draggingIndex = useRef<number | null>(null);
 
+  // Load saved positions from AsyncStorage
+  useEffect(() => {
+    const loadPositions = async () => {
+      try {
+        const saved = await AsyncStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed: GridPos[] = JSON.parse(saved);
+          setGridPositions(parsed);
+          parsed.forEach((pos, i) => {
+            positions[i].setValue({
+              x: pos.col * (TILE_SIZE + TILE_MARGIN),
+              y: pos.row * (TILE_SIZE + TILE_MARGIN),
+            });
+          });
+        } else {
+          // If no saved, use defaults
+          const defaultPositions = initialTiles.map((_, i) => ({
+            row: Math.floor(i / NUM_COLUMNS),
+            col: i % NUM_COLUMNS,
+          }));
+          setGridPositions(defaultPositions);
+          defaultPositions.forEach((pos, i) => {
+            positions[i].setValue({
+              x: pos.col * (TILE_SIZE + TILE_MARGIN),
+              y: pos.row * (TILE_SIZE + TILE_MARGIN),
+            });
+          });
+        }
+      } catch (err) {
+        console.log("Failed to load positions:", err);
+      }
+    };
+    loadPositions();
+  }, []);
+
+  // Save positions to AsyncStorage
+  const savePositions = async (newPositions: GridPos[]) => {
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newPositions));
+    } catch (err) {
+      console.log("Failed to save positions:", err);
+    }
+  };
+
   const panResponders = tiles.map((tile, index) =>
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
@@ -65,8 +108,6 @@ export default function DraggableGrid({
       onPanResponderGrant: () => {
         const longPressTimeout = setTimeout(() => {
           draggingIndex.current = index;
-          setDraggingIndexState(index);
-
           positions[index].setOffset({
             x: positions[index].x._value,
             y: positions[index].y._value,
@@ -79,7 +120,7 @@ export default function DraggableGrid({
           }).start();
 
           Vibration.vibrate(30);
-        }, 750);
+        }, 200);
 
         (positions[index] as any).longPressTimeout = longPressTimeout;
       },
@@ -95,9 +136,7 @@ export default function DraggableGrid({
         clearTimeout((positions[index] as any).longPressTimeout);
 
         const isTap = Math.abs(gesture.dx) < 5 && Math.abs(gesture.dy) < 5;
-
         if (isTap) {
-          // Navigate to the page for this tile
           switch (tile.id) {
             case "1":
               navigation.navigate("ManagerLandingStack");
@@ -115,40 +154,46 @@ export default function DraggableGrid({
           return;
         }
 
-        if (draggingIndex.current === index) {
-          if (snapToGrid) {
-            const tileX =
-              positions[index].x._value + positions[index].x._offset;
-            const tileY =
-              positions[index].y._value + positions[index].y._offset;
+        if (draggingIndex.current === index && snapToGrid) {
+          const tileX = positions[index].x._value + positions[index].x._offset;
+          const tileY = positions[index].y._value + positions[index].y._offset;
 
-            const col = Math.round(tileX / (TILE_SIZE + TILE_MARGIN));
-            const row = Math.round(tileY / (TILE_SIZE + TILE_MARGIN));
+          let col = Math.round(tileX / (TILE_SIZE + TILE_MARGIN));
+          let row = Math.round(tileY / (TILE_SIZE + TILE_MARGIN));
 
-            const clampedCol = Math.max(0, Math.min(NUM_COLUMNS - 1, col));
-            const clampedRow = Math.max(
-              0,
-              Math.min(Math.floor(tiles.length / NUM_COLUMNS), row)
-            );
+          col = Math.max(0, Math.min(NUM_COLUMNS - 1, col));
+          row = Math.max(0, row);
 
-            Animated.spring(positions[index], {
-              toValue: {
-                x: clampedCol * (TILE_SIZE + TILE_MARGIN),
-                y: clampedRow * (TILE_SIZE + TILE_MARGIN),
-              },
-              useNativeDriver: false,
-            }).start();
+          // Check for occupied cells
+          const occupied = gridPositions.some(
+            (pos, iPos) => iPos !== index && pos.row === row && pos.col === col
+          );
+          if (occupied) {
+            col = gridPositions[index].col;
+            row = gridPositions[index].row;
+          } else {
+            const newPositions = [...gridPositions];
+            newPositions[index] = { row, col };
+            setGridPositions(newPositions);
+            savePositions(newPositions); // save after each move
           }
 
-          Animated.spring(scales[index], {
-            toValue: 1,
+          Animated.spring(positions[index], {
+            toValue: {
+              x: col * (TILE_SIZE + TILE_MARGIN),
+              y: row * (TILE_SIZE + TILE_MARGIN),
+            },
             useNativeDriver: false,
           }).start();
-
-          draggingIndex.current = null;
-          setDraggingIndexState(null);
-          positions[index].flattenOffset();
         }
+
+        Animated.spring(scales[index], {
+          toValue: 1,
+          useNativeDriver: false,
+        }).start();
+
+        draggingIndex.current = null;
+        positions[index].flattenOffset();
       },
 
       onPanResponderTerminate: () => {
@@ -163,40 +208,40 @@ export default function DraggableGrid({
   );
 
   return (
-    <View style={styles.container}>
-      {tiles
-        .map((tile, index) => ({ tile, index }))
-        .sort((a, b) => {
-          // Render dragging tile last
-          if (a.index === draggingIndex.current) return 1;
-          if (b.index === draggingIndex.current) return -1;
-          return 0;
-        })
-        .map(({ tile, index }) => {
-          const isDragging = draggingIndex.current === index;
-          return (
-            <Animated.View
-              key={tile.id}
-              {...panResponders[index].panHandlers}
-              style={[
-                styles.tile,
-                {
-                  backgroundColor: tile.color,
-                  width: TILE_SIZE,
-                  height: TILE_SIZE,
-                  transform: [
-                    ...positions[index].getTranslateTransform(),
-                    { scale: scales[index] },
-                  ],
-                  zIndex: isDragging ? 999 : index,
-                  elevation: isDragging ? 999 : index,
-                },
-              ]}
-            >
-              <Text style={styles.label}>{tile.label}</Text>
-            </Animated.View>
-          );
-        })}
+    <View
+      style={[
+        styles.container,
+        {
+          height:
+            Math.ceil(tiles.length / NUM_COLUMNS) * (TILE_SIZE + TILE_MARGIN),
+        },
+      ]}
+    >
+      {tiles.map((tile, index) => {
+        const isDragging = draggingIndex.current === index;
+        return (
+          <Animated.View
+            key={tile.id}
+            {...panResponders[index].panHandlers}
+            style={[
+              styles.tile,
+              {
+                backgroundColor: tile.color,
+                width: TILE_SIZE,
+                height: TILE_SIZE,
+                transform: [
+                  ...positions[index].getTranslateTransform(),
+                  { scale: scales[index] },
+                ],
+                zIndex: isDragging ? 999 : index,
+                elevation: isDragging ? 999 : index,
+              },
+            ]}
+          >
+            <Text style={styles.label}>{tile.label}</Text>
+          </Animated.View>
+        );
+      })}
     </View>
   );
 }
