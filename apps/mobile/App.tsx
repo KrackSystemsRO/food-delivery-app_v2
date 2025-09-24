@@ -6,21 +6,24 @@ import Toast from "react-native-toast-message";
 import { CartProvider } from "./src/context/CartContext";
 import { LanguageProvider } from "./src/context/LanguageContext";
 import { Provider as PaperProvider } from "react-native-paper";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 function AppContent() {
   return (
-    <NavigationContainer>
-      <AuthProvider>
-        <LanguageProvider>
-          <CartProvider>
-            <PaperProvider>
-              <RootNavigator />
-              <Toast />
-            </PaperProvider>
-          </CartProvider>
-        </LanguageProvider>
-      </AuthProvider>
-    </NavigationContainer>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <NavigationContainer>
+        <AuthProvider>
+          <LanguageProvider>
+            <CartProvider>
+              <PaperProvider>
+                <RootNavigator />
+                <Toast />
+              </PaperProvider>
+            </CartProvider>
+          </LanguageProvider>
+        </AuthProvider>
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 }
 

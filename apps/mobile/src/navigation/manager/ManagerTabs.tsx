@@ -4,12 +4,8 @@ import OrdersStack from "./OrdersStack";
 import ProductsStack from "./ProductsStack";
 import ProfileStack from "@/navigation/common/ProfileStack";
 import { getManagerTabIcon } from "@/navigation/common/TabIcons";
-
-export type ManagerTabsParamList = {
-  Orders: undefined;
-  Products: undefined;
-  Profile: undefined;
-};
+import ManagerLandingScreen from "@/screens/manager/ManagerLanding";
+import { ManagerTabsParamList } from "../types";
 
 const Tab = createBottomTabNavigator<ManagerTabsParamList>();
 
@@ -29,20 +25,27 @@ export default function ManagerTabs() {
         tabBarInactiveTintColor: "gray",
       })}
     >
+      {/* <Tab.Screen
+        name="ManagerLandingStack"
+        component={ManagerLandingScreen}
+        options={{
+          tabBarStyle: { display: "none" },
+        }}
+      /> */}
       <Tab.Screen
-        name="Orders"
+        name="OrdersStack"
         component={OrdersStack}
-        options={{ title: "Orders" }}
+        options={{ title: "Orders" /* tabBarStyle: { display: "none" }*/ }}
       />
       <Tab.Screen
-        name="Products"
+        name="ProductsStack"
         component={ProductsStack}
-        options={{ title: "Products" }}
+        options={{ title: "Products" /* tabBarStyle: { display: "none" }*/ }}
       />
       <Tab.Screen
-        name="Profile"
+        name="ProfileStack"
         component={ProfileStack}
-        options={{ title: "Profile" }}
+        options={{ title: "Profile" /* tabBarStyle: { display: "none" }*/ }}
       />
     </Tab.Navigator>
   );

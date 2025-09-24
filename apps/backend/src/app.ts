@@ -103,6 +103,9 @@ const buildApp = async () => {
   fastify.register(require("./routes/ingredient.route").default, {
     prefix: "/api/v1/ingredient",
   });
+  fastify.register(require("./routes/deliveryLocation.route").default, {
+    prefix: "/api/v1/locations",
+  });
 
   await fastify.ready();
 

@@ -45,7 +45,8 @@ export type ProductsStackParamList = {
 export type AccountStackParamList = { AccountMain: undefined };
 
 export type ManagerTabsParamList = {
-  Orders: undefined;
-  Products: undefined;
-  Profile: undefined;
+  ManagerLandingStack: undefined;
+  OrdersStack: undefined;
+  ProductsStack: undefined;
+  ProfileStack: undefined;
 };

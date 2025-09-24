@@ -10,3 +10,4 @@ export * as Product from "./services/product";
 export * as Recipe from "./services/recipe";
 export * as Store from "./services/store";
 export * as Cart from "./services/cart";
+export * as DeliveryLocation from "./services/deliveryLocation";
