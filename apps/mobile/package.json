@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "dev": "expo start --port 3001",
-    "android": "expo start --android --port 3001",
-    "ios": "expo start --ios --port 3001",
-    "web": "expo start --web --port 3001"
+    "dev": "expo start --port 3001 --clear",
+    "android": "expo start --android --port 3001 --clear",
+    "ios": "expo start --ios --port 3001 --clear",
+    "web": "expo start --web --port 3001 --clear"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",

@@ -4,7 +4,7 @@ import UtilityManager from "@/components/UtilityManager";
 export default function MetroGrid() {
   return (
     <View style={styles.screen}>
-      <UtilityManager />
+      <UtilityManager snapToGrid={true} />
     </View>
   );
 }
