@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   Modal,
   ScrollView,
+  Alert,
+  RefreshControl,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import DeliveryLocationManager from "@/components/DeliveryLocationsManager";
@@ -17,13 +19,13 @@ import { useAuth } from "@/context/authContext";
 export default function DeliveryLocationsScreen() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [locations, setLocations] = useState<
     Types.DeliveryLocation.DeliveryLocation[]
   >([]);
 
   const { t } = useTranslation();
 
-  // Fetch user's delivery locations on mount
   useEffect(() => {
     if (!user) return;
     const fetchLocations = async () => {
@@ -45,7 +47,24 @@ export default function DeliveryLocationsScreen() {
     fetchLocations();
   }, [user]);
 
-  // Save a new location
+  const fetchLocations = async () => {
+    setRefreshing(true);
+    try {
+      const response = await Services.DeliveryLocation.getDeliveryLocations(
+        axiosInstance,
+        { order: "asc" }
+      );
+      if (response?.status === 200) {
+        setLocations(response.result || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch locations:", error);
+    } finally {
+      setRefreshing(false);
+      setLoading(false);
+    }
+  };
+
   const handleSaveLocation = async (
     newLocation: Types.DeliveryLocation.DeliveryLocation
   ) => {
@@ -64,15 +83,38 @@ export default function DeliveryLocationsScreen() {
     }
   };
 
+  const handleDeleteLocation = async (id: string) => {
+    try {
+      const response = await Services.DeliveryLocation.deleteDeliveryLocation(
+        axiosInstance,
+        id
+      );
+      if (response && response.status === 200) {
+        // setLocations(response.result || []);
+        fetchLocations();
+      } else {
+        console.warn("Failed to delete location:", response.message);
+      }
+    } catch (error) {
+      console.error("Error deleteing location:", error);
+    }
+  };
+
   if (loading) return <LoadingSpin />;
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      contentContainerStyle={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={fetchLocations} />
+      }
+    >
       <Text style={styles.heading}>{t("locations.manage_locations")}</Text>
 
       <DeliveryLocationManager
         deliveryLocations={locations}
-        onSave={handleSaveLocation}
+        onSave={(loc) => handleSaveLocation(loc)}
+        onDelete={(id) => handleDeleteLocation(id)}
         isDisplayList={true}
       />
     </ScrollView>
