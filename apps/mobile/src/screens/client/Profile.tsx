@@ -11,7 +11,7 @@ import { useAuth } from "../../context/authContext";
 import LoadingSpin from "../../components/LoadingSpin";
 import { useTranslation } from "react-i18next";
 import LanguageSwitch from "@/components/buttons/LanguageSwitch";
-import DeliveryLocationManager from "@/components/DeliveryLocationsManager";
+import DeliveryLocationManager from "@/components/map/DeliveryLocationsManager";
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
 import { ScrollView } from "react-native-gesture-handler";

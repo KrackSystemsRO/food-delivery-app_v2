@@ -10,7 +10,7 @@ import {
   RefreshControl,
 } from "react-native";
 import { useTranslation } from "react-i18next";
-import DeliveryLocationManager from "@/components/DeliveryLocationsManager";
+import DeliveryLocationManager from "@/components/map/DeliveryLocationsManager";
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
 import LoadingSpin from "@/components/LoadingSpin";
