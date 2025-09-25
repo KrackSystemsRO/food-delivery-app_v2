@@ -6,6 +6,7 @@ export interface GetOrderParams {
     user?: string;
     store?: string;
     status?: string;
+    date?: Date;
     page?: number;
     limit?: number;
     sort_by?: string;
