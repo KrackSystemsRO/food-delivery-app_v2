@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Alert } from "react-native";
+import { ScrollView, StyleSheet, Alert, Linking, Platform } from "react-native";
 import { Text, Card, Button } from "react-native-paper";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { CourierOrdersStackParamList } from "@/navigation/types";
@@ -21,18 +21,6 @@ export default function DeliveryDetailPage({
   const handleEndDelivery = async () => {
     try {
       setLoading(true);
-      console.log(order);
-      const payload: Types.Order.OrderForm = {
-        store: order.store,
-        items: order.items.filter(
-          (item): item is NonNullable<typeof item> => !!item
-        ),
-        total: order.total,
-        deliveryLocation: order.deliveryLocation,
-        user: order.user,
-        status: order.status,
-      };
-
       await Services.Order.updateOrder(axiosInstance, order._id, {
         user: order.user,
         store: order.store,
@@ -41,14 +29,47 @@ export default function DeliveryDetailPage({
         deliveryLocation: order.deliveryLocation,
         status: "delivered",
       });
-      // Alert.alert("Success", "Order marked as delivered");
-      // optionally navigate back or refresh
       navigation.goBack();
     } catch (err) {
       console.error(err);
       Alert.alert("Error", "Failed to update order status");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOpenMap = async () => {
+    const { lat, lng, address } = order.deliveryLocation || {};
+    if (lat == null || lng == null) {
+      if (address) {
+        // fallback to address
+        const encoded = encodeURIComponent(address);
+        const googleUrl = `https://www.google.com/maps/dir/?api=1&destination=${encoded}`;
+        const appleUrl = `http://maps.apple.com/?daddr=${encoded}`;
+        await Linking.openURL(Platform.OS === "ios" ? appleUrl : googleUrl);
+      } else {
+        Alert.alert("No location", "This order has no location data.");
+      }
+      return;
+    }
+
+    const coords = `${lat},${lng}`;
+    const wazeUrl = `https://waze.com/ul?ll=${coords}&navigate=yes`;
+    const googleUrl = `https://www.google.com/maps/dir/?api=1&destination=${coords}`;
+    const appleUrl = `http://maps.apple.com/?daddr=${coords}`;
+
+    try {
+      const canOpenWaze = await Linking.canOpenURL(wazeUrl);
+      if (canOpenWaze) {
+        await Linking.openURL(wazeUrl);
+      } else if (Platform.OS === "ios") {
+        await Linking.openURL(appleUrl);
+      } else {
+        await Linking.openURL(googleUrl);
+      }
+    } catch (err) {
+      console.error(err);
+      Alert.alert("Error", "Could not open map application.");
     }
   };
 
@@ -73,6 +94,15 @@ export default function DeliveryDetailPage({
           <Text variant="bodyMedium">Status: {order.status}</Text>
         </Card.Content>
       </Card>
+
+      <Button
+        mode="outlined"
+        style={styles.button}
+        icon="map"
+        onPress={handleOpenMap}
+      >
+        Open in Maps / Waze
+      </Button>
 
       {order.status === ("delivering" as Types.Order.OrderStatus["status"]) && (
         <Button
