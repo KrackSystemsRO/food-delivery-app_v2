@@ -111,11 +111,7 @@ export const placeOrder = async (
   orderData: {
     store: Types.Store.StoreType;
     items: Types.Cart.CartItemType[];
-    deliveryLocation: {
-      lat: number;
-      lng: number;
-      address: string;
-    };
+    deliveryLocation: Types.DeliveryLocation.DeliveryLocation;
   }
 ) => {
   try {

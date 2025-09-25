@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -16,13 +16,31 @@ import {
 } from "react-native-gesture-handler";
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
+import { useAuth } from "@/context/authContext";
+import { Picker } from "@react-native-picker/picker";
 
 export default function CartScreen() {
+  const { user } = useAuth();
   const { state, dispatch, syncUpdateQuantity, refreshCart } = useCart();
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [deliveryLocations, setDeliveryLocations] = useState<
+    Types.DeliveryLocation.DeliveryLocation[]
+  >([]);
+  const [selectedLocationId, setSelectedLocationId] =
+    useState<Types.DeliveryLocation.DeliveryLocation>();
 
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (!user) return;
+    setDeliveryLocations(user.deliveryLocations);
+  }, [user]);
+
+  useEffect(() => {
+    console.log(selectedLocationId);
+  }, [selectedLocationId]);
 
   const subtotal = state.items.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -79,6 +97,11 @@ export default function CartScreen() {
         return;
       }
 
+      if (!selectedLocationId) {
+        showToast("error", "Oops!", "No delivery location was selected.");
+        return;
+      }
+
       const itemsToOrder = state.items.map((item: Types.Cart.CartItemType) => ({
         product: item.product,
         quantity: item.quantity,
@@ -86,20 +109,24 @@ export default function CartScreen() {
         price: item.price,
       }));
 
-      const deliveryLocation = {
-        lat: 40.712776,
-        lng: -74.005974,
-        address: "123 Example St, New York, NY",
-      };
+      const deliveryLocationObject = deliveryLocations.find(
+        (el) => el._id === selectedLocationId
+      );
+
+      if (!deliveryLocationObject) {
+        showToast("error", "Oops!", "Please select a delivery location.");
+        return;
+      }
 
       const orderData = {
         store: state.store,
         items: itemsToOrder,
-        deliveryLocation: deliveryLocation,
+        deliveryLocation: deliveryLocationObject,
       };
 
       await Services.Order.placeOrder(axiosInstance, orderData);
       await Services.Cart.clearCart(axiosInstance);
+      setSelectedLocationId(undefined);
       dispatch({ type: "CLEAR_CART" });
 
       showToast("success", "Yeey!", "Your order has been placed!");
@@ -130,6 +157,32 @@ export default function CartScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
+        <View
+          style={{
+            margin: 16,
+            borderWidth: 1,
+            borderRadius: 6,
+            borderColor: "#ccc",
+          }}
+        >
+          <Picker
+            selectedValue={selectedLocationId}
+            onValueChange={(value) => setSelectedLocationId(value)}
+            style={{ height: 50 }}
+          >
+            <Picker.Item
+              label="Select delivery location..."
+              value={undefined}
+            />
+            {deliveryLocations.map((loc) => (
+              <Picker.Item
+                key={loc._id}
+                label={`${loc.label} — ${loc.address}`}
+                value={loc._id} // just the id
+              />
+            ))}
+          </Picker>
+        </View>
         {state.items.length === 0 ? (
           <Text style={styles.empty}>{t("cart.message.cart_empty")}</Text>
         ) : (
