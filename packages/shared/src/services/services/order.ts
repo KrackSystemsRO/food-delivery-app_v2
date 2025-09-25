@@ -7,6 +7,7 @@ export interface GetOrderParams {
   user?: string;
   store?: string;
   status?: string;
+  date?: Date;
   page?: number;
   limit?: number;
   sort_by?: string;
@@ -36,7 +37,10 @@ export const getOrders = async (
     const response = await axios.get("/order", {
       params: {
         search: params.search,
+        user: params.user,
+        store: params.store,
         status: params.status,
+        date: params.date,
         page: params.page,
         limit: params.limit,
         sort_by: params.sort_by,
@@ -107,11 +111,7 @@ export const placeOrder = async (
   orderData: {
     store: Types.Store.StoreType;
     items: Types.Cart.CartItemType[];
-    deliveryLocation: {
-      lat: number;
-      lng: number;
-      address: string;
-    };
+    deliveryLocation: Types.DeliveryLocation.DeliveryLocation;
   }
 ) => {
   try {

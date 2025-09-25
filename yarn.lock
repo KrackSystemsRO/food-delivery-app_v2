@@ -4905,6 +4905,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-picker/picker@npm:^2.11.2":
+  version: 2.11.2
+  resolution: "@react-native-picker/picker@npm:2.11.2"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/f9a6449797311367d52c5a0ef692fd76784ff151696db3702b21e8e94ddbd209494c0362281a55f197c43d5da67d5337046f95c4e79fdb63a493ff3565cb689e
+  languageName: node
+  linkType: hard
+
 "@react-native/assets-registry@npm:0.81.4":
   version: 0.81.4
   resolution: "@react-native/assets-registry@npm:0.81.4"
@@ -13302,6 +13312,7 @@ __metadata:
     "@babel/core": "npm:^7.26.0"
     "@react-native-async-storage/async-storage": "npm:2.2.0"
     "@react-native-community/cli": "npm:^20.0.1"
+    "@react-native-picker/picker": "npm:^2.11.2"
     "@react-navigation/bottom-tabs": "npm:^7.4.4"
     "@react-navigation/material-top-tabs": "npm:^7.3.7"
     "@react-navigation/native": "npm:^7.1.16"
@@ -13335,6 +13346,7 @@ __metadata:
     react-native-maps: "npm:1.20.1"
     react-native-pager-view: "npm:^6.9.1"
     react-native-paper: "npm:^5.14.5"
+    react-native-paper-dates: "npm:^0.22.50"
     react-native-reanimated: "npm:~4.1.0"
     react-native-safe-area-context: "npm:^5.6.1"
     react-native-screens: "npm:~4.16.0"
@@ -13343,6 +13355,7 @@ __metadata:
     react-native-toast-message: "npm:^2.3.3"
     react-native-vector-icons: "npm:^10.3.0"
     react-native-worklets: "npm:0.5.1"
+    rn-swipe-button: "npm:^3.0.1"
     socket.io-client: "npm:^4.8.1"
     typescript: "npm:~5.9.2"
     zustand: "npm:^5.0.6"
@@ -14816,6 +14829,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-paper-dates@npm:^0.22.50":
+  version: 0.22.50
+  resolution: "react-native-paper-dates@npm:0.22.50"
+  dependencies:
+    color: "npm:^4.2.3"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+    react-native-paper: "*"
+    react-native-safe-area-context: "*"
+  checksum: 10c0/b075f8bc92d115913701766236a99a096794bfdb1ae5d43cbb0ff0cd6bc138ca04231f185ae99c137bcf7fe4bdd78f701ff0bb9927fdb90ec2af943d4747cd4e
+  languageName: node
+  linkType: hard
+
 "react-native-paper@npm:^5.14.5":
   version: 5.14.5
   resolution: "react-native-paper@npm:5.14.5"
@@ -15525,6 +15552,16 @@ __metadata:
   bin:
     rimraf: bin.js
   checksum: 10c0/9cb7757acb489bd83757ba1a274ab545eafd75598a9d817e0c3f8b164238dd90eba50d6b848bd4dcc5f3040912e882dc7ba71653e35af660d77b25c381d402e8
+  languageName: node
+  linkType: hard
+
+"rn-swipe-button@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "rn-swipe-button@npm:3.0.1"
+  peerDependencies:
+    react: ">=18.1.0"
+    react-native: ">=0.70.0"
+  checksum: 10c0/80a11466e1849635ff0457dcf2b1718b9917e2dc625ba1e04437dfbc5ffdac1d174892085e36c04cd46ee24e27dab38fbf7dcbb7ac1045075debb89ca70ad5b5
   languageName: node
   linkType: hard
 

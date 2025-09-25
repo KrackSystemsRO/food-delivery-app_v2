@@ -3,7 +3,10 @@ export const getOrders = async (axios, params) => {
         const response = await axios.get("/order", {
             params: {
                 search: params.search,
+                user: params.user,
+                store: params.store,
                 status: params.status,
+                date: params.date,
                 page: params.page,
                 limit: params.limit,
                 sort_by: params.sort_by,

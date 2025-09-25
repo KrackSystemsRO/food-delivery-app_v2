@@ -6,6 +6,7 @@ export interface GetOrderParams {
     user?: string;
     store?: string;
     status?: string;
+    date?: Date;
     page?: number;
     limit?: number;
     sort_by?: string;
@@ -31,11 +32,7 @@ export declare const deleteOrder: (axios: AxiosInstance, id: string) => Promise<
 export declare const placeOrder: (axios: AxiosInstance, orderData: {
     store: Types.Store.StoreType;
     items: Types.Cart.CartItemType[];
-    deliveryLocation: {
-        lat: number;
-        lng: number;
-        address: string;
-    };
+    deliveryLocation: Types.DeliveryLocation.DeliveryLocation;
 }) => Promise<any>;
 export declare const getUserOrder: (axios: AxiosInstance) => Promise<any>;
 export declare const getOrderById: (axios: AxiosInstance, id: string) => Promise<any>;

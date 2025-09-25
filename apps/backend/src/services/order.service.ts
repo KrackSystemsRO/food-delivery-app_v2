@@ -89,6 +89,7 @@ export async function listOrders(
     user?: string;
     store?: string | { $in: string[] };
     status?: string;
+    date?: Date;
     page?: number;
     limit?: number;
     sort_by?: string;
@@ -102,6 +103,7 @@ export async function listOrders(
     user,
     store,
     status,
+    date,
     page = 1,
     limit = 10,
     sort_by = "createdAt",
@@ -135,6 +137,15 @@ export async function listOrders(
   }
   if (status) {
     filter.status = status;
+  }
+  if (date) {
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+
+    filter.createdAt = { $gte: start, $lte: end };
   }
 
   const [orders, totalCount] = await Promise.all([
