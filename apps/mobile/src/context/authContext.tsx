@@ -88,28 +88,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       // Role-specific events
       if (currentUser.role === "CLIENT") {
         sock.on("orderStatusUpdate", (data) =>
-          console.log("Client order update:", data)
+          console.log("Client order update:")
         );
-        sock.on("orderCreated", (order) =>
-          console.log("Client new order:", order)
-        );
+        sock.on("orderCreated", (order) => console.log("Client new order:"));
       }
 
       if (currentUser.role === "MANAGER") {
-        sock.on("newOrder", (order) =>
-          console.log("Manager new order:", order)
-        );
+        sock.on("newOrder", (order) => console.log("Manager new order:"));
         sock.on("orderUpdated", (order) =>
-          console.log("Manager order update:", order)
+          console.log("Manager order update:")
         );
       }
 
       if (currentUser.role === "COURIER") {
         sock.on("orderCreated", (payload) =>
-          console.log("Courier order created:", payload)
+          console.log("Courier order created:")
         );
         sock.on("orderUpdated", (payload) =>
-          console.log("Courier order updated:", payload)
+          console.log("Courier order updated:")
         );
       }
     },
