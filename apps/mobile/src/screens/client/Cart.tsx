@@ -157,32 +157,34 @@ export default function CartScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <View
-          style={{
-            margin: 16,
-            borderWidth: 1,
-            borderRadius: 6,
-            borderColor: "#ccc",
-          }}
-        >
-          <Picker
-            selectedValue={selectedLocationId}
-            onValueChange={(value) => setSelectedLocationId(value)}
-            style={{ height: 50 }}
+        {state.items.length !== 0 && (
+          <View
+            style={{
+              margin: 16,
+              borderWidth: 1,
+              borderRadius: 6,
+              borderColor: "#ccc",
+            }}
           >
-            <Picker.Item
-              label="Select delivery location..."
-              value={undefined}
-            />
-            {deliveryLocations.map((loc) => (
+            <Picker
+              selectedValue={selectedLocationId}
+              onValueChange={(value) => setSelectedLocationId(value)}
+              style={{ height: 50 }}
+            >
               <Picker.Item
-                key={loc._id}
-                label={`${loc.label} — ${loc.address}`}
-                value={loc._id} // just the id
+                label="Select delivery location..."
+                value={undefined}
               />
-            ))}
-          </Picker>
-        </View>
+              {deliveryLocations.map((loc) => (
+                <Picker.Item
+                  key={loc._id}
+                  label={`${loc.label} — ${loc.address}`}
+                  value={loc._id} // just the id
+                />
+              ))}
+            </Picker>
+          </View>
+        )}
         {state.items.length === 0 ? (
           <Text style={styles.empty}>{t("cart.message.cart_empty")}</Text>
         ) : (
