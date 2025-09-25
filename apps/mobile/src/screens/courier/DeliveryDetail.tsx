@@ -1,10 +1,18 @@
-import { ScrollView, StyleSheet, Alert, Linking, Platform } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Alert,
+  Linking,
+  Platform,
+  View,
+} from "react-native";
 import { Text, Card, Button } from "react-native-paper";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { CourierOrdersStackParamList } from "@/navigation/types";
 import { Services, Types } from "@my-monorepo/shared";
 import axiosInstance from "@/utils/request/authorizedRequest";
 import { useState } from "react";
+import SwipeButton from "rn-swipe-button"; // ✅ slide button
 
 type DeliveryDetailProps = NativeStackScreenProps<
   CourierOrdersStackParamList,
@@ -42,7 +50,6 @@ export default function DeliveryDetailPage({
     const { lat, lng, address } = order.deliveryLocation || {};
     if (lat == null || lng == null) {
       if (address) {
-        // fallback to address
         const encoded = encodeURIComponent(address);
         const googleUrl = `https://www.google.com/maps/dir/?api=1&destination=${encoded}`;
         const appleUrl = `http://maps.apple.com/?daddr=${encoded}`;
@@ -74,53 +81,68 @@ export default function DeliveryDetailPage({
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Card style={styles.card}>
-        <Card.Content>
-          <Text variant="titleMedium">Store: {order.store?.name ?? "-"}</Text>
-          <Text variant="bodyMedium">
-            Customer: {order.user?.first_name ?? "-"}{" "}
-            {order.user?.last_name ?? "-"}
-          </Text>
-          <Text variant="bodyMedium">
-            Address: {order.deliveryLocation?.address ?? "-"}
-          </Text>
-          <Text variant="bodyMedium">
-            Phone: {order.user?.phone_number ?? "-"}
-          </Text>
-          <Text variant="bodyMedium">
-            Price: ${order.total?.toFixed(2) ?? "0.00"}
-          </Text>
-          <Text variant="bodyMedium">Status: {order.status}</Text>
-        </Card.Content>
-      </Card>
+    <View style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Card style={styles.card}>
+          <Card.Content>
+            <Text variant="titleMedium">Store: {order.store?.name ?? "-"}</Text>
+            <Text variant="bodyMedium">
+              Customer: {order.user?.first_name ?? "-"}{" "}
+              {order.user?.last_name ?? "-"}
+            </Text>
+            <Text variant="bodyMedium">
+              Address: {order.deliveryLocation?.address ?? "-"}
+            </Text>
+            <Text variant="bodyMedium">
+              Phone: {order.user?.phone_number ?? "-"}
+            </Text>
+            <Text variant="bodyMedium">
+              Price: ${order.total?.toFixed(2) ?? "0.00"}
+            </Text>
+            <Text variant="bodyMedium">Status: {order.status}</Text>
+          </Card.Content>
+        </Card>
 
-      <Button
-        mode="outlined"
-        style={styles.button}
-        icon="map"
-        onPress={handleOpenMap}
-      >
-        Open in Maps / Waze
-      </Button>
-
-      {order.status === ("delivering" as Types.Order.OrderStatus["status"]) && (
         <Button
-          mode="contained"
+          mode="outlined"
           style={styles.button}
-          loading={loading}
-          disabled={loading}
-          onPress={handleEndDelivery}
+          icon="map"
+          onPress={handleOpenMap}
         >
-          End Delivery
+          Open in Maps / Waze
         </Button>
+      </ScrollView>
+
+      {order.status === "delivering" && (
+        <View style={styles.swipeContainer}>
+          <SwipeButton
+            disabled={loading}
+            swipeSuccessThreshold={70}
+            height={55}
+            title={loading ? "Updating..." : "Slide to End Delivery"}
+            onSwipeSuccess={handleEndDelivery}
+            railBackgroundColor="#e0e0e0"
+            railFillBackgroundColor="#4caf50"
+            thumbIconBackgroundColor="#fff"
+            thumbIconBorderColor="#4caf50"
+            titleColor="#000"
+          />
+        </View>
       )}
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 16 },
+  container: { padding: 16, paddingBottom: 100 }, // leave space for swipe button
   card: { marginBottom: 16 },
   button: { marginTop: 16 },
+  swipeContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
+    backgroundColor: "#fff",
+  },
 });
